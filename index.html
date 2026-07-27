@@ -1,615 +1,459 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="light">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>KOTCHA — ألعاب البث المباشر</title>
-<style>
-  :root{
-    --bg:#07070c; --panel:#0f1020; --panel2:#161832; --line:#23264a;
-    --text:#eef1ff; --muted:#8b90c7;
-    --accent:#7c5cff; --accent2:#22d3ee; --gold:#ffd166; --danger:#ff4d6d; --ok:#22c55e;
-    --shadow:0 20px 60px rgba(0,0,0,.5);
-    --radius:16px;
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:radial-gradient(1200px 800px at 10% -10%,#1a1240 0%,transparent 60%),radial-gradient(1000px 700px at 100% 10%,#062036 0%,transparent 55%),var(--bg);color:var(--text);font-family:"Segoe UI",Tahoma,system-ui,-apple-system,sans-serif;min-height:100vh}
-  a{color:var(--accent2);text-decoration:none}
-  button{font-family:inherit;cursor:pointer}
-  .app{max-width:1400px;margin:0 auto;padding:20px}
-  header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:linear-gradient(90deg,rgba(124,92,255,.15),rgba(34,211,238,.08));border:1px solid var(--line);border-radius:var(--radius);backdrop-filter:blur(10px)}
-  .brand{display:flex;gap:12px;align-items:center;font-weight:800;letter-spacing:.5px}
-  .brand .logo{width:38px;height:38px;border-radius:12px;background:conic-gradient(from 180deg,#7c5cff,#22d3ee,#ffd166,#7c5cff);display:grid;place-items:center;color:#000;font-weight:900}
-  .brand h1{font-size:18px;margin:0}
-  .badge{padding:4px 10px;font-size:12px;border-radius:999px;background:#1a1c3e;color:var(--accent2);border:1px solid var(--line)}
-  .grid{display:grid;grid-template-columns:320px 1fr 320px;gap:18px;margin-top:18px}
-  @media (max-width:1100px){.grid{grid-template-columns:1fr}}
-  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
-  .card h3{margin:0 0 10px;font-size:14px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
-  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  select,input,button{background:#0b0d21;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;outline:none}
-  input:focus,select:focus{border-color:var(--accent)}
-  .btn{background:linear-gradient(135deg,var(--accent),#4b2fd6);border:none;color:#fff;font-weight:700;transition:transform .15s}
-  .btn:hover{transform:translateY(-1px)}
-  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
-  .btn.danger{background:linear-gradient(135deg,var(--danger),#a3123f)}
-  .btn.ok{background:linear-gradient(135deg,var(--ok),#166534)}
-  .btn.gold{background:linear-gradient(135deg,var(--gold),#b47b00);color:#111}
-  .status{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
-  .dot{width:8px;height:8px;border-radius:50%;background:#666;box-shadow:0 0 0 4px rgba(255,255,255,.03)}
-  .dot.on{background:var(--ok);box-shadow:0 0 0 4px rgba(34,197,94,.15)}
-  .dot.off{background:var(--danger)}
-  .games{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px}
-  .gcard{position:relative;background:#0b0d21;border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center;cursor:pointer;transition:.2s;overflow:hidden}
-  .gcard:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 12px 30px rgba(124,92,255,.25)}
-  .gcard.active{border-color:var(--gold);background:linear-gradient(180deg,#2a1f00,#0b0d21)}
-  .gcard .emoji{font-size:26px}
-  .gcard .name{font-weight:700;margin-top:4px}
-  .gcard .desc{color:var(--muted);font-size:11px;margin-top:4px;min-height:28px}
-  .stage{min-height:520px;position:relative;overflow:hidden}
-  .stage .canvas{width:100%;height:520px;background:radial-gradient(600px 400px at 50% 20%,#1a1740,transparent 70%),#05060f;border-radius:14px;border:1px solid var(--line);position:relative;overflow:hidden}
-  .stage h2{margin:0 0 6px}
-  .stage .sub{color:var(--muted);font-size:13px;margin-bottom:12px}
-  .empty{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);text-align:center;padding:20px}
-  .empty .big{font-size:48px;margin-bottom:8px}
-  .timer{position:absolute;top:12px;left:12px;background:rgba(0,0,0,.5);border:1px solid var(--line);padding:6px 12px;border-radius:999px;font-weight:800;color:var(--gold);z-index:5}
-  .chat{max-height:420px;overflow:auto;display:flex;flex-direction:column;gap:6px;padding-right:4px}
-  .chat::-webkit-scrollbar{width:6px}.chat::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
-  .msg{background:#0b0d21;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px;animation:pop .3s}
-  .msg .u{font-weight:700;color:var(--accent2)}
-  .msg .p{font-size:10px;color:var(--muted);margin-inline-start:6px}
-  @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  .lb{display:flex;flex-direction:column;gap:6px}
-  .lb .row2{display:flex;justify-content:space-between;padding:8px 10px;background:#0b0d21;border:1px solid var(--line);border-radius:10px}
-  .lb .row2 .p{color:var(--gold);font-weight:800}
-  .footer-note{margin-top:14px;padding:12px;color:var(--muted);font-size:12px;border:1px dashed var(--line);border-radius:12px;background:rgba(255,255,255,.02)}
-  /* game-specific */
-  .abyss{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;padding:24px;height:100%}
-  .abyss .plank{position:relative;background:linear-gradient(180deg,#3b2a10,#1a1206);border:2px solid #6b4a1c;border-radius:12px;display:grid;place-items:center;color:#ffd08a;font-size:32px;font-weight:900;transition:.4s}
-  .abyss .plank.safe{background:linear-gradient(180deg,#0f5132,#0a3822);border-color:#22c55e;box-shadow:0 0 30px rgba(34,197,94,.5)}
-  .abyss .plank.broken{opacity:.3;transform:translateY(60px) rotate(8deg)}
-  .abyss .plank .count{position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.6);border-radius:999px;padding:2px 8px;font-size:12px;color:#fff}
-  .derby{display:grid;grid-template-rows:1fr auto 1fr;height:100%;padding:20px}
-  .derby .goal{background:linear-gradient(180deg,#0b6e4f,#0a3822);border:2px solid #22c55e;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:60px;font-weight:900}
-  .derby .score{display:flex;justify-content:space-around;font-size:40px;font-weight:900;padding:10px 0}
-  .cups{display:flex;gap:20px;justify-content:center;align-items:flex-end;height:100%;padding:40px}
-  .cup{width:120px;height:150px;background:linear-gradient(180deg,#b8860b,#8b4513);border-radius:60px 60px 20px 20px;position:relative;cursor:pointer;transition:.3s;display:grid;place-items:center;font-size:40px;font-weight:900;color:#fff}
-  .cup .n{position:absolute;top:-32px;background:rgba(0,0,0,.6);border-radius:999px;padding:4px 10px;font-size:14px}
-  .cup.reveal.ball::after{content:"⚽";position:absolute;bottom:-40px;font-size:40px}
-  .cups-status{position:absolute;top:60px;left:50%;transform:translateX(-50%);text-align:center;color:var(--muted)}
-  .match{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:20px;height:100%}
-  .mtile{background:#1a1740;border:2px solid var(--line);border-radius:12px;display:grid;place-items:center;font-size:36px;cursor:pointer;transition:.3s;transform-style:preserve-3d}
-  .mtile.flip{background:#0b6e4f;border-color:#22c55e}
-  .mtile.done{opacity:.3}
-  .vote-bars{padding:30px;height:100%;display:flex;flex-direction:column;justify-content:center;gap:20px}
-  .vbar{background:#0b0d21;border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative;height:60px}
-  .vbar .fill{position:absolute;inset:0;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0;transition:width .5s}
-  .vbar .lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-weight:800;font-size:20px;z-index:2}
-  .rockets{position:relative;height:100%;overflow:hidden;background:linear-gradient(180deg,#0a0e2a,#000)}
-  .castle{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-size:100px}
-  .castle-hp{position:absolute;top:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);padding:8px 20px;border-radius:999px;font-weight:800;color:var(--gold)}
-  .rocket{position:absolute;font-size:30px;transition:all 1.5s linear}
-  .teams{position:absolute;bottom:150px;width:100%;display:flex;justify-content:space-around;font-size:24px;font-weight:900}
-  .codebreaker{padding:30px;text-align:center;height:100%;display:flex;flex-direction:column;justify-content:center;gap:20px}
-  .code-display{font-size:80px;font-weight:900;letter-spacing:20px;color:var(--gold);text-shadow:0 0 30px rgba(255,209,102,.5)}
-  .code-guesses{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;max-height:200px;overflow:auto}
-  .code-guess{background:#0b0d21;border:1px solid var(--line);border-radius:8px;padding:8px;font-size:14px}
-  .toast{position:fixed;top:20px;right:20px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:12px 20px;border-radius:12px;font-weight:800;z-index:100;animation:toastin .4s}
-  @keyframes toastin{from{transform:translateX(120%);opacity:0}to{transform:none;opacity:1}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚡ KOTCHA - منصة البث والتفاعل المباشر</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              500: '#ff6b00',
+              600: '#ea580c',
+              700: '#c2410c',
+            }
+          },
+          fontFamily: {
+            sans: ['Tajawal', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Tajawal', sans-serif; transition: background-color 0.3s, color 0.3s; }
+    .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); }
+    .dark .glass { background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(12px); }
+  </style>
 </head>
-<body>
-<div class="app">
-  <header>
-    <div class="brand">
-      <div class="logo">K</div>
-      <div>
-        <h1>KOTCHA — ألعاب البث المباشر</h1>
-        <div style="font-size:11px;color:var(--muted)">ربط مباشر • تفاعل فوري للشات • أداء محسن</div>
-      </div>
+<body class="bg-gray-50 text-gray-900 dark:bg-zinc-950 dark:text-gray-100 min-h-screen flex flex-col">
+
+  <!-- NAVIGATION BAR -->
+  <header class="sticky top-0 z-50 glass border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-brand-500/30">⚡</div>
+      <span class="text-2xl font-extrabold tracking-wider bg-gradient-to-r from-brand-500 to-amber-500 bg-clip-text text-transparent">KOTCHA</span>
     </div>
-    <div class="row">
-      <span class="badge">v8.0.0</span>
-      <span class="status"><span id="wsDot" class="dot off"></span><span id="wsStatus">غير متصل</span></span>
+
+    <nav class="hidden md:flex items-center gap-6 font-bold text-sm">
+      <button onclick="showPage('home')" class="hover:text-brand-500 transition">الرئيسية</button>
+      <button onclick="showPage('game')" class="hover:text-brand-500 transition">منطقة اللعب</button>
+      <button onclick="showPage('subscribe')" class="hover:text-brand-500 transition">الاشتراكات والتفعيل</button>
+      <button onclick="showPage('admin')" class="text-xs bg-red-500/10 text-red-500 px-3 py-1.5 rounded-lg border border-red-500/20 hover:bg-red-500 hover:text-white transition">لوحة الأدمن</button>
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <button onclick="toggleTheme()" class="p-2 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 hover:scale-105 transition">
+        🌙 / ☀️
+      </button>
+      <button onclick="showPage('auth')" id="authBtn" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-5 py-2 rounded-xl shadow-md transition">تسجيل الدخول</button>
     </div>
   </header>
 
-  <div class="grid">
-    <!-- LEFT: connection + games -->
-    <div class="card">
-      <h3>الاتصال بالبث</h3>
-      <div class="row" style="margin-bottom:8px">
-        <select id="platform">
-          <option value="twitch">Twitch</option>
-          <option value="tiktok">TikTok</option>
-          <option value="kick">Kick</option>
-          <option value="kotcha">KOTCHA (تجريبي)</option>
-        </select>
-        <input id="channel" placeholder="اسم القناة" style="flex:1;min-width:120px" />
-      </div>
-      <div class="row" style="margin-bottom:8px">
-        <input id="apiBase" placeholder="https://your-worker.workers.dev" style="flex:1" value="" />
-      </div>
-      <div class="row">
-        <button class="btn ok" id="connectBtn">اتصال</button>
-        <button class="btn danger" id="disconnectBtn">قطع</button>
-        <button class="btn ghost" id="resetScoresBtn">تصفير النقاط</button>
-      </div>
+  <!-- SCREEN 1: LANDING / HOME PAGE -->
+  <section id="page-home" class="page-view flex-1 flex flex-col items-center justify-center text-center px-4 py-16">
+    <div class="inline-flex items-center gap-2 bg-brand-50 dark:bg-brand-500/10 text-brand-600 border border-brand-500/20 px-4 py-2 rounded-full text-sm font-bold mb-6">
+      <span class="w-2 h-2 rounded-full bg-brand-500 animate-ping"></span>
+      الجيل الجديد من منصات الألعاب التفاعلية مع بث المباشر
+    </div>
+    <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight">
+      دَع المتابعين يلعبون معكَ <br> <span class="bg-gradient-to-r from-brand-500 to-amber-500 bg-clip-text text-transparent">مُباشرةً عبر TikTok!</span>
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400 max-w-2xl text-lg mb-8 font-medium">
+      ربط حقيقي وسريع بدون تأخير. يكتب متابعوك في الدردشة، فتتغير نتائج اللعبة في الشاشة تلقائياً وبأصوات ومؤثرات تفاعلية.
+    </p>
+    <div class="flex flex-wrap gap-4 justify-center">
+      <button onclick="showPage('game')" class="bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-lg px-8 py-4 rounded-2xl shadow-xl shadow-brand-500/25 transform hover:-translate-y-1 transition">
+        🚀 ابدأ اللعب الآن
+      </button>
+      <button onclick="showPage('subscribe')" class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 font-extrabold text-lg px-8 py-4 rounded-2xl hover:bg-gray-50 transition">
+        💳 التفعيل والأسعار
+      </button>
+    </div>
+  </section>
 
-      <h3 style="margin-top:16px">الألعاب المتاحة</h3>
-      <div class="games" id="gamesGrid"></div>
-
-      <div class="footer-note">
-        <b>Twitch:</b> يعمل مباشرة عبر IRC من المتصفح (بدون خادم).<br/>
-        <b>TikTok/Kick:</b> يستقبل الرسائل عبر endpoint <code>POST /api/ingest</code> — شغّل relay خارجي يبث إليه.
+  <!-- SCREEN 2: GAME ARENA (MATCHES ASCII SPECIFICATION) -->
+  <section id="page-game" class="page-view hidden flex-1 p-4 md:p-8">
+    <!-- TIKTOK LIVE CONNECT CONTROL -->
+    <div class="max-w-6xl mx-auto mb-4 bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-gray-200 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span class="text-xl">📱</span>
+        <div>
+          <h4 class="font-bold text-sm">ربط بث TikTok MASHUP</h4>
+          <p class="text-xs text-gray-500">أدخل اسم مستخدم الحساب الذي يبث الآن لتمرير شات المتابعين فورا</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <input type="text" id="tiktokUser" placeholder="@username" class="px-4 py-2 rounded-xl bg-gray-100 dark:bg-zinc-800 text-sm font-bold border border-transparent focus:border-brand-500 outline-none">
+        <button onclick="connectTikTok()" class="bg-black text-white dark:bg-white dark:text-black font-bold px-4 py-2 rounded-xl text-sm hover:opacity-80 transition">ربط البث</button>
       </div>
     </div>
 
-    <!-- CENTER: stage -->
-    <div class="card stage">
-      <h2 id="stageTitle">اختر لعبة للبدء</h2>
-      <div class="sub" id="stageSub">اللعبة تعمل مباشرة مع رسائل الشات — الأوامر تظهر داخل كل لعبة</div>
-      <div class="canvas" id="canvas">
-        <div class="empty">
+    <!-- ASCII GAME LAYOUT CONTAINER -->
+    <div class="max-w-6xl mx-auto bg-white dark:bg-zinc-900 rounded-3xl border-2 border-brand-500/20 shadow-2xl overflow-hidden flex flex-col">
+      
+      <!-- TOP STATUS BAR -->
+      <div class="bg-gray-100 dark:bg-zinc-800/80 px-6 py-4 border-b border-gray-200 dark:border-zinc-700 flex items-center justify-between font-bold text-sm">
+        <div class="flex items-center gap-3">
+          <span class="text-brand-500 font-black text-lg">⚡ KOTCHA</span>
+          <span class="bg-red-500 text-white text-xs px-2.5 py-1 rounded-full animate-pulse flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-white"></span> LIVE
+          </span>
+        </div>
+        <div class="text-gray-500 font-mono text-xs md:text-sm">
+          👥 <span id="viewerCount" class="text-brand-500 font-extrabold">1,248</span> مشاهد
+        </div>
+      </div>
+
+      <!-- MAIN ARENA SPLIT -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 min-h-[480px]">
+        
+        <!-- GAME AREA (LEFT / MAIN 2 COLS) -->
+        <div class="lg:col-span-2 p-8 border-b lg:border-b-0 lg:border-l border-gray-200 dark:border-zinc-800 flex flex-col justify-between">
           <div>
-            <div class="big">🎮</div>
-            <div>لا توجد لعبة نشطة</div>
-            <div style="font-size:12px;margin-top:6px">اضغط لعبة من اليسار لبدء التشغيل</div>
+            <div class="text-center my-6">
+              <span class="text-5xl">🗳️</span>
+              <h2 id="questionTitle" class="text-3xl font-black mt-4">من سيفوز في الجولة؟</h2>
+              <p class="text-xs text-gray-400 mt-1">اكتب رقم الخيار (1 أو 2 أو 3) في شات البث للتصويت الفوري</p>
+            </div>
+
+            <!-- VOTE BARS -->
+            <div class="space-y-4 max-w-md mx-auto my-8">
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs font-bold"><span>خيار [ 1 ]</span><span id="v1-val">0 صوت</span></div>
+                <div class="w-full h-4 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                  <div id="bar-1" class="h-full bg-brand-500 transition-all duration-300" style="width: 0%"></div>
+                </div>
+              </div>
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs font-bold"><span>خيار [ 2 ]</span><span id="v2-val">0 صوت</span></div>
+                <div class="w-full h-4 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                  <div id="bar-2" class="h-full bg-amber-500 transition-all duration-300" style="width: 0%"></div>
+                </div>
+              </div>
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs font-bold"><span>خيار [ 3 ]</span><span id="v3-val">0 صوت</span></div>
+                <div class="w-full h-4 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                  <div id="bar-3" class="h-full bg-orange-400 transition-all duration-300" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONTROLS -->
+          <div class="flex gap-3 justify-center pt-4">
+            <button onclick="castVote(1)" class="flex-1 max-w-[120px] bg-brand-500 hover:bg-brand-600 text-white font-black py-3 rounded-xl shadow-lg transition"> [ 1 ] </button>
+            <button onclick="castVote(2)" class="flex-1 max-w-[120px] bg-amber-500 hover:bg-amber-600 text-white font-black py-3 rounded-xl shadow-lg transition"> [ 2 ] </button>
+            <button onclick="castVote(3)" class="flex-1 max-w-[120px] bg-orange-400 hover:bg-orange-500 text-white font-black py-3 rounded-xl shadow-lg transition"> [ 3 ] </button>
+          </div>
+        </div>
+
+        <!-- LIVE CHAT FEED (RIGHT COL) -->
+        <div class="p-4 bg-gray-50/50 dark:bg-zinc-950/50 flex flex-col justify-between">
+          <div>
+            <h3 class="font-extrabold text-xs text-gray-400 tracking-wider mb-4 border-b pb-2 dark:border-zinc-800">LIVE CHAT</h3>
+            <div id="chatBox" class="space-y-3 h-80 overflow-y-auto pr-1 text-sm">
+              <div class="bg-white dark:bg-zinc-900 p-2.5 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm">
+                <span class="font-bold text-brand-500">Ahmed:</span> 🔥🔥
+              </div>
+              <div class="bg-white dark:bg-zinc-900 p-2.5 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm">
+                <span class="font-bold text-brand-500">Sara:</span> let's go!!
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-4 flex gap-2">
+            <input type="text" id="chatInput" placeholder="اكتب تعليقاً..." class="flex-1 px-3 py-2 rounded-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium outline-none">
+            <button onclick="sendChatMessage()" class="bg-brand-500 text-white font-bold px-4 py-2 rounded-xl text-xs">إرسال</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- BOTTOM LEADERBOARD & POINTS BAR -->
+      <div class="bg-gray-100 dark:bg-zinc-800/80 px-6 py-4 border-t border-gray-200 dark:border-zinc-700 flex flex-wrap items-center justify-between gap-4 font-bold text-sm">
+        <div class="flex items-center gap-2">
+          <span>🏆 المتصدرون:</span>
+          <div id="topLeaderboard" class="flex items-center gap-2 text-xs">
+            <span class="bg-brand-500/10 text-brand-600 px-2.5 py-1 rounded-lg">لا يوجد متصدرين بعد</span>
+          </div>
+        </div>
+        <div class="text-brand-500 font-extrabold">
+          ⚡ نقاطك: <span id="myPoints">120</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SCREEN 3: SUBSCRIPTION & CODE ACTIVATION -->
+  <section id="page-subscribe" class="page-view hidden flex-1 p-6 max-w-4xl mx-auto w-full flex flex-col justify-center">
+    <div class="text-center mb-10">
+      <h2 class="text-4xl font-black mb-2">تفعيل الاشتراكات وباقات البث</h2>
+      <p class="text-gray-500">احصل على كود التفعيل الخاص بك وأدخله هنا لتفعيل مزايا VIP والبث المباشر</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- REDEEM CODE FORM -->
+      <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-gray-200 dark:border-zinc-800 shadow-xl flex flex-col justify-between">
+        <div>
+          <h3 class="text-xl font-bold mb-4 flex items-center gap-2">🔑 أدخل كود التفعيل</h3>
+          <p class="text-xs text-gray-500 mb-6">إذا كنت قد قمت بشراء الكود من الموزعين المعتمدين أدخله بالأسفل</p>
+          <input type="text" id="activationCodeInput" placeholder="مثال: KOTCHA-X9A21B" class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 font-mono font-bold text-center tracking-widest uppercase mb-4 outline-none focus:border-brand-500">
+        </div>
+        <button onclick="redeemCode()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-extrabold py-3.5 rounded-xl shadow-lg transition">تفعيل الاشتراك الحساب</button>
+      </div>
+
+      <!-- PRICING INFO -->
+      <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl border-2 border-brand-500/30 shadow-xl flex flex-col justify-between">
+        <div>
+          <span class="bg-brand-500 text-white text-xs font-black px-3 py-1 rounded-full">الأكثر شعبية</span>
+          <h3 class="text-2xl font-black mt-3">اشتراك صناع المحتوى VIP</h3>
+          <div class="my-4 text-4xl font-black">49 <span class="text-sm font-medium text-gray-500">ر.س / شهرياً</span></div>
+          <ul class="space-y-2 text-xs font-bold text-gray-600 dark:text-gray-300">
+            <li>✓ ربط مباشر وغير محدود مع بث TikTok Live</li>
+            <li>✓ استخدام محرك الألعاب الكامل والأصوات</li>
+            <li>✓ دعم فني مباشر واستضافة خاصة بالروم</li>
+          </ul>
+        </div>
+        <button onclick="alert('يرجى التواصل مع الدعم لشراء كود التفعيل الحقيقي')" class="w-full bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 font-extrabold py-3.5 rounded-xl mt-6 transition">شراء كود جديد</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREEN 4: ISOLATED ADMIN DASHBOARD -->
+  <section id="page-admin" class="page-view hidden flex-1 p-6 max-w-6xl mx-auto w-full">
+    <div class="bg-red-500/10 border border-red-500/30 p-6 rounded-3xl mb-8 flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-black text-red-500">لوحة تحكم مطور المنصة (Admin Panel)</h2>
+        <p class="text-xs text-red-400 font-medium">منطقة محمية لإدارة السيرفر وتوليد أكواد التفعيل وتتبع حالة البث</p>
+      </div>
+      <span class="bg-red-500 text-white font-mono text-xs px-3 py-1 rounded-lg">ADMIN ACCESS</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- CODE GENERATOR -->
+      <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-200 dark:border-zinc-800">
+        <h3 class="font-bold mb-4">إنشاء كود تفعيل جديد</h3>
+        <label class="block text-xs font-bold text-gray-500 mb-1">مدة الاشتراك (بالأيام)</label>
+        <input type="number" id="adminCodeDays" value="30" class="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-zinc-800 text-sm font-bold mb-4 border border-gray-200 dark:border-zinc-700">
+        <button onclick="generateAdminCode()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl text-sm">توليد الكود</button>
+        <div id="generatedCodeResult" class="mt-4 p-3 bg-gray-100 dark:bg-zinc-800 rounded-xl font-mono text-xs font-bold text-center text-brand-500 hidden"></div>
+      </div>
+
+      <!-- SYSTEM METRICS -->
+      <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-200 dark:border-zinc-800 col-span-2">
+        <h3 class="font-bold mb-4">حالة خوادم Durable Objects</h3>
+        <div class="grid grid-cols-2 gap-4 text-center">
+          <div class="p-4 bg-gray-50 dark:bg-zinc-800 rounded-xl">
+            <div class="text-xs text-gray-500 font-bold">الغرف النشطة</div>
+            <div class="text-2xl font-black text-brand-500 mt-1">1 MAIN ROOM</div>
+          </div>
+          <div class="p-4 bg-gray-50 dark:bg-zinc-800 rounded-xl">
+            <div class="text-xs text-gray-500 font-bold">إجمالي الاتصالات</div>
+            <div class="text-2xl font-black text-amber-500 mt-1" id="adminTotalConns">1</div>
           </div>
         </div>
       </div>
-      <div class="row" style="margin-top:10px">
-        <button class="btn danger" id="endGameBtn">إنهاء اللعبة</button>
-        <button class="btn gold" id="simulateBtn">حقن رسائل تجريبية</button>
-        <input id="manualUser" placeholder="اسم المستخدم" style="width:120px" value="host"/>
-        <input id="manualMsg" placeholder="اكتب رسالة يدوية…" style="flex:1;min-width:150px"/>
-        <button class="btn" id="sendManualBtn">إرسال</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 5: AUTHENTICATION (LOGIN/REGISTER) -->
+  <section id="page-auth" class="page-view hidden flex-1 p-6 max-w-md mx-auto w-full flex flex-col justify-center">
+    <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-gray-200 dark:border-zinc-800 shadow-xl">
+      <h2 class="text-2xl font-black text-center mb-6">تسجيل الدخول / إنشاء حساب</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">اسم المستخدم</label>
+          <input type="text" id="authUsername" placeholder="مثال: abdulaziz" class="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-sm font-bold">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">كلمة المرور</label>
+          <input type="password" placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-sm font-bold">
+        </div>
+        <button onclick="handleAuthSubmit()" class="w-full bg-brand-500 text-white font-extrabold py-3 rounded-xl">دخول</button>
       </div>
     </div>
+  </section>
 
-    <!-- RIGHT: chat + leaderboard -->
-    <div class="card">
-      <h3>الشات المباشر</h3>
-      <div class="chat" id="chat"></div>
-      <h3 style="margin-top:14px">لوحة النقاط</h3>
-      <div class="lb" id="leaderboard"></div>
-    </div>
-  </div>
-</div>
+  <script>
+    // WEB AUDIO SOUND ENGINE (REAL SYNTHESIZED SOUND EFFECTS)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
 
-<script>
-// ============================================================
-// KOTCHA CLIENT
-// ============================================================
-const GAMES = [
-  {id:"ABYSS", name:"الهاوية", emoji:"🕳️", desc:"اختر لوح النجاة قبل السقوط", cmd:"1..6"},
-  {id:"DERBY", name:"ديربي", emoji:"⚽", desc:"سباق أهداف بين فريقين", cmd:"A / B"},
-  {id:"MATCH", name:"تطابق", emoji:"🃏", desc:"ذاكرة بصرية وإيجاد المتطابقات", cmd:"3 7"},
-  {id:"CUPS", name:"أكواب", emoji:"🥤", desc:"تتبع الكوب الذي يخبئ الكرة", cmd:"1..3"},
-  {id:"TOP10", name:"توب تن", emoji:"🔟", desc:"خمّن أفضل 10 إجابات", cmd:"كلمة"},
-  {id:"AMBUSH", name:"الكمين", emoji:"🎯", desc:"فك شيفرة الإحداثيات", cmd:"B3"},
-  {id:"CHAIRS", name:"الكراسي الموسيقية", emoji:"🪑", desc:"اجلس قبل نفاد الكراسي", cmd:"sit"},
-  {id:"ROULETTE_HIDDEN", name:"الروليت المخفي", emoji:"🎡", desc:"روليت الإقصاء بأعلام الدول", cmd:"join"},
-  {id:"NARRATE", name:"سرد", emoji:"📖", desc:"ابحث عن الكلمات المترابطة", cmd:"كلمة"},
-  {id:"ROULETTE_OUT", name:"الروليت والإقصاء", emoji:"🎰", desc:"عجلة إقصاء اللاعبين", cmd:"join"},
-  {id:"RUSSIAN_ROULETTE", name:"الروليت الروسي", emoji:"🔫", desc:"موت أو نجاة", cmd:"join"},
-  {id:"GEO_LINK", name:"شبك", emoji:"🌍", desc:"اربط الدول والحدود", cmd:"دولة"},
-  {id:"BOMB", name:"القنبلة الموقوتة", emoji:"💣", desc:"فريق الشباب ضد البنات", cmd:"boy/girl"},
-  {id:"LETTER_GRID", name:"شبكة الحروف", emoji:"🔤", desc:"مسار الشباب ضد البنات", cmd:"حرف"},
-  {id:"CODEBREAKER", name:"كاسر الشفرة", emoji:"🔐", desc:"خمّن الرقم السري", cmd:"رقم"},
-  {id:"SCRIBBLE", name:"خربشة", emoji:"✏️", desc:"ارسم والجمهور يخمّن", cmd:"كلمة"},
-  {id:"SNIPER", name:"القناص", emoji:"🎯", desc:"اختبئ من القناص", cmd:"1..9"},
-  {id:"SALAD", name:"سلطة", emoji:"🥗", desc:"مجموعة ألعاب سريعة", cmd:"تلقائي"},
-  {id:"ELIMINATE", name:"شطب", emoji:"❌", desc:"أسئلة والنجاة من الشطب", cmd:"إجابة"},
-  {id:"MIND", name:"ذهنيات", emoji:"🧠", desc:"ذكاء وحساب ذهني", cmd:"رقم"},
-  {id:"ROCKETS", name:"حرب الصواريخ", emoji:"🚀", desc:"إطلاق الصواريخ وحماية القلعة", cmd:"A / B"},
-];
+      if (type === 'vote') {
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+      } else if (type === 'chat') {
+        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.08);
+      }
+    }
 
-const state = {
-  ws:null, apiBase:"", platform:"twitch", channel:"",
-  game:null, twitchWs:null, scores:new Map(),
-};
+    // STATE & ROUTING
+    const WORKER_URL = "https://kotcha.ig999x.workers.dev";
+    let ws = null;
+    let votes = [0, 0, 0];
+    let points = 120;
 
-const $ = id => document.getElementById(id);
-const canvas = $("canvas");
+    function showPage(pageId) {
+      document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`page-${pageId}`).classList.remove('hidden');
+    }
 
-// -------- UI init --------
-function renderGames(){
-  const g = $("gamesGrid"); g.innerHTML = "";
-  for(const G of GAMES){
-    const el = document.createElement("div");
-    el.className = "gcard"; el.dataset.id = G.id;
-    el.innerHTML = `<div class="emoji">${G.emoji}</div><div class="name">${G.name}</div><div class="desc">${G.desc}</div><div class="badge" style="margin-top:6px">${G.cmd}</div>`;
-    el.onclick = () => startGame(G.id);
-    g.appendChild(el);
-  }
-}
-renderGames();
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+    }
 
-function toast(msg){
-  const t = document.createElement("div");
-  t.className = "toast"; t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(), 2500);
-}
+    // REAL WEBSOCKET CONNECTION
+    function initWebSocket() {
+      const wsUrl = WORKER_URL.replace("https://", "wss://") + "/room/main-room";
+      ws = new WebSocket(wsUrl);
 
-function setWS(on, label){
-  $("wsDot").className = "dot " + (on?"on":"off");
-  $("wsStatus").textContent = label || (on?"متصل":"غير متصل");
-}
-
-// -------- Server WS --------
-function connectServer(){
-  const apiBase = $("apiBase").value.trim();
-  const platform = $("platform").value;
-  const channel = $("channel").value.trim() || "default";
-  state.apiBase = apiBase; state.platform = platform; state.channel = channel;
-
-  if(!apiBase){ toast("أدخل رابط الـ Worker"); return; }
-  disconnectServer();
-  const wsUrl = apiBase.replace(/^http/,"ws") + `/ws?platform=${platform}&channel=${encodeURIComponent(channel)}&role=host`;
-  try{
-    const ws = new WebSocket(wsUrl);
-    state.ws = ws;
-    ws.onopen = () => { setWS(true,"متصل بالخادم"); toast("تم الاتصال بـ KOTCHA"); if(platform==="twitch") connectTwitch(channel); };
-    ws.onclose = () => { setWS(false); state.ws=null; };
-    ws.onerror = () => { setWS(false,"خطأ في الاتصال"); };
-    ws.onmessage = ev => handleServerMsg(JSON.parse(ev.data));
-  }catch(e){ toast("فشل الاتصال: "+e.message); }
-}
-function disconnectServer(){
-  if(state.ws){ try{state.ws.close()}catch{} state.ws=null; }
-  if(state.twitchWs){ try{state.twitchWs.close()}catch{} state.twitchWs=null; }
-  setWS(false);
-}
-function sendServer(obj){
-  if(state.ws && state.ws.readyState===1) state.ws.send(JSON.stringify(obj));
-}
-
-function handleServerMsg(m){
-  switch(m.type){
-    case "hello":
-      if(m.snapshot?.chatSample) m.snapshot.chatSample.forEach(addChat);
-      if(m.snapshot?.topScores) renderLeaderboard(m.snapshot.topScores);
-      break;
-    case "chat": addChat(m.chat); break;
-    case "score":
-      state.scores.set(m.user, m.points);
-      renderLeaderboard([...state.scores.entries()].sort((a,b)=>b[1]-a[1]).slice(0,20).map(([user,points])=>({user,points})));
-      break;
-    case "scores": renderLeaderboard(m.topScores||[]); state.scores.clear(); break;
-    case "gameStart": state.game = m.game; renderGame(); break;
-    case "gameEnd": state.game = null; renderEmpty(); break;
-    case "gameUpdate":
-      if(state.game){ state.game.state = m.state; renderGame(); }
-      break;
-    case "tick":
-      const tEl = document.querySelector(".timer");
-      if(tEl) tEl.textContent = `⏱ ${m.remaining}s`;
-      break;
-    case "codeCracked": toast(`🎉 ${m.user} كسر الشفرة!`); break;
-    case "scribbleWin": toast(`🎨 ${m.user} خمّن الكلمة!`); break;
-    case "timeUp": toast("⏱ انتهى الوقت"); break;
-  }
-}
-
-// -------- Twitch IRC (direct browser) --------
-function connectTwitch(channel){
-  try{
-    const ws = new WebSocket("wss://irc-ws.chat.twitch.tv:443");
-    state.twitchWs = ws;
-    ws.onopen = () => {
-      ws.send("CAP REQ :twitch.tv/tags");
-      ws.send("NICK justinfan" + Math.floor(Math.random()*100000));
-      ws.send("JOIN #"+channel.toLowerCase());
-      toast("Twitch IRC متصل بقناة "+channel);
-    };
-    ws.onmessage = ev => {
-      const lines = ev.data.split("\r\n");
-      for(const line of lines){
-        if(line.startsWith("PING")) { ws.send("PONG :tmi.twitch.tv"); continue; }
-        const m = line.match(/PRIVMSG #\S+ :(.+)$/);
-        if(m){
-          const user = (line.match(/display-name=([^;]*)/)||[])[1] || (line.match(/:(\w+)!/)||[])[1] || "anon";
-          const message = m[1];
-          const chat = { platform:"twitch", user, message, t:Date.now() };
-          addChat(chat);
-          sendServer({ type:"chat", user, message });
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        
+        if (data.type === 'INIT' || data.type === 'VOTE_UPDATE') {
+          if (data.votes) updateVoteBars(data.votes);
+          if (data.viewers) document.getElementById('viewerCount').innerText = data.viewers.toLocaleString();
+          if (data.leaderboard) renderLeaderboard(data.leaderboard);
         }
+
+        if (data.type === 'TIKTOK_CHAT') {
+          appendChatMessage(data.chat.username, data.chat.message);
+          if (data.votes) updateVoteBars(data.votes);
+          playSound('chat');
+        }
+      };
+    }
+
+    function updateVoteBars(newVotes) {
+      votes = newVotes;
+      const total = votes.reduce((a, b) => a + b, 0) || 1;
+      
+      for (let i = 1; i <= 3; i++) {
+        const count = votes[i-1] || 0;
+        const pct = Math.round((count / total) * 100);
+        document.getElementById(`bar-${i}`).style.width = pct + '%';
+        document.getElementById(`v${i}-val`).innerText = `${count} صوت (${pct}%)`;
       }
+    }
+
+    function renderLeaderboard(board) {
+      const el = document.getElementById('topLeaderboard');
+      if (!board || board.length === 0) return;
+      
+      el.innerHTML = board.map((item, idx) => `
+        <span class="bg-brand-500/10 text-brand-600 px-2.5 py-1 rounded-lg">
+          #${idx + 1} ${item.username} (${item.points} نقطة)
+        </span>
+      `).join('');
+    }
+
+    async function castVote(val) {
+      playSound('vote');
+      points += 10;
+      document.getElementById('myPoints').innerText = points;
+
+      fetch(`${WORKER_URL}/room/main-room/vote/cast`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ value: val, user: { username: "أنت" } })
+      });
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      appendChatMessage("أنت", msg);
+      playSound('chat');
+
+      fetch(`${WORKER_URL}/room/main-room/chat/send`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg, user: { username: "أنت" } })
+      });
+      input.value = "";
+    }
+
+    function appendChatMessage(user, msg) {
+      const box = document.getElementById('chatBox');
+      const div = document.createElement('div');
+      div.className = "bg-white dark:bg-zinc-900 p-2.5 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm text-xs";
+      div.innerHTML = `<span class="font-bold text-brand-500">${user}:</span> ${msg}`;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function connectTikTok() {
+      const username = document.getElementById('tiktokUser').value.trim();
+      if (!username) return alert('أدخل اسم الحساب');
+      alert(`جاري ربط البث المباشر للحساب ${username}...`);
+    }
+
+    async function redeemCode() {
+      const code = document.getElementById('activationCodeInput').value.trim();
+      const res = await fetch(`${WORKER_URL}/api/subscription/activate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code })
+      });
+      const data = await res.json();
+      alert(data.message || data.error);
+    }
+
+    async function generateAdminCode() {
+      const days = document.getElementById('adminCodeDays').value;
+      const res = await fetch(`${WORKER_URL}/api/admin/generate-code`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "X-Admin-Token": "KOTCHA_ADMIN_SECRET_999"
+        },
+        body: JSON.stringify({ days })
+      });
+      const data = await res.json();
+      if (data.success) {
+        const box = document.getElementById('generatedCodeResult');
+        box.innerText = `الكود المُنشأ: ${data.code}`;
+        box.classList.remove('hidden');
+      }
+    }
+
+    function handleAuthSubmit() {
+      const user = document.getElementById('authUsername').value;
+      if (user) {
+        document.getElementById('authBtn').innerText = user;
+        showPage('home');
+      }
+    }
+
+    // INIT
+    window.onload = () => {
+      initWebSocket();
     };
-    ws.onclose = () => { state.twitchWs = null; };
-  }catch(e){ toast("فشل Twitch: "+e.message); }
-}
-
-// -------- Chat + leaderboard --------
-function addChat(c){
-  const el = document.createElement("div");
-  el.className = "msg";
-  el.innerHTML = `<span class="u">${escapeHtml(c.user)}</span> <span class="p">${(c.platform||"").toUpperCase()}</span><br/>${escapeHtml(c.message)}`;
-  const ch = $("chat");
-  ch.appendChild(el);
-  while(ch.children.length>80) ch.removeChild(ch.firstChild);
-  ch.scrollTop = ch.scrollHeight;
-}
-function renderLeaderboard(list){
-  const el = $("leaderboard"); el.innerHTML = "";
-  if(!list.length){ el.innerHTML = `<div style="color:var(--muted);font-size:12px;text-align:center;padding:12px">لا نقاط بعد</div>`; return; }
-  list.forEach((r,i)=>{
-    const row = document.createElement("div");
-    row.className = "row2";
-    row.innerHTML = `<span>${i+1}. ${escapeHtml(r.user)}</span><span class="p">${r.points}</span>`;
-    el.appendChild(row);
-  });
-}
-function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
-
-// -------- Game start/end --------
-function startGame(id){
-  const cfg = buildConfig(id);
-  document.querySelectorAll(".gcard").forEach(e=>e.classList.toggle("active", e.dataset.id===id));
-  if(state.ws){
-    sendServer({ type:"startGame", game:id, config:cfg });
-  }else{
-    // offline preview mode
-    state.game = { type:id, id:"local", startedAt:Date.now(), config:cfg, state: initLocalState(id,cfg) };
-    renderGame();
-  }
-}
-function endGame(){
-  document.querySelectorAll(".gcard").forEach(e=>e.classList.remove("active"));
-  if(state.ws) sendServer({type:"endGame"});
-  state.game=null; renderEmpty();
-}
-function buildConfig(id){
-  switch(id){
-    case "ABYSS": return { count:6, safe: 1 + Math.floor(Math.random()*6), duration:30 };
-    case "CUPS": return { ball: 1+Math.floor(Math.random()*3), duration:20 };
-    case "AMBUSH": {
-      const cols=["A","B","C","D","E"], rows=5;
-      return { cols, rows, target: cols[Math.floor(Math.random()*cols.length)] + (1+Math.floor(Math.random()*rows)), duration:40 };
-    }
-    case "CODEBREAKER": return { code: 1000+Math.floor(Math.random()*9000), duration:60 };
-    case "SCRIBBLE": {
-      const words = ["قطة","سيارة","شمس","قمر","نجمة","بيت","شجرة","سمكة"];
-      return { word: words[Math.floor(Math.random()*words.length)], duration:60 };
-    }
-    case "VOTE": return { options:["A","B"], duration:30 };
-    case "MATCH": return { pairs:8, duration:60 };
-    case "ROCKETS": return { duration:60 };
-    default: return { duration:30 };
-  }
-}
-function initLocalState(id,cfg){
-  // mirror of server initGameState for offline preview
-  switch(id){
-    case "ABYSS": return {picks:{}, safe:cfg.safe, remaining:cfg.duration};
-    case "DERBY": return {teamA:0,teamB:0,remaining:cfg.duration};
-    case "CUPS": return {picks:{}, ball:cfg.ball, remaining:cfg.duration};
-    case "AMBUSH": return {picks:{}, target:cfg.target, remaining:cfg.duration};
-    case "CODEBREAKER": return {guesses:{}, code:cfg.code, remaining:cfg.duration};
-    case "SCRIBBLE": return {guesses:{}, word:cfg.word, remaining:cfg.duration};
-    case "VOTE": return {tally:{}, options:cfg.options, remaining:cfg.duration};
-    case "ROCKETS": return {teamA:0,teamB:0,castle:100,remaining:cfg.duration};
-    case "BOMB": return {boys:0,girls:0,remaining:cfg.duration};
-    case "CHAIRS": return {sitters:[], chairs:5, remaining:cfg.duration};
-    case "MATCH": return {attempts:{}, solved:false, remaining:cfg.duration};
-    default: return {remaining:cfg.duration};
-  }
-}
-
-// -------- Renderers --------
-function renderEmpty(){
-  $("stageTitle").textContent = "اختر لعبة للبدء";
-  $("stageSub").textContent = "اللعبة تعمل مباشرة مع رسائل الشات";
-  canvas.innerHTML = `<div class="empty"><div><div class="big">🎮</div><div>لا توجد لعبة نشطة</div></div></div>`;
-}
-function renderGame(){
-  const g = state.game; if(!g){ renderEmpty(); return; }
-  const meta = GAMES.find(x=>x.id===g.type) || {name:g.type,emoji:"🎮"};
-  $("stageTitle").textContent = `${meta.emoji} ${meta.name}`;
-  $("stageSub").textContent = `اكتب في الشات: ${meta.cmd}  •  الوقت المتبقي:`;
-  canvas.innerHTML = `<div class="timer">⏱ ${g.state.remaining||0}s</div>` + renderers[g.type]?.(g) || renderers.DEFAULT(g);
-}
-const renderers = {
-  ABYSS(g){
-    const s=g.state, n=g.config.count||6;
-    let html='<div class="abyss">';
-    for(let i=1;i<=n;i++){
-      const votes = Object.values(s.picks).filter(v=>v===i).length;
-      const cls = (s.remaining===0 && i===s.safe)?"plank safe":(s.remaining===0?"plank broken":"plank");
-      html += `<div class="${cls}">${i}<div class="count">${votes}</div></div>`;
-    }
-    return html+'</div>';
-  },
-  DERBY(g){
-    const s=g.state;
-    return `<div class="derby">
-      <div class="goal">🥅</div>
-      <div class="score"><span style="color:#22d3ee">A: ${s.teamA||0}</span><span style="color:#ff4d6d">B: ${s.teamB||0}</span></div>
-      <div class="goal">⚽</div>
-    </div>`;
-  },
-  CUPS(g){
-    const s=g.state; let html='<div class="cups">';
-    for(let i=1;i<=3;i++){
-      const votes = Object.values(s.picks).filter(v=>v===i).length;
-      const reveal = s.remaining===0 ? "reveal" : "";
-      const ball = (s.remaining===0 && i===s.ball) ? "ball" : "";
-      html += `<div class="cup ${reveal} ${ball}"><span class="n">${votes} صوت</span>${i}</div>`;
-    }
-    return html + `<div class="cups-status">اختر الكوب: 1 أو 2 أو 3</div></div>`;
-  },
-  MATCH(g){
-    const n = (g.config.pairs||8)*2;
-    let html='<div class="match">';
-    for(let i=0;i<n;i++) html += `<div class="mtile">?</div>`;
-    return html + '</div>';
-  },
-  AMBUSH(g){
-    const s=g.state, cols=g.config.cols||["A","B","C","D","E"], rows=g.config.rows||5;
-    let html='<div style="padding:20px;display:grid;grid-template-columns:repeat('+cols.length+',1fr);gap:6px;height:100%">';
-    for(let r=1;r<=rows;r++){
-      for(const c of cols){
-        const coord = c+r;
-        const votes = Object.values(s.picks).filter(v=>v===coord).length;
-        const isTarget = s.remaining===0 && coord===s.target;
-        html += `<div style="background:${isTarget?'#22c55e':'#0b0d21'};border:1px solid var(--line);border-radius:8px;display:grid;place-items:center;font-weight:800;color:${isTarget?'#000':'#fff'}">${coord}<br/><small>${votes}</small></div>`;
-      }
-    }
-    return html+'</div>';
-  },
-  CODEBREAKER(g){
-    const s=g.state;
-    const shown = s.remaining===0 ? String(s.code) : "????";
-    let list='';
-    for(const [u,val] of Object.entries(s.guesses||{})) list += `<div class="code-guess">${escapeHtml(u)}: <b>${val}</b></div>`;
-    return `<div class="codebreaker">
-      <div>الرقم السري:</div>
-      <div class="code-display">${shown}</div>
-      <div class="code-guesses">${list||'<div style="color:var(--muted)">لا تخمينات بعد</div>'}</div>
-    </div>`;
-  },
-  SCRIBBLE(g){
-    const s=g.state;
-    return `<div style="padding:30px;text-align:center">
-      <div style="color:var(--muted);margin-bottom:10px">الكلمة: ${s.remaining===0? '<b style="color:var(--gold)">'+escapeHtml(s.word)+'</b>':'مخفية'}</div>
-      <canvas id="drawpad" width="600" height="360" style="background:#fff;border-radius:12px;cursor:crosshair"></canvas>
-      <div style="margin-top:10px;color:var(--muted);font-size:12px">ارسم بالمؤشر — الشات يخمّن</div>
-    </div>`;
-  },
-  VOTE(g){
-    const s=g.state, total = Object.values(s.tally||{}).reduce((a,b)=>a+b,0)||1;
-    let html='<div class="vote-bars">';
-    for(const opt of s.options){
-      const v = s.tally?.[opt]||0, pct = Math.round(v/total*100);
-      html += `<div class="vbar"><div class="fill" style="width:${pct}%"></div><div class="lbl"><span>${escapeHtml(opt)}</span><span>${v} (${pct}%)</span></div></div>`;
-    }
-    return html+'</div>';
-  },
-  ROCKETS(g){
-    const s=g.state;
-    let rockets='';
-    for(let i=0;i<Math.min(s.teamA||0,15);i++){
-      rockets += `<div class="rocket" style="left:${10+i*5}%;bottom:${20+i*4}%;transform:rotate(45deg)">🚀</div>`;
-    }
-    return `<div class="rockets">
-      ${rockets}
-      <div class="castle-hp">🏰 القلعة: ${s.castle}%</div>
-      <div class="teams"><span style="color:#22d3ee">هجوم A: ${s.teamA||0}</span><span style="color:#ff4d6d">دفاع B: ${s.teamB||0}</span></div>
-      <div class="castle">🏰</div>
-    </div>`;
-  },
-  BOMB(g){
-    const s=g.state, total=(s.boys||0)+(s.girls||0)||1;
-    return `<div style="padding:40px;height:100%;display:flex;align-items:center;justify-content:space-around">
-      <div style="text-align:center"><div style="font-size:80px">👦</div><div style="font-size:40px;color:#22d3ee">${s.boys||0}</div><div>شباب</div></div>
-      <div style="font-size:100px">💣</div>
-      <div style="text-align:center"><div style="font-size:80px">👧</div><div style="font-size:40px;color:#ff4d6d">${s.girls||0}</div><div>بنات</div></div>
-    </div>`;
-  },
-  CHAIRS(g){
-    const s=g.state; let html='<div style="padding:30px;text-align:center"><div style="font-size:20px;margin-bottom:20px">الكراسي المتبقية: '+s.chairs+'</div>';
-    html+='<div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap">';
-    for(let i=0;i<s.chairs;i++){
-      const sitter=s.sitters[i];
-      html+=`<div style="width:120px;height:140px;background:${sitter?'#0b6e4f':'#1a1740'};border:2px solid var(--line);border-radius:12px;display:grid;place-items:center;font-size:50px">${sitter?'😊':'🪑'}<div style="font-size:12px;color:#fff">${sitter?escapeHtml(sitter):''}</div></div>`;
-    }
-    return html+'</div></div>';
-  },
-  DEFAULT(g){
-    return `<div class="empty"><div><div class="big">${(GAMES.find(x=>x.id===g.type)||{}).emoji||'🎮'}</div><div style="font-size:20px;font-weight:800">${(GAMES.find(x=>x.id===g.type)||{}).name||g.type}</div><div style="margin-top:8px">اللعبة نشطة — تفاعل الشات مرئي في اللوحة اليمنى</div><pre style="text-align:left;background:#0b0d21;padding:12px;border-radius:8px;margin-top:16px;max-width:400px;overflow:auto;font-size:11px">${escapeHtml(JSON.stringify(g.state,null,2))}</pre></div></div>`;
-  }
-};
-
-// register other games under DEFAULT
-["TOP10","GEO_LINK","NARRATE","LETTER_GRID","SNIPER","SALAD","ELIMINATE","MIND","ROULETTE_HIDDEN","ROULETTE_OUT","RUSSIAN_ROULETTE"].forEach(t=>{ renderers[t] = renderers.DEFAULT; });
-
-// -------- Buttons --------
-$("connectBtn").onclick = connectServer;
-$("disconnectBtn").onclick = disconnectServer;
-$("endGameBtn").onclick = endGame;
-$("resetScoresBtn").onclick = () => sendServer({type:"resetScores"});
-$("sendManualBtn").onclick = () => {
-  const user = $("manualUser").value || "host";
-  const message = $("manualMsg").value;
-  if(!message) return;
-  if(state.ws) sendServer({type:"chat", user, message});
-  else { addChat({platform:"local",user,message,t:Date.now()}); applyLocal({user,message}); }
-  $("manualMsg").value="";
-};
-$("simulateBtn").onclick = () => {
-  const users = ["ahmed","sara","ali","mona","khaled","noor","yasir","layla"];
-  for(let i=0;i<12;i++){
-    setTimeout(()=>{
-      const u = users[Math.floor(Math.random()*users.length)];
-      const msg = generateFakeCmd();
-      if(state.ws) sendServer({type:"chat", user:u, message:msg});
-      else { addChat({platform:"sim",user:u,message:msg,t:Date.now()}); applyLocal({user:u,message:msg}); }
-    }, i*300);
-  }
-};
-function generateFakeCmd(){
-  const g = state.game;
-  if(!g) return "hi";
-  switch(g.type){
-    case "ABYSS": return String(1+Math.floor(Math.random()*6));
-    case "DERBY": case "ROCKETS": return Math.random()<0.5?"A":"B";
-    case "CUPS": return String(1+Math.floor(Math.random()*3));
-    case "AMBUSH": return "ABCDE"[Math.floor(Math.random()*5)] + (1+Math.floor(Math.random()*5));
-    case "CODEBREAKER": return String(1000+Math.floor(Math.random()*9000));
-    case "BOMB": return Math.random()<0.5?"boy":"girl";
-    case "CHAIRS": return "sit";
-    case "VOTE": return Math.random()<0.5?"A":"B";
-    default: return ["join","1","2","hi","yes"][Math.floor(Math.random()*5)];
-  }
-}
-// offline local chat->game (for preview without server)
-function applyLocal({user,message}){
-  const g = state.game; if(!g) return;
-  const raw = message.trim(), lower = raw.toLowerCase(), num = parseInt(raw,10);
-  const s = g.state;
-  switch(g.type){
-    case "ABYSS": if(num>=1&&num<=6){ s.picks[user]=num; } break;
-    case "DERBY": if(lower==="a")s.teamA++; else if(lower==="b")s.teamB++; break;
-    case "CUPS": if(num>=1&&num<=3){ s.picks[user]=num; } break;
-    case "AMBUSH": { const m=raw.match(/^([A-E])\s*([1-5])$/i); if(m) s.picks[user]=m[1].toUpperCase()+m[2]; break; }
-    case "CODEBREAKER": if(!isNaN(num)) s.guesses[user]=num; break;
-    case "SCRIBBLE": if(lower===String(s.word).toLowerCase()){ toast(user+" فاز!"); } else s.guesses[user]=raw; break;
-    case "VOTE": { const opt=s.options.find(o=>o.toLowerCase()===lower); if(opt){ s.tally[opt]=(s.tally[opt]||0)+1; } break; }
-    case "ROCKETS": if(lower==="a"){ s.teamA++; s.castle=Math.max(0,s.castle-1); } else if(lower==="b"){ s.teamB++; s.castle=Math.min(100,s.castle+1); } break;
-    case "BOMB": if(lower==="boy") s.boys++; else if(lower==="girl") s.girls++; break;
-    case "CHAIRS": if(lower==="sit"&&!s.sitters.includes(user)&&s.sitters.length<s.chairs){ s.sitters.push(user); } break;
-  }
-  renderGame();
-  // local scoring bump
-  const pts = (state.scores.get(user)||0)+1;
-  state.scores.set(user, pts);
-  renderLeaderboard([...state.scores.entries()].sort((a,b)=>b[1]-a[1]).slice(0,20).map(([u,p])=>({user:u,points:p})));
-}
-
-// local timer tick for offline preview
-setInterval(()=>{
-  if(!state.ws && state.game && typeof state.game.state.remaining==="number" && state.game.state.remaining>0){
-    state.game.state.remaining--;
-    const t=document.querySelector(".timer"); if(t) t.textContent = `⏱ ${state.game.state.remaining}s`;
-    if(state.game.state.remaining===0){ renderGame(); toast("انتهى الوقت"); }
-  }
-},1000);
-
-// scribble drawing pad enhancement (when SCRIBBLE renders)
-const mo = new MutationObserver(()=>{
-  const cvs = document.getElementById("drawpad");
-  if(cvs && !cvs.dataset.ready){
-    cvs.dataset.ready="1";
-    const ctx = cvs.getContext("2d"); ctx.strokeStyle="#111"; ctx.lineWidth=3; ctx.lineCap="round";
-    let drawing=false;
-    cvs.addEventListener("mousedown",e=>{drawing=true; ctx.beginPath(); ctx.moveTo(e.offsetX,e.offsetY);});
-    cvs.addEventListener("mousemove",e=>{ if(drawing){ ctx.lineTo(e.offsetX,e.offsetY); ctx.stroke(); }});
-    window.addEventListener("mouseup",()=>drawing=false);
-  }
-});
-mo.observe(canvas,{childList:true,subtree:true});
-</script>
+  </script>
 </body>
 </html>
