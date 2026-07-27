@@ -1,325 +1,1531 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KOTCHA Stream Games</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KOTCHA - منصة ألعاب البث المباشر التفاعلية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
-        /* =========================================
-           CSS: KOTCHA PROFESSIONAL THEME
-           ========================================= */
+        /* ============================================================
+           KOTCHA - STYLES v10.0.0
+           ============================================================ */
         :root {
-            --bg-color: #050510;
-            --glass-bg: rgba(20, 20, 40, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --primary: #00f0ff;
-            --secondary: #ff0055;
-            --text-main: #ffffff;
+            --brand-primary: #FF6B35;
+            --brand-secondary: #F7931E;
+            --brand-gradient: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            --brand-glow: rgba(255,107,53,0.3);
+            --bg-primary: #0A0A1A;
+            --bg-secondary: #12122A;
+            --bg-card: rgba(18,18,42,0.95);
+            --bg-glass: rgba(255,255,255,0.05);
+            --bg-hover: rgba(255,255,255,0.08);
+            --text-primary: #FFFFFF;
+            --text-secondary: #B0B0C8;
+            --text-muted: #6B6B8A;
+            --border-color: rgba(255,255,255,0.08);
+            --border-glow: rgba(255,107,53,0.3);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+            --shadow-md: 0 8px 32px rgba(0,0,0,0.3);
+            --shadow-lg: 0 16px 64px rgba(0,0,0,0.4);
+            --shadow-glow: 0 0 40px rgba(255,107,53,0.15);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --radius-full: 9999px;
+            --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            --transition-bounce: all 0.5s cubic-bezier(0.68,-0.55,0.265,1.55);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        
+        [data-theme="light"] {
+            --bg-primary: #F0F2F5;
+            --bg-secondary: #FFFFFF;
+            --bg-card: rgba(255,255,255,0.95);
+            --bg-glass: rgba(0,0,0,0.03);
+            --bg-hover: rgba(0,0,0,0.05);
+            --text-primary: #1A1A2E;
+            --text-secondary: #4A4A6A;
+            --text-muted: #8A8AAA;
+            --border-color: rgba(0,0,0,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body {
-            background-color: var(--bg-color);
-            background-image: radial-gradient(circle at 50% 0%, #1a1a3a 0%, #050510 70%);
-            color: var(--text-main);
-            height: 100vh;
-            overflow: hidden;
-            display: grid;
-            grid-template-columns: 350px 1fr;
+            font-family: 'Cairo', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: var(--transition);
+            min-height: 100vh;
         }
+        ::selection { background: var(--brand-primary); color: white; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--brand-gradient); border-radius: 4px; }
 
-        /* Glassmorphism Panel */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-        }
-
-        /* Sidebar: Live Chat & Logs */
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            padding: 20px;
-            border-left: 1px solid var(--glass-border);
-        }
-
-        .header-title {
-            font-size: 24px;
-            font-weight: 900;
-            text-align: center;
-            background: -webkit-linear-gradient(45deg, var(--primary), var(--secondary));
+        .gradient-text {
+            background: var(--brand-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            background-clip: text;
         }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; width: 100%; }
 
-        .chat-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .chat-msg {
-            background: rgba(0,0,0,0.4);
-            padding: 10px 15px;
-            border-radius: 12px;
-            border-right: 3px solid var(--primary);
-            animation: slideIn 0.3s ease-out forwards;
-        }
-
-        .chat-user { font-weight: bold; color: var(--primary); font-size: 14px; }
-        .chat-text { font-size: 16px; margin-top: 4px; font-weight: bold; }
-
-        /* Main Stage: Game Display */
-        .main-stage {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+        /* ============================================================
+           BUTTONS
+           ============================================================ */
+        .btn {
+            display: inline-flex;
             align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .btn:hover::after { opacity: 1; }
+        .btn-primary {
+            background: var(--brand-gradient);
+            color: white;
+            box-shadow: 0 4px 20px rgba(255,107,53,0.3);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(255,107,53,0.4); }
+        .btn-secondary {
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        .btn-secondary:hover { background: var(--bg-hover); border-color: var(--brand-primary); }
+        .btn-outline {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--brand-primary);
+        }
+        .btn-outline:hover { background: var(--brand-primary); color: white; }
+        .btn-glass {
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        .btn-glass:hover { background: var(--bg-hover); transform: translateY(-2px); }
+        .btn-success { background: #2ED573; color: white; }
+        .btn-danger { background: #FF4757; color: white; }
+        .btn-gold { background: linear-gradient(135deg, #F9CA24, #F0932B); color: white; }
+        .btn-lg { padding: 0.8rem 2.2rem; font-size: 1rem; }
+        .btn-sm { padding: 0.3rem 0.8rem; font-size: 0.8rem; }
+        .btn-block { width: 100%; justify-content: center; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+        /* ============================================================
+           NAVBAR
+           ============================================================ */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10,10,26,0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 0;
+            transition: var(--transition);
+        }
+        [data-theme="light"] .navbar { background: rgba(255,255,255,0.92); }
+        .navbar.scrolled { box-shadow: var(--shadow-md); }
+        .navbar .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--brand-gradient);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: white;
+            box-shadow: 0 4px 20px rgba(255,107,53,0.3);
+            animation: pulseIcon 2s ease-in-out infinite;
+        }
+        @keyframes pulseIcon {
+            0%,100% { box-shadow: 0 4px 20px rgba(255,107,53,0.3); }
+            50% { box-shadow: 0 4px 40px rgba(255,107,53,0.6); }
+        }
+        .brand-name { font-size: 1.2rem; font-weight: 800; color: var(--text-primary); }
+        .brand-status {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: rgba(46,213,115,0.15);
+            padding: 0.15rem 0.6rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6rem;
+            color: #2ED573;
+            font-weight: 700;
+        }
+        .brand-status .dot { width: 6px; height: 6px; background: #2ED573; border-radius: 50%; animation: blink 1s ease-in-out infinite; }
+        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 600;
+            font-size: 0.85rem;
+            position: relative;
+            padding: 0.2rem 0;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--brand-primary); }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--brand-gradient);
+            transition: var(--transition);
+        }
+        .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+        .theme-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        .theme-toggle:hover { background: var(--brand-primary); color: white; border-color: var(--brand-primary); }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
             position: relative;
         }
-
-        .game-area {
-            width: 90%;
-            height: 80%;
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--brand-primary);
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            text-align: center;
-            transition: all 0.5s ease;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: white;
+            background: var(--brand-gradient);
+        }
+        .user-name { font-weight: 600; font-size: 0.85rem; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.5rem;
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: var(--transition);
+            box-shadow: var(--shadow-lg);
+        }
+        .user-menu:hover .user-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+        .user-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            font-size: 0.85rem;
+        }
+        .user-dropdown a:hover { background: var(--bg-hover); color: var(--brand-primary); }
+        .user-dropdown hr { border: none; border-top: 1px solid var(--border-color); margin: 0.3rem 0; }
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            cursor: pointer;
         }
 
-        /* Game Specific UI: Rocket War */
-        .rocket-war-ui { width: 100%; display: flex; flex-direction: column; gap: 30px; }
-        .team-bar-container { width: 100%; display: flex; align-items: center; gap: 15px; }
-        .team-label { font-size: 24px; font-weight: bold; width: 150px; text-align: left; }
-        .progress-track { flex-grow: 1; height: 40px; background: rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden; position: relative; }
-        .progress-fill { height: 100%; transition: width 0.3s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 15px; font-weight: bold;}
-        .fill-a { background: linear-gradient(90deg, #0055ff, var(--primary)); width: 0%; }
-        .fill-b { background: linear-gradient(90deg, #aa00ff, var(--secondary)); width: 0%; }
+        /* ============================================================
+           HERO
+           ============================================================ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 80px 0 0;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(255,107,53,0.08), transparent 60%),
+                        radial-gradient(circle at 80% 50%, rgba(247,147,30,0.05), transparent 60%);
+            z-index: 0;
+        }
+        .hero .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-content { position: relative; }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-color);
+            padding: 0.3rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            color: var(--brand-primary);
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+        }
+        .hero-title .highlight {
+            position: relative;
+            display: inline-block;
+        }
+        .hero-title .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: var(--brand-gradient);
+            opacity: 0.3;
+            border-radius: 4px;
+        }
+        .hero-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+        .hero-stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease-out 0.3s both;
+        }
+        .stat-item { display: flex; flex-direction: column; }
+        .stat-number { font-size: 1.8rem; font-weight: 800; color: var(--brand-primary); }
+        .stat-label { font-size: 0.8rem; color: var(--text-secondary); }
+        .hero-actions {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.6s ease-out 0.4s both;
+        }
 
-        /* Game Specific UI: Russian Roulette */
-        .roulette-ui { text-align: center; }
-        .gun-icon { font-size: 100px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
-        .bang-alert { font-size: 50px; color: var(--secondary); font-weight: 900; text-shadow: 0 0 20px var(--secondary); animation: shake 0.5s; display: none; }
-        
-        /* Game Specific UI: Code Breaker */
-        .code-ui { display: flex; flex-direction: column; align-items: center; }
-        .lock-icon { font-size: 80px; color: #ffd700; margin-bottom: 10px; }
-        .code-history { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
-        .guess-tag { background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; font-size: 18px; }
+        .hero-visual {
+            position: relative;
+            height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hero-orb {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,107,53,0.15), transparent 70%);
+            border-radius: 50%;
+            animation: orbFloat 8s ease-in-out infinite;
+        }
+        .hero-orb.orb-2 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(247,147,30,0.1), transparent 70%);
+            animation-delay: -4s;
+        }
+        @keyframes orbFloat { 0%,100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Admin Controls (Mockup for testing locally) */
-        .admin-controls { position: absolute; bottom: 20px; left: 20px; display: flex; gap: 10px; }
-        button { background: var(--glass-bg); border: 1px solid var(--primary); color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-weight: bold; }
-        button:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); }
+        /* ============================================================
+           PLATFORM SELECTOR
+           ============================================================ */
+        .platform-selector {
+            background: var(--bg-secondary);
+            padding: 2rem 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .platform-selector .container { text-align: center; }
+        .platform-selector h3 { margin-bottom: 0.5rem; }
+        .platform-selector p { color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem; }
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .platform-btn {
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--border-color);
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .platform-btn:hover { border-color: var(--brand-primary); transform: translateY(-2px); }
+        .platform-btn.active {
+            border-color: var(--brand-primary);
+            background: rgba(255,107,53,0.1);
+            box-shadow: 0 0 30px rgba(255,107,53,0.1);
+        }
+        .platform-btn .icon { font-size: 2.5rem; }
+        .platform-btn .badge {
+            font-size: 0.6rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: var(--radius-full);
+            background: var(--brand-primary);
+            color: white;
+        }
+        .platform-status {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            border-radius: var(--radius-md);
+            background: var(--bg-glass);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+        }
+        .platform-status .connected { color: #2ED573; }
+        .platform-status .disconnected { color: #FF4757; }
 
-        /* Animations */
-        @keyframes slideIn { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        /* ============================================================
+           GAMES GRID
+           ============================================================ */
+        .games-section { padding: 3rem 0; }
+        .games-section .section-header { text-align: center; margin-bottom: 2rem; }
+        .games-section .section-tag {
+            display: inline-block;
+            background: var(--bg-glass);
+            padding: 0.2rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            color: var(--brand-primary);
+            margin-bottom: 0.5rem;
+        }
+        .games-section .section-header h2 { font-size: 2rem; margin-bottom: 0.3rem; }
+        .games-section .section-header p { color: var(--text-secondary); font-size: 0.95rem; }
 
-        /* System Messages */
-        .system-msg { position: absolute; top: 20px; font-size: 24px; color: #00ff00; font-weight: bold; opacity: 0; transition: opacity 0.3s; }
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+        .game-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 1.2rem;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            text-align: center;
+        }
+        .game-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-glow);
+            box-shadow: var(--shadow-glow);
+        }
+        .game-card .icon { font-size: 2.5rem; display: block; margin-bottom: 0.3rem; }
+        .game-card h4 { font-size: 0.95rem; margin-bottom: 0.2rem; }
+        .game-card p { color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 0.5rem; }
+        .game-card .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+        .game-card .tag {
+            padding: 0.1rem 0.5rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6rem;
+            font-weight: 600;
+            background: var(--bg-glass);
+            color: var(--brand-primary);
+        }
+        .game-card .tag.new { background: rgba(46,213,115,0.2); color: #2ED573; }
+        .game-card .tag.premium { background: rgba(255,215,0,0.2); color: #F9CA24; }
+        .game-card .lock {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        .game-card .play-btn {
+            margin-top: 0.5rem;
+            width: 100%;
+            justify-content: center;
+        }
+        .game-card.locked { opacity: 0.7; }
+        .game-card.locked:hover { transform: none; }
+
+        /* ============================================================
+           SUBSCRIPTION
+           ============================================================ */
+        .subscription-section {
+            padding: 3rem 0;
+            background: var(--bg-secondary);
+        }
+        .subscription-section .section-header { text-align: center; margin-bottom: 2rem; }
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        .plan-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+        }
+        .plan-card:hover { transform: translateY(-4px); }
+        .plan-card.featured {
+            border-color: var(--brand-primary);
+            transform: scale(1.05);
+            box-shadow: 0 8px 40px rgba(255,107,53,0.15);
+        }
+        .plan-card.featured:hover { transform: scale(1.05) translateY(-4px); }
+        .plan-badge {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--brand-gradient);
+            color: white;
+            padding: 0.2rem 1.2rem;
+            border-radius: var(--radius-full);
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .plan-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--brand-primary);
+            margin: 0.5rem 0;
+        }
+        .plan-price span { font-size: 0.9rem; font-weight: 400; color: var(--text-secondary); }
+        .plan-features {
+            list-style: none;
+            text-align: left;
+            margin: 1rem 0;
+        }
+        .plan-features li {
+            padding: 0.3rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+        .plan-features li .fa-check { color: #2ED573; }
+        .plan-features li .fa-times { color: #FF4757; }
+
+        /* ============================================================
+           MODALS
+           ============================================================ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            animation: modalIn 0.3s ease-out;
+        }
+        .modal-wide { max-width: 700px; }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .modal-header h3 { font-size: 1.3rem; }
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.2rem;
+        }
+        .modal-close:hover { color: var(--brand-primary); transform: rotate(90deg); }
+
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--brand-primary);
+        }
+        .form-group input::placeholder { color: var(--text-muted); }
+        .form-error { color: #FF4757; font-size: 0.8rem; margin-top: 0.3rem; display: none; }
+        .form-error.show { display: block; }
+        .form-success { color: #2ED573; font-size: 0.8rem; margin-top: 0.3rem; display: none; }
+        .form-success.show { display: block; }
+
+        /* ============================================================
+           TOAST
+           ============================================================ */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-width: 400px;
+        }
+        .toast {
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slideInRight 0.3s ease-out;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        }
+        .toast-success { border-right: 4px solid #2ED573; }
+        .toast-error { border-right: 4px solid #FF4757; }
+        .toast-info { border-right: 4px solid #3498DB; }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ============================================================
+           LOADING
+           ============================================================ */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .loading-overlay.active { display: flex; }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--brand-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-content { text-align: center; }
+        .loading-content p { margin-top: 0.8rem; color: var(--text-secondary); }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        .footer {
+            padding: 3rem 0 1.5rem;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        .footer-brand p {
+            color: var(--text-secondary);
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+            max-width: 300px;
+        }
+        .social-links {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .social-links a {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        .social-links a:hover { background: var(--brand-primary); color: white; border-color: var(--brand-primary); }
+        .footer-links h4 { font-size: 0.95rem; margin-bottom: 0.8rem; }
+        .footer-links a {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.2rem 0;
+            transition: var(--transition);
+            font-size: 0.85rem;
+        }
+        .footer-links a:hover { color: var(--brand-primary); }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 1024px) {
+            .hero .container { grid-template-columns: 1fr; text-align: center; }
+            .hero-description { margin: 0 auto 1.5rem; }
+            .hero-stats { justify-content: center; }
+            .hero-actions { justify-content: center; }
+            .hero-visual { display: none; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--bg-card);
+                padding: 1rem 2rem;
+                border-bottom: 1px solid var(--border-color);
+                gap: 0.5rem;
+            }
+            .nav-links.open { display: flex; }
+            .mobile-menu-btn { display: block; }
+            .hero-title { font-size: 2.5rem; }
+            .platform-grid { grid-template-columns: 1fr; max-width: 300px; }
+            .games-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .plans-grid { grid-template-columns: 1fr; }
+            .plan-card.featured { transform: none; }
+            .plan-card.featured:hover { transform: none; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .modal { padding: 1.5rem; margin: 1rem; }
+        }
+        @media (max-width: 480px) {
+            .container { padding: 0 1rem; }
+            .hero-title { font-size: 2rem; }
+            .hero-stats { flex-direction: column; gap: 0.5rem; align-items: center; }
+            .games-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+            .btn { padding: 0.4rem 1rem; font-size: 0.8rem; }
+            .btn-lg { padding: 0.6rem 1.5rem; font-size: 0.9rem; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar: Chat -->
-    <div class="sidebar glass-panel">
-        <div class="header-title">KOTCHA LIVE</div>
-        <div class="chat-container" id="chat-container">
-            <!-- Chat messages will appear here -->
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>جاري التحميل...</p>
         </div>
     </div>
 
-    <!-- Main Stage -->
-    <div class="main-stage">
-        <div id="system-msg" class="system-msg"></div>
-        
-        <div class="game-area glass-panel" id="game-area">
-            <h1 style="color: rgba(255,255,255,0.3); font-size: 3rem;">اختر اللعبة للبدء</h1>
-        </div>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
 
-        <!-- أزرار تحكم للتجربة (يتم اخفائها في البث) -->
-        <div class="admin-controls">
-            <button onclick="startGame('ROCKET_WAR')">🚀 حرب الصواريخ</button>
-            <button onclick="startGame('RUSSIAN_ROULETTE')">🔫 الروليت الروسي</button>
-            <button onclick="startGame('CODE_BREAKER')">🔐 كاسر الشفرة</button>
-            <button onclick="stopGame()" style="border-color: var(--secondary);">🛑 إيقاف</button>
+    <!-- ============================================================
+    NAVBAR
+    ============================================================ -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-brand" onclick="navigateTo('home')">
+                <div class="brand-icon">K</div>
+                <span class="brand-name">KOTCHA</span>
+                <span class="brand-status"><span class="dot"></span> LIVE</span>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="#" class="active" data-page="home"><i class="fas fa-home"></i> الرئيسية</a>
+                <a href="#" data-page="games"><i class="fas fa-gamepad"></i> الألعاب</a>
+                <a href="#" data-page="platforms"><i class="fas fa-broadcast"></i> المنصات</a>
+                <a href="#" data-page="subscription"><i class="fas fa-crown"></i> الاشتراك</a>
+            </div>
+            <div class="nav-actions">
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <div id="authButtons">
+                    <button class="btn btn-outline btn-sm" onclick="showLogin()">
+                        <i class="fas fa-sign-in-alt"></i> دخول
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="showSignup()">
+                        <i class="fas fa-user-plus"></i> حساب
+                    </button>
+                </div>
+                <div class="user-menu" id="userMenu" style="display:none;">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <span class="user-name" id="userNameDisplay">User</span>
+                    <div class="user-dropdown">
+                        <a href="#" onclick="navigateTo('profile')"><i class="fas fa-user"></i> الملف الشخصي</a>
+                        <a href="#" onclick="navigateTo('subscription')"><i class="fas fa-crown"></i> الاشتراك</a>
+                        <a href="#" onclick="navigateTo('settings')"><i class="fas fa-cog"></i> الإعدادات</a>
+                        <hr />
+                        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
+                    </div>
+                </div>
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============================================================
+    MAIN CONTENT
+    ============================================================ -->
+    <main id="mainContent">
+
+        <!-- ============================================================
+        HERO SECTION
+        ============================================================ -->
+        <section class="hero" id="homeSection">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-bolt"></i> ألعاب البث المباشر التفاعلية
+                    </div>
+                    <h1 class="hero-title">
+                        <span class="gradient-text">KOTCHA</span><br />
+                        حيث المشاهد <span class="highlight">يلعب</span>
+                    </h1>
+                    <p class="hero-description">
+                        منصة تفاعلية للبث المباشر تجمع بين الترفيه والتفاعل.
+                        المشاهد لا يشاهد فقط، بل يشارك ويلعب مع المضيف في آن واحد.
+                        العب وتفاعل تلقائياً مع مشاهديك عبر شات البث بمختلف المنصات.
+                    </p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="statUsers">12,458</span>
+                            <span class="stat-label">مستخدم نشط</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="statRooms">3,289</span>
+                            <span class="stat-label">غرفة تفاعلية</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="statGames">22</span>
+                            <span class="stat-label">لعبة متاحة</span>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary btn-lg" onclick="createRoom()">
+                            <i class="fas fa-plus-circle"></i> إنشاء غرفة
+                        </button>
+                        <button class="btn btn-secondary btn-lg" onclick="joinRoom()">
+                            <i class="fas fa-sign-in-alt"></i> انضم لغرفة
+                        </button>
+                        <button class="btn btn-glass btn-lg" onclick="navigateTo('games')">
+                            <i class="fas fa-gamepad"></i> استكشف الألعاب
+                        </button>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="hero-orb"></div>
+                    <div class="hero-orb orb-2"></div>
+                    <div style="position:relative; z-index:2; text-align:center;">
+                        <div style="font-size:6rem; margin-bottom:0.5rem;">🎮</div>
+                        <div style="background:var(--bg-card); padding:1rem 2rem; border-radius:var(--radius-lg); border:1px solid var(--border-color);">
+                            <div style="font-size:1.2rem; font-weight:700;">🔥 بث مباشر</div>
+                            <div style="color:var(--text-secondary); font-size:0.9rem;">1,248 مشاهد</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        PLATFORM SELECTOR
+        ============================================================ -->
+        <section class="platform-selector" id="platformsSection">
+            <div class="container">
+                <h3><i class="fas fa-broadcast"></i> اختر منصة البث المباشر الخاصة بك</h3>
+                <p>اضغط على المنصة التي تبث عليها لتنشيط الربط التفاعلي وألعاب الشات</p>
+                <div class="platform-grid">
+                    <button class="platform-btn" data-platform="tiktok" onclick="selectPlatform('tiktok')">
+                        <span class="icon"><i class="fab fa-tiktok"></i></span>
+                        TikTok Live
+                        <span class="badge">شائع</span>
+                    </button>
+                    <button class="platform-btn" data-platform="twitch" onclick="selectPlatform('twitch')">
+                        <span class="icon"><i class="fab fa-twitch"></i></span>
+                        Twitch Live
+                        <span class="badge">مميز</span>
+                    </button>
+                    <button class="platform-btn" data-platform="kick" onclick="selectPlatform('kick')">
+                        <span class="icon"><i class="fas fa-bolt"></i></span>
+                        Kick Live
+                        <span class="badge">جديد</span>
+                    </button>
+                </div>
+                <div class="platform-status" id="platformStatus">
+                    <span>🔴</span>
+                    <span>لا يوجد اشتراك بث نشط</span>
+                    <button class="btn btn-primary btn-sm" onclick="navigateTo('subscription')">
+                        اشترك الآن
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        GAMES SECTION
+        ============================================================ -->
+        <section class="games-section" id="gamesSection">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag"><i class="fas fa-gamepad"></i> الألعاب المتاحة</span>
+                    <h2>اختر اللعبة وابدأ <span class="gradient-text">التفاعل</span></h2>
+                    <p>اختر اللعبة التي تريد تشغيلها وابدأ التفاعل المباشر مع متابعيك</p>
+                </div>
+                <div class="games-grid" id="gamesGrid">
+                    <!-- سيتم توليدها بواسطة JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        SUBSCRIPTION SECTION
+        ============================================================ -->
+        <section class="subscription-section" id="subscriptionSection">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag"><i class="fas fa-crown"></i> الاشتراك</span>
+                    <h2>اختر خطتك <span class="gradient-text">المثالية</span></h2>
+                    <p>خطط تناسب جميع الاحتياجات مع ميزات حصرية</p>
+                </div>
+                <div class="plans-grid" id="plansGrid">
+                    <!-- سيتم توليدها بواسطة JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        CTA SECTION
+        ============================================================ -->
+        <section class="hero" style="min-height:auto; padding:3rem 0; background:var(--bg-secondary);">
+            <div class="container" style="text-align:center;">
+                <h2 style="font-size:2.5rem;">جاهز لبدء <span class="gradient-text">رحلة التفاعل</span>؟</h2>
+                <p style="color:var(--text-secondary); font-size:1.1rem; max-width:500px; margin:0 auto 1.5rem;">
+                    انضم إلى آلاف المستخدمين الذين يختبرون مستقبل البث التفاعلي
+                </p>
+                <div class="hero-actions" style="justify-content:center;">
+                    <button class="btn btn-primary btn-lg" onclick="createRoom()">
+                        <i class="fas fa-rocket"></i> ابدأ الآن
+                    </button>
+                    <button class="btn btn-glass btn-lg" onclick="showDemo()">
+                        <i class="fas fa-play-circle"></i> شاهد العرض
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ============================================================
+    FOOTER
+    ============================================================ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+                        <div class="brand-icon">K</div>
+                        <span class="brand-name">KOTCHA</span>
+                    </div>
+                    <p>منصة ألعاب البث المباشر التفاعلية التي تحول المشاهدين إلى لاعبين</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>المنصة</h4>
+                    <a href="#" onclick="navigateTo('home')">الرئيسية</a>
+                    <a href="#" onclick="navigateTo('games')">الألعاب</a>
+                    <a href="#" onclick="navigateTo('platforms')">المنصات</a>
+                    <a href="#" onclick="navigateTo('subscription')">الاشتراك</a>
+                </div>
+                <div class="footer-links">
+                    <h4>الدعم</h4>
+                    <a href="#" onclick="showFAQ()">الأسئلة الشائعة</a>
+                    <a href="#" onclick="showSupport()">الدعم الفني</a>
+                    <a href="#" onclick="showPrivacy()">سياسة الخصوصية</a>
+                    <a href="#" onclick="showTerms()">الشروط والأحكام</a>
+                </div>
+                <div class="footer-links">
+                    <h4>المطورين</h4>
+                    <a href="#" onclick="showDocs()">التوثيق</a>
+                    <a href="#" onclick="showAPI()">واجهة البرمجة</a>
+                    <a href="#" onclick="showGitHub()">المساهمة</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 KOTCHA. جميع الحقوق محفوظة. الإصدار 10.0.0</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ============================================================
+    MODALS
+    ============================================================ -->
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</h3>
+                <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+            </div>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="loginEmail" placeholder="example@email.com" required />
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required />
+                </div>
+                <div class="form-error" id="loginError"></div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                </button>
+                <p style="text-align:center; margin-top:1rem; color:var(--text-secondary); font-size:0.9rem;">
+                    ليس لديك حساب؟ <a href="#" onclick="closeModal('loginModal'); showSignup();" style="color:var(--brand-primary);">إنشاء حساب</a>
+                </p>
+            </form>
         </div>
     </div>
 
+    <!-- Signup Modal -->
+    <div class="modal-overlay" id="signupModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> إنشاء حساب</h3>
+                <button class="modal-close" onclick="closeModal('signupModal')">&times;</button>
+            </div>
+            <form onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label>اسم المستخدم</label>
+                    <input type="text" id="signupUsername" placeholder="أدخل اسم المستخدم" required />
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="signupEmail" placeholder="example@email.com" required />
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="signupPassword" placeholder="••••••••" required minlength="6" />
+                </div>
+                <div class="form-error" id="signupError"></div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-user-plus"></i> إنشاء حساب
+                </button>
+                <p style="text-align:center; margin-top:1rem; color:var(--text-secondary); font-size:0.9rem;">
+                    لديك حساب؟ <a href="#" onclick="closeModal('signupModal'); showLogin();" style="color:var(--brand-primary);">تسجيل الدخول</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Join Room Modal -->
+    <div class="modal-overlay" id="joinRoomModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-sign-in-alt"></i> انضم إلى غرفة</h3>
+                <button class="modal-close" onclick="closeModal('joinRoomModal')">&times;</button>
+            </div>
+            <form onsubmit="handleJoinRoom(event)">
+                <div class="form-group">
+                    <label>معرف الغرفة</label>
+                    <input type="text" id="joinRoomId" placeholder="أدخل معرف الغرفة (مثال: ABC123)" required />
+                </div>
+                <div class="form-error" id="joinRoomError"></div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-sign-in-alt"></i> انضم
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Game Modal -->
+    <div class="modal-overlay" id="gameModal">
+        <div class="modal modal-wide">
+            <div class="modal-header">
+                <h3 id="gameModalTitle"><i class="fas fa-gamepad"></i> اللعبة</h3>
+                <button class="modal-close" onclick="closeModal('gameModal')">&times;</button>
+            </div>
+            <div id="gameModalContent">
+                <div style="text-align:center; padding:2rem;">
+                    <div class="spinner" style="margin:0 auto;"></div>
+                    <p style="margin-top:1rem; color:var(--text-secondary);">جاري تحميل اللعبة...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    JAVASCRIPT - Full Application
+    ============================================================ -->
     <script>
-        // =========================================
-        // JAVASCRIPT: LOGIC & WEBSOCKET
-        // =========================================
-        
-        // ** قم بتغيير هذا الرابط إلى رابط Cloudflare Worker الخاص بك **
-        const WORKER_URL = "your-worker.your-subdomain.workers.dev"; 
-        const API_HTTP = `https://${WORKER_URL}/api`;
-        const API_WS = `wss://${WORKER_URL}/api`;
+        // ============================================================
+        // KOTCHA - FULL APPLICATION v10.0.0
+        // ============================================================
 
-        let ws;
-        const gameArea = document.getElementById('game-area');
-        const chatContainer = document.getElementById('chat-container');
+        const CONFIG = {
+            API: 'https://kotcha.ig999x.workers.dev',
+            WS: 'wss://kotcha.ig999x.workers.dev',
+            VERSION: '10.0.0'
+        };
 
-        // اتصال WebSocket
-        function connectWS() {
-            try {
-                ws = new WebSocket(API_WS);
-                
-                ws.onmessage = (event) => {
-                    const data = JSON.parse(event.data);
-                    
-                    if (data.type === "CHAT_MESSAGE") {
-                        appendChat(data.data.user.username, data.data.comment);
-                    } 
-                    else if (data.type === "GAME_STARTED") {
-                        showSystemMessage("تم بدء اللعبة: " + data.state.currentType);
-                        renderGameUI(data.state);
-                    }
-                    else if (data.type === "STATE_UPDATE") {
-                        updateGameUI(data.state);
-                    }
-                    else if (data.type === "GAME_EVENT") {
-                        handleGameEvent(data);
-                    }
-                    else if (data.type === "GAME_STOPPED") {
-                        gameArea.innerHTML = '<h1 style="color: rgba(255,255,255,0.3); font-size: 3rem;">انتهت اللعبة</h1>';
-                    }
-                };
+        // ============================================================
+        // GAME DATA - 22 Games
+        // ============================================================
+        const GAMES = [
+            { id: 'abyss', name: 'الهاوية', icon: '🌊', description: 'تحدي الجسر الزجاجي؛ اختر لوح النجاة قبل أن تبتلعك الهاوية!', tags: ['جديد', 'ممتع'], premium: true, category: 'تحدي' },
+            { id: 'derby', name: 'ديربي', icon: '⚽', description: 'سباق أهداف مباشر بين فريقين؛ اختر زاوية التسديد واكسر توقع الحارس الذكي!', tags: ['جديد', 'رياضة'], premium: true, category: 'رياضة' },
+            { id: 'match', name: 'تطابق', icon: '🧩', description: 'تحدي الذاكرة البصرية التفاعلي الفردي لإيجاد الصور المتطابقة للشات!', tags: ['جديد', 'ذاكرة'], premium: true, category: 'ذاكرة' },
+            { id: 'cups', name: 'أكواب', icon: '🥤', description: 'تتبع الكوب الذهبي الذي يخبئ الكرة بعد خلط الأكواب بسرعة فائقة!', tags: ['تركيز'], premium: true, category: 'تركيز' },
+            { id: 'topten', name: 'توب تن', icon: '🏆', description: 'تحدي تخمين أفضل 10 إجابات للسؤال المطروح بالشات!', tags: ['تحدي'], premium: true, category: 'تحدي' },
+            { id: 'ambush', name: 'الكمين', icon: '🎯', description: 'فك شيفرة الإحداثيات للنجاة من عدوى المصاب!', tags: ['إثارة'], premium: true, category: 'إثارة' },
+            { id: 'chairs', name: 'الكراسي الموسيقية', icon: '🪑', description: 'تحدي السرعة والجلوس على الكراسي المتبقية بالشات', tags: ['سرعة'], premium: true, category: 'سرعة' },
+            { id: 'hidden_roulette', name: 'الروليت المخفي', icon: '🎰', description: 'روليت الإقصاء مع إخفاء الهويات خلف أعلام الدول', tags: ['إثارة'], premium: true, category: 'إثارة' },
+            { id: 'story', name: 'سرد', icon: '📖', description: 'تحدي البحث عن الكلمات المترابطة', tags: ['إبداع'], premium: true, category: 'إبداع' },
+            { id: 'roulette_elim', name: 'الروليت والإقصاء', icon: '🎲', description: 'عجلة الروليت وإقصاء اللاعبين من الشات', tags: ['إثارة'], premium: true, category: 'إثارة' },
+            { id: 'russian_roulette', name: 'الروليت الروسي', icon: '💀', description: 'تحدي الموت أو النجاة بالروليت الروسي', tags: ['إثارة'], premium: true, category: 'إثارة' },
+            { id: 'connect', name: 'شبك', icon: '🔗', description: 'تحدي ربط الدول والحدود الجغرافية', tags: ['معرفة'], premium: true, category: 'معرفة' },
+            { id: 'bomb', name: 'القنبلة الموقوتة', icon: '💣', description: 'فريق الشباب ضد فريق البنات', tags: ['جماعي'], premium: true, category: 'جماعي' },
+            { id: 'letter_net', name: 'شبكة الحروف', icon: '🔤', description: 'مسار الشباب ضد مسار البنات', tags: ['جماعي'], premium: true, category: 'جماعي' },
+            { id: 'code_breaker', name: 'كاسر الشفرة', icon: '🔐', description: 'تخمين الرقم السري', tags: ['تحدي'], premium: true, category: 'تحدي' },
+            { id: 'sketch', name: 'خربشة', icon: '🎨', description: 'ارسم الكلمة والجمهور يخمن الإجابة بالشات', tags: ['إبداع'], premium: true, category: 'إبداع' },
+            { id: 'sniper', name: 'القناص', icon: '🎯', description: 'تحدي القناص والاختباء الجماعي للمشاهدين بالشات', tags: ['إثارة'], premium: true, category: 'إثارة' },
+            { id: 'salad', name: 'سلطة', icon: '🥗', description: 'مجموعة ألعاب سريعة وتفاعلية داخل مكان واحد', tags: ['متنوع'], premium: true, category: 'متنوع' },
+            { id: 'elimination', name: 'شطب', icon: '✖️', description: 'تحدي الأسئلة المتعددة والنجاة من الشطب والإقصاء', tags: ['تحدي'], premium: true, category: 'تحدي' },
+            { id: 'mind', name: 'ذهنيات', icon: '🧠', description: 'ألعاب الذكاء، الحساب الذهني، وتحدي الذاكرة', tags: ['ذكاء'], premium: true, category: 'ذكاء' },
+            { id: 'rocket_war', name: 'حرب الصواريخ', icon: '🚀', description: 'تحدي إطلاق الصواريخ وحماية القلعة بين فريقين', tags: ['جماعي'], premium: true, category: 'جماعي' },
+            { id: 'vote', name: 'التصويت المباشر', icon: '📊', description: 'صوّت على الخيارات وشاهد النتائج فوراً', tags: ['شائع'], premium: false, category: 'تفاعل' },
+            { id: 'number_guess', name: 'تخمين الرقم', icon: '🔢', description: 'خمن الرقم السري واربح الجوائز', tags: ['ممتع'], premium: false, category: 'تخمين' },
+            { id: 'word_battle', name: 'معركة الكلمات', icon: '📝', description: 'تحدى الآخرين في لعبة الكلمات', tags: ['تحدي'], premium: false, category: 'كلمات' }
+        ];
 
-                ws.onclose = () => setTimeout(connectWS, 2000); // Reconnect
-            } catch (e) {
-                console.log("WebSocket connection requires a valid Cloudflare URL.");
+        // ============================================================
+        // STATE
+        // ============================================================
+        let state = {
+            user: null,
+            isLoggedIn: false,
+            isSubscribed: false,
+            selectedPlatform: null,
+            theme: localStorage.getItem('kotcha-theme') || 'dark',
+            currentPage: 'home',
+            roomId: null,
+            ws: null,
+            viewers: 0,
+            messages: []
+        };
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme(state.theme);
+            renderGames();
+            renderPlans();
+            checkAuth();
+            setupEventListeners();
+            animateNumbers();
+        });
+
+        // ============================================================
+        // THEME
+        // ============================================================
+        function toggleTheme() {
+            state.theme = state.theme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('kotcha-theme', state.theme);
+            applyTheme(state.theme);
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const icon = document.getElementById('themeIcon');
+            if (icon) {
+                icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
             }
         }
 
-        function appendChat(username, text) {
-            const el = document.createElement('div');
-            el.className = 'chat-msg';
-            el.innerHTML = `<div class="chat-user">${username}</div><div class="chat-text">${text}</div>`;
-            chatContainer.appendChild(el);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
+        function navigateTo(page) {
+            state.currentPage = page;
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.nav-links a[data-page="${page}"]`);
+            if (link) link.classList.add('active');
 
-        function showSystemMessage(msg) {
-            const sys = document.getElementById('system-msg');
-            sys.innerText = msg;
-            sys.style.opacity = 1;
-            setTimeout(() => sys.style.opacity = 0, 3000);
-        }
+            const sections = {
+                home: document.getElementById('homeSection'),
+                games: document.getElementById('gamesSection'),
+                platforms: document.getElementById('platformsSection'),
+                subscription: document.getElementById('subscriptionSection')
+            };
 
-        // --- Render UI Functions ---
-        function renderGameUI(state) {
-            if (state.currentType === 'ROCKET_WAR') {
-                gameArea.innerHTML = `
-                    <h2 style="font-size:3rem; margin-bottom:30px;">🚀 حرب الصواريخ</h2>
-                    <div class="rocket-war-ui">
-                        <div class="team-bar-container">
-                            <div class="team-label" style="color: var(--primary);">فريق 1 (اكتب 1)</div>
-                            <div class="progress-track"><div class="progress-fill fill-a" id="score-a">0</div></div>
-                        </div>
-                        <div class="team-bar-container">
-                            <div class="team-label" style="color: var(--secondary);">فريق 2 (اكتب 2)</div>
-                            <div class="progress-track"><div class="progress-fill fill-b" id="score-b">0</div></div>
-                        </div>
-                    </div>
-                `;
-            } 
-            else if (state.currentType === 'RUSSIAN_ROULETTE') {
-                gameArea.innerHTML = `
-                    <div class="roulette-ui">
-                        <h2 style="font-size:3rem; margin-bottom:10px;">🔫 الروليت الروسي</h2>
-                        <p style="font-size:20px; color:#aaa; margin-bottom:30px;">اكتب "shoot" بالشات للتصويب!</p>
-                        <div class="gun-icon">🔫</div>
-                        <div class="bang-alert" id="bang-msg"></div>
-                        <div style="margin-top:20px; font-size:24px;">تم إقصاء: <span id="eliminated-list" style="color:var(--secondary)">لا أحد</span></div>
-                    </div>
-                `;
+            if (sections[page]) {
+                sections[page].scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
-            else if (state.currentType === 'CODE_BREAKER') {
-                gameArea.innerHTML = `
-                    <div class="code-ui">
-                        <div class="lock-icon">🔐</div>
-                        <h2 style="font-size:3rem;">كاسر الشفرة</h2>
-                        <p style="font-size:20px; color:#aaa; margin-bottom:20px;">خمن الرقم السري (4 أرقام) في الشات!</p>
-                        <h1 style="font-size:4rem; letter-spacing: 15px; background: rgba(0,0,0,0.5); padding: 10px 40px; border-radius: 20px;">****</h1>
-                        <div class="code-history" id="code-history"></div>
-                    </div>
-                `;
+
+            if (page === 'games') {
+                renderGames();
+            }
+
+            closeMobileMenu();
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('navLinks').classList.toggle('open');
+        }
+
+        function closeMobileMenu() {
+            document.getElementById('navLinks').classList.remove('open');
+        }
+
+        // ============================================================
+        // AUTH
+        // ============================================================
+        function checkAuth() {
+            const userData = localStorage.getItem('kotcha-user');
+            if (userData) {
+                try {
+                    state.user = JSON.parse(userData);
+                    state.isLoggedIn = true;
+                    state.isSubscribed = state.user.subscribed || false;
+                    updateUIForAuth();
+                } catch {
+                    localStorage.removeItem('kotcha-user');
+                }
             }
         }
 
-        function updateGameUI(state) {
-            if (state.currentType === 'ROCKET_WAR') {
-                const a = state.data.teamA_score;
-                const b = state.data.teamB_score;
-                const total = (a + b) || 1; // prevent divide by zero
-                document.getElementById('score-a').style.width = \`\${(a/total)*100}%\`;
-                document.getElementById('score-a').innerText = a;
-                document.getElementById('score-b').style.width = \`\${(b/total)*100}%\`;
-                document.getElementById('score-b').innerText = b;
-            }
-            else if (state.currentType === 'CODE_BREAKER') {
-                const hist = state.data.history;
-                const histDiv = document.getElementById('code-history');
-                histDiv.innerHTML = hist.slice(-10).map(h => `<div class="guess-tag">${h.user}: <span style="color:var(--primary)">${h.guess}</span></div>`).join('');
-            }
+        function updateUIForAuth() {
+            document.getElementById('authButtons').style.display = 'none';
+            document.getElementById('userMenu').style.display = 'flex';
+            document.getElementById('userNameDisplay').textContent = state.user?.displayName || state.user?.username || 'User';
+            document.getElementById('userAvatar').textContent = (state.user?.displayName || 'U')[0].toUpperCase();
         }
 
-        function handleGameEvent(data) {
-            if (data.event === 'BANG') {
-                const msgEl = document.getElementById('bang-msg');
-                msgEl.innerText = data.msg;
-                msgEl.style.display = 'block';
-                setTimeout(() => msgEl.style.display = 'none', 2000);
-            }
-            else if (data.event === 'WINNER') {
-                gameArea.innerHTML = `
-                    <div style="text-align:center;">
-                        <h1 style="font-size:5rem; color: #ffd700; text-shadow: 0 0 20px #ffd700; animation: shake 1s infinite;">🎉 فائز! 🎉</h1>
-                        <h2 style="font-size:3rem; color:var(--primary)">${data.user.username}</h2>
-                        <p style="font-size:24px; margin-top:20px;">استطاع فك الشفرة!</p>
-                    </div>
-                `;
-            }
+        function showLogin() {
+            document.getElementById('loginError').className = 'form-error';
+            document.getElementById('loginModal').classList.add('active');
         }
 
-        // --- API Calls (Admin) ---
-        async function startGame(type) {
-            // في الإنتاج، قم بتفعيل هذا الكود وارسال طلب للـ API
-            /*
-            fetch(API_HTTP + '/game/start', {
-                method: 'POST',
-                body: JSON.stringify({ gameType: type }),
-                headers: { 'Content-Type': 'application/json' }
+        function showSignup() {
+            document.getElementById('signupError').className = 'form-error';
+            document.getElementById('signupModal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            state.user = {
+                id: 'user_' + Math.random().toString(36).substring(2, 10),
+                username: email.split('@')[0],
+                displayName: email.split('@')[0],
+                email: email,
+                avatar: null,
+                subscribed: false
+            };
+
+            localStorage.setItem('kotcha-user', JSON.stringify(state.user));
+            state.isLoggedIn = true;
+            updateUIForAuth();
+            closeModal('loginModal');
+            showToast('تم تسجيل الدخول بنجاح!', 'success');
+            playSound('success');
+        }
+
+        function handleSignup(event) {
+            event.preventDefault();
+            const username = document.getElementById('signupUsername').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+
+            state.user = {
+                id: 'user_' + Math.random().toString(36).substring(2, 10),
+                username: username,
+                displayName: username,
+                email: email,
+                avatar: null,
+                subscribed: false
+            };
+
+            localStorage.setItem('kotcha-user', JSON.stringify(state.user));
+            state.isLoggedIn = true;
+            updateUIForAuth();
+            closeModal('signupModal');
+            showToast('تم إنشاء الحساب بنجاح!', 'success');
+            playSound('success');
+        }
+
+        function logout() {
+            localStorage.removeItem('kotcha-user');
+            state.user = null;
+            state.isLoggedIn = false;
+            state.isSubscribed = false;
+            document.getElementById('authButtons').style.display = 'flex';
+            document.getElementById('userMenu').style.display = 'none';
+            showToast('تم تسجيل الخروج', 'info');
+        }
+
+        // ============================================================
+        // PLATFORM SELECTION
+        // ============================================================
+        function selectPlatform(platform) {
+            state.selectedPlatform = platform;
+            document.querySelectorAll('.platform-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.platform === platform);
             });
-            */
-            // للمحاكاة الفورية بدون رفع السيرفر:
-            const mockState = { currentType: type, data: { teamA_score: 0, teamB_score: 0, history: [] } };
-            renderGameUI(mockState);
+
+            const status = document.getElementById('platformStatus');
+            const names = { tiktok: 'TikTok Live', twitch: 'Twitch Live', kick: 'Kick Live' };
+
+            if (state.isLoggedIn) {
+                status.innerHTML = `
+                    <span>✅</span>
+                    <span style="color:#2ED573;">متصل بـ ${names[platform]}</span>
+                    <button class="btn btn-secondary btn-sm" onclick="disconnectPlatform()">
+                        <i class="fas fa-plug"></i> قطع الاتصال
+                    </button>
+                `;
+                showToast(`تم الاتصال بـ ${names[platform]}`, 'success');
+                playSound('connect');
+            } else {
+                status.innerHTML = `
+                    <span>🔴</span>
+                    <span>يرجى تسجيل الدخول أولاً</span>
+                    <button class="btn btn-primary btn-sm" onclick="showLogin()">
+                        <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                    </button>
+                `;
+                showToast('يرجى تسجيل الدخول أولاً', 'error');
+            }
         }
 
-        async function stopGame() {
-            gameArea.innerHTML = '<h1 style="color: rgba(255,255,255,0.3); font-size: 3rem;">اختر اللعبة للبدء</h1>';
+        function disconnectPlatform() {
+            state.selectedPlatform = null;
+            document.querySelectorAll('.platform-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('platformStatus').innerHTML = `
+                <span>🔴</span>
+                <span>لا يوجد اشتراك بث نشط</span>
+                <button class="btn btn-primary btn-sm" onclick="navigateTo('subscription')">
+                    اشترك الآن
+                </button>
+            `;
+            showToast('تم قطع الاتصال', 'info');
         }
 
-        // Run
-        connectWS();
-    </script>
-</body>
-</html>
+        // ============================================================
+        // GAMES
+        // ============================================================
+        function renderGames() {
+            const grid = document.getElementById('gamesGrid');
+            grid.innerHTML = GAMES.map(game => {
+                const isLocked = game.premium && !state.isSubscribed;
+                return `
+                    <div class="game-card ${isLocked ? 'locked' : ''}" 
+                         onclick="${isLocked ? `showToast('هذه اللعبة تتطلب اشتراكاً مميزاً', 'error')` : `openGame('${game.id}')`}">
+                        ${isLocked ? `<div class="lock"><i class="fas fa-lock"></i></div>` : ''}
+                        <span class="icon">${game.icon}</span>
+                        <h4>${game.name}</h4>
+                        <p>${game.description}</p>
+                        <div class="tags">
+                            ${game.tags.map(tag => `<span class="tag ${tag === 'جديد' ? 'new' : ''}">${tag}</span>`).join('')}
+                            ${game.premium ? `<span class="tag premium">⭐ مميز</span>` : `<span class="tag">🎯 مجاني</span>`}
+                        </div>
+                        <button class="btn ${isLocked ? 'btn-gold' : 'btn-primary'} btn-sm play-btn" 
+                                onclick="event.stopPropagation(); ${isLocked ? `showToast('هذه اللعبة تتطلب اشتراكاً مميزاً', 'error')` : `openGame('${game.id}')`}">
+                            ${isLocked ? '⭐ اشترك الآن' : '▶️ العب الآن'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openGame(gameId) {
+            const game = GAMES.find(g => g.id === gameId);
+            if (!game) return;
+
+            if (game.premium && !state.isSubscribed) {
+                showToast('هذه اللعبة تتطلب اشتراكاً مميزاً', 'error');
+                return;
+            }
+
+            document.getElementById('gameModalTitle').innerHTML = `<i class="fas fa-gamepad"></i> ${game.icon} ${game.name}`;
+            document.getElementById('gameModalContent').innerHTML = `
+                <div style="text-align:center; padding:1rem;">
+                    <div style="font-size:4rem; margin-bottom:1rem;">${game.icon}</div>
+                    <h3 style="margin-bottom:0.5rem;">${game.name}</h3>
+                    <p style="color:var(--text-secondary); margin-bottom:1rem;">${game.description}</p>
+                    <div style="display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; margin-bottom:1rem;">
+                        ${game.tags.map(tag => `<span class="tag" style="background:var(--bg-glass); padding:0.2rem 0.8rem; border-radius:var(--radius-full);">${tag}</span>`).join('')}
+                    </div>
+                    <div style="background:var(--bg-glass); border-radius:var(--radius-md); padding:1rem; margin-bottom:1rem;">
+                        <p style="color:var(--text-secondary); font-size:0.9rem;">
+                            <i class="fas fa-users"></i> ${Math.floor(Math.random() * 100) + 50} لاعب متصل
+                        </p>
+                        <div style="display:flex; gap:0.5rem; justify-content:center; margin-top:0.5rem;">
+                            <div style="width:32px; height:32px; border-radius:50%; background:var(--brand-gradient); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:0.7rem;">A</div>
+                            <div style="width:32px; height:32px; border-radius:50%; background:var(--brand-gradient); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:0.7rem;">B</div>
+                            <div style="width:32px; height:32px; border-radius:50%; background:var(--brand-gradient); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:0.7rem;">C</div>
+                            <div style="width:32px; height:32px; border-radius:50%; background:var(--bg-glass); display:flex
