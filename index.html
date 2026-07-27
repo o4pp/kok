@@ -1,11 +1,15 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" class="light">
+<html lang="ar" dir="rtl" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>⚡ KOTCHA - منصة البث والألعاب التفاعلية المباشرة</title>
+  
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts (Tajawal) -->
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -33,27 +37,30 @@
     .dark .glass { background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(12px); }
     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #ff6b0033; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #ff6b0044; border-radius: 10px; }
     .obs-overlay { background: transparent !important; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900 dark:bg-zinc-950 dark:text-gray-100 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
 
-  <!-- NAVIGATION BAR -->
-  <header id="mainHeader" class="sticky top-0 z-50 glass border-b border-gray-200 dark:border-zinc-800 px-6 py-3.5 flex items-center justify-between transition-all">
+  <!-- ================= HEADER & NAVIGATION ================= -->
+  <header id="mainHeader" class="sticky top-0 z-50 glass border-b border-gray-200 dark:border-zinc-800 px-4 md:px-6 py-3.5 flex items-center justify-between transition-all">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-brand-500/30">⚡</div>
       <span class="text-2xl font-black tracking-wider bg-gradient-to-r from-brand-500 to-amber-500 bg-clip-text text-transparent">KOTCHA</span>
-      <span class="text-[10px] bg-brand-500/10 text-brand-600 border border-brand-500/20 px-2 py-0.5 rounded-full font-bold hidden sm:inline-block">v2.5 PRO</span>
+      <span class="text-[10px] bg-brand-500/10 text-brand-600 border border-brand-500/20 px-2 py-0.5 rounded-full font-bold hidden sm:inline-block">v8.0.0 PRO</span>
     </div>
 
+    <!-- MAIN NAV LINKS -->
     <nav class="hidden md:flex items-center gap-6 font-bold text-sm">
       <button onclick="showPage('home')" class="nav-btn hover:text-brand-500 transition">الرئيسية</button>
-      <button onclick="showPage('game')" class="nav-btn hover:text-brand-500 transition text-brand-500">منطقة اللعب</button>
-      <button onclick="showPage('subscribe')" class="nav-btn hover:text-brand-500 transition">الاشتراكات والتفعيل</button>
+      <button onclick="showPage('explore')" class="nav-btn hover:text-brand-500 transition">🔍 استكشاف الغرف</button>
+      <button onclick="showPage('game')" class="nav-btn hover:text-brand-500 transition text-brand-500">🎮 منطقة اللعب</button>
+      <button onclick="showPage('subscribe')" class="nav-btn hover:text-brand-500 transition">💳 الاشتراكات</button>
       <button onclick="showPage('admin')" class="text-xs bg-red-500/10 text-red-500 px-3 py-1.5 rounded-lg border border-red-500/20 hover:bg-red-500 hover:text-white transition font-bold">لوحة الأدمن</button>
     </nav>
 
+    <!-- RIGHT ACTION CONTROLS -->
     <div class="flex items-center gap-3">
       <button onclick="toggleOBSMode()" class="hidden lg:flex items-center gap-1.5 text-xs bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900 px-3 py-2 rounded-xl font-bold hover:opacity-90 transition" title="وضع تراكب البث المباشر لـ OBS">
         <span>🎬</span> وضع OBS
@@ -61,72 +68,164 @@
       <button onclick="toggleTheme()" class="p-2.5 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 hover:scale-105 transition text-sm">
         🌙 / ☀️
       </button>
-      <button onclick="showPage('auth')" id="authBtn" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-5 py-2 rounded-xl shadow-md shadow-brand-500/20 transition text-sm">تسجيل الدخول</button>
+      
+      <!-- AUTHENTICATION CONTAINER -->
+      <div id="userHeaderProfile" class="flex items-center gap-2">
+        <button onclick="showPage('auth')" id="authBtn" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-5 py-2 rounded-xl shadow-md shadow-brand-500/20 transition text-sm">تسجيل الدخول</button>
+      </div>
     </div>
   </header>
 
-  <!-- SCREEN 1: LANDING / HOME PAGE -->
-  <section id="page-home" class="page-view hidden flex-1 flex flex-col items-center justify-center text-center px-4 py-12 max-w-6xl mx-auto">
+  <!-- ================= NOTIFICATION TOAST ================= -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-zinc-900 text-white px-5 py-3 rounded-2xl shadow-2xl border border-brand-500/30 text-xs font-bold hidden transition-all transform translate-y-2">
+    <span id="toastMsg">إشعار النظام</span>
+  </div>
+
+  <!-- ================= SCREEN 1: LANDING / HOME ================= -->
+  <section id="page-home" class="page-view flex-1 flex flex-col items-center justify-center text-center px-4 py-12 max-w-6xl mx-auto">
     <div class="inline-flex items-center gap-2 bg-brand-50 dark:bg-brand-500/10 text-brand-600 border border-brand-500/20 px-4 py-2 rounded-full text-xs font-bold mb-6">
       <span class="w-2 h-2 rounded-full bg-brand-500 animate-ping"></span>
-      الجيل الجديد من منصات الألعاب التفاعلية لـ TikTok Live
+      الجيل الجديد من منصات الألعاب التفاعلية لـ TikTok Live, Twitch, & Kick
     </div>
     
     <h1 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
       حَوّل المتابعين إلى لاعبين <br>
-      <span class="bg-gradient-to-r from-brand-500 to-amber-500 bg-clip-text text-transparent">تفاعل مباشر وربط فوري عبر TikTok!</span>
+      <span class="bg-gradient-to-r from-brand-500 to-amber-500 bg-clip-text text-transparent">تفاعل مباشر وربط فوري ومباشر!</span>
     </h1>
     
     <p class="text-gray-600 dark:text-gray-400 max-w-2xl text-base md:text-lg mb-8 font-medium leading-relaxed">
-      ربط حقيقي وسريع بدون تأخير. يكتب متابعوك في الدردشة أو يرسلون الهدايا، فتتغير نتائج الألعاب، وتدور عجلة الحظ، وتهتز الشاشة بمؤثرات صوتیة وتفاعلیة حیاً.
+      ربط حقيقي عبر السيرفر الخادم المباشر. يكتب متابعوك في الدردشة، فتتغير نتائج الألعاب فوراً وتدور عجلة الحظ مع إشارات صوتية وحركات حية على الشاشة.
     </p>
 
-    <div class="flex flex-wrap gap-4 justify-center mb-16">
-      <button onclick="showPage('game')" class="bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-lg px-8 py-4 rounded-2xl shadow-xl shadow-brand-500/25 transform hover:-translate-y-1 transition">
-        🚀 ابدأ اللعب المباشر
+    <div class="flex flex-wrap gap-4 justify-center mb-12">
+      <button onclick="createNewRoom()" class="bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-lg px-8 py-4 rounded-2xl shadow-xl shadow-brand-500/25 transform hover:-translate-y-1 transition">
+        ➕ إنشاء غرفة بث جديدة
       </button>
-      <button onclick="showPage('subscribe')" class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 font-extrabold text-lg px-8 py-4 rounded-2xl hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
-        💳 التفعيل والأسعار
+      <button onclick="showPage('explore')" class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 font-extrabold text-lg px-8 py-4 rounded-2xl hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
+        🔍 استكشاف الغرف النشطة
       </button>
     </div>
 
-    <!-- FEATURE GRID -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-right my-8">
+    <!-- FEATURES -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-right my-4">
       <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-sm">
-        <div class="w-12 h-12 bg-brand-500/10 text-brand-500 rounded-xl flex items-center justify-center text-2xl font-black mb-4">🎮</div>
-        <h3 class="font-extrabold text-lg mb-2">ألعاب متعددة ومبتكرة</h3>
-        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">اختر بين التصويت المباشر، عجلة الحظ، شد الحبل بين الفريقين، أو معارك الوحش التفاعلية.</p>
+        <div class="w-12 h-12 bg-brand-500/10 text-brand-500 rounded-xl flex items-center justify-center text-2xl font-black mb-4">🎵</div>
+        <h3 class="font-extrabold text-lg mb-2">ربط متعدد المنصات</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">دعم متكامل لمنصات TikTok Live و Twitch و Kick لجمع تفاعلات جمهورك في مكان واحد.</p>
       </div>
       <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-sm">
         <div class="w-12 h-12 bg-amber-500/10 text-amber-500 rounded-xl flex items-center justify-center text-2xl font-black mb-4">⚡</div>
-        <h3 class="font-extrabold text-lg mb-2">استجابة فائقة السرعة</h3>
-        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">ربط فوري خالي من التأخير يعتمد على تقنيات WebSockets المتطورة لمنح تجربة سلسة.</p>
+        <h3 class="font-extrabold text-lg mb-2">اتصال Real-Time WebSocket</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">ربط فوري مع خوادم Cloudflare Workers مع تقنيات Durable Objects لمنع أي تأخير.</p>
       </div>
       <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-sm">
         <div class="w-12 h-12 bg-orange-500/10 text-orange-500 rounded-xl flex items-center justify-center text-2xl font-black mb-4">🎥</div>
-        <h3 class="font-extrabold text-lg mb-2">دعم كامل لبرامج OBS</h3>
-        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">تخطيط مخصص يسهل دمجه مع OBS Studio وStreamlabs لجعل بثك ذا طابع احترافي.</p>
+        <h3 class="font-extrabold text-lg mb-2">تراكب خاص بـ OBS</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">تصميم شفاف ومخصص للاندماج السلس مع برامج البث مثل OBS Studio و Streamlabs.</p>
       </div>
     </div>
   </section>
 
-  <!-- SCREEN 2: GAME ARENA (ENHANCED MULTI-GAME PLATFORM) -->
-  <section id="page-game" class="page-view flex-1 p-3 md:p-6 max-w-7xl mx-auto w-full">
+  <!-- ================= SCREEN 2: AUTHENTICATION (LOGIN & SIGNUP) ================= -->
+  <section id="page-auth" class="page-view hidden flex-1 p-6 max-w-md mx-auto w-full flex flex-col justify-center">
+    <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-gray-200 dark:border-zinc-800 shadow-xl">
+      
+      <!-- AUTH TABS -->
+      <div class="flex border-b border-gray-200 dark:border-zinc-800 mb-6 font-bold text-sm">
+        <button onclick="switchAuthTab('login')" id="authTab-login" class="flex-1 pb-3 text-center border-b-2 border-brand-500 text-brand-500 transition">تسجيل الدخول</button>
+        <button onclick="switchAuthTab('signup')" id="authTab-signup" class="flex-1 pb-3 text-center border-b-2 border-transparent text-gray-400 hover:text-gray-200 transition">حساب جديد</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form id="form-login" onsubmit="handleAuthSubmit(event, 'login')" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">اسم المستخدم أو البريد</label>
+          <input type="text" id="loginUsername" required placeholder="مثال: StreamerPRO" class="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-sm font-bold outline-none focus:border-brand-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">كلمة المرور</label>
+          <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-sm font-bold outline-none focus:border-brand-500">
+        </div>
+        <button type="submit" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-extrabold py-3 rounded-xl shadow-lg shadow-brand-500/20 transition text-sm">دخول الحساب</button>
+      </form>
+
+      <!-- SIGNUP FORM -->
+      <form id="form-signup" onsubmit="handleAuthSubmit(event, 'signup')" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">اسم المستخدم</label>
+          <input type="text" id="signupUsername" required placeholder="اختر اسم مستخدم..." class="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-sm font-bold outline-none focus:border-brand-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">الاسم المستعار (Display Name)</label>
+          <input type="text" id="signupDisplayName" placeholder="الاسم للظهور في البث..." class="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-sm font-bold outline-none focus:border-brand-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">كلمة المرور</label>
+          <input type="password" id="signupPassword" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-sm font-bold outline-none focus:border-brand-500">
+        </div>
+        <button type="submit" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-extrabold py-3 rounded-xl shadow-lg shadow-brand-500/20 transition text-sm">إنشاء حساب جديد</button>
+      </form>
+
+    </div>
+  </section>
+
+  <!-- ================= SCREEN 3: EXPLORE & JOIN ROOMS ================= -->
+  <section id="page-explore" class="page-view hidden flex-1 p-6 max-w-5xl mx-auto w-full">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+      <div>
+        <h2 class="text-3xl font-black">🔍 استكشاف الغرف المباشرة</h2>
+        <p class="text-xs text-gray-500 mt-1">انضم لغرف البث النشطة أو ادخل المعرف الخاص بغرفتك</p>
+      </div>
+      <button onclick="createNewRoom()" class="bg-brand-500 text-white font-bold px-5 py-2.5 rounded-xl text-xs hover:bg-brand-600 transition shadow-md shadow-brand-500/20">
+        ➕ انشاء غرفة جديدة
+      </button>
+    </div>
+
+    <!-- DIRECT ROOM JOIN CARD -->
+    <div class="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-gray-200 dark:border-zinc-800 mb-8 shadow-sm">
+      <h3 class="font-bold text-sm mb-3">الدخول المباشر إلى غرفة بواسطة معرّف الغرفة (Room ID):</h3>
+      <div class="flex gap-3">
+        <input type="text" id="manualRoomIdInput" placeholder="أدخل رمز الغرفة مثلاً: my-live-room-123" class="flex-1 px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-sm font-mono font-bold outline-none focus:border-brand-500">
+        <button onclick="joinRoomById()" class="bg-brand-500 text-white font-bold px-6 py-2.5 rounded-xl text-xs hover:bg-brand-600 transition">انضمام للغرفة</button>
+      </div>
+    </div>
+
+    <!-- CURRENT ACTIVE ROOM CARD -->
+    <div id="activeRoomInfoCard" class="bg-white dark:bg-zinc-900 p-6 rounded-3xl border-2 border-brand-500/30 shadow-lg hidden">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span>
+          <div>
+            <h4 class="font-extrabold text-base">الغرفة النشطة حالياً: <span id="activeRoomIdDisplay" class="text-brand-500 font-mono">--</span></h4>
+            <p class="text-xs text-gray-400">حالة الاتصال: <span id="activeRoomConnStatus" class="text-green-500 font-bold">متصل</span></p>
+          </div>
+        </div>
+        <button onclick="showPage('game')" class="bg-brand-500 text-white font-bold px-5 py-2 rounded-xl text-xs">الانتقال للعب 🎮</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SCREEN 4: GAME ARENA ================= -->
+  <section id="page-game" class="page-view hidden flex-1 p-3 md:p-6 max-w-7xl mx-auto w-full">
     
-    <!-- TIKTOK LIVE CONNECT CONTROL & SIMULATOR BAR -->
+    <!-- LIVE PLATFORM CONNECT CONTROL BAR -->
     <div class="mb-4 bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-gray-200 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-4 shadow-sm">
       <div class="flex items-center gap-3">
         <span class="text-2xl animate-bounce">📱</span>
         <div>
-          <h4 class="font-bold text-sm">ربط بث TikTok Live المباشر</h4>
-          <p class="text-xs text-gray-500">أدخل اسم المستخدم للبث المباشر لتشغيل التفاعل التلقائي</p>
+          <h4 class="font-bold text-sm">ربط البث الحي (TikTok / Twitch / Kick)</h4>
+          <p class="text-xs text-gray-500">أدخل اسم المستخدم للرابط المباشر مع الخادم</p>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-        <input type="text" id="tiktokUser" placeholder="@username" class="flex-1 sm:w-48 px-4 py-2 rounded-xl bg-gray-100 dark:bg-zinc-800 text-sm font-bold border border-transparent focus:border-brand-500 outline-none">
-        <button onclick="connectTikTok()" class="bg-brand-500 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-brand-600 transition shadow-md shadow-brand-500/20">ربط البث</button>
-        <button onclick="simulateActivity()" class="bg-gray-200 dark:bg-zinc-700 font-bold px-3 py-2 rounded-xl text-xs hover:bg-gray-300 transition" title="تجربة الشات والتفاعل بدون بث حي">🧪 محاكاة تفاعل</button>
+        <select id="platformSelect" class="px-3 py-2 rounded-xl bg-gray-100 dark:bg-zinc-800 text-xs font-bold border border-transparent outline-none">
+          <option value="tiktok">TikTok Live 🎵</option>
+          <option value="twitch">Twitch 💜</option>
+          <option value="kick">Kick 💚</option>
+        </select>
+        <input type="text" id="liveUsernameInput" placeholder="@username" class="flex-1 sm:w-44 px-4 py-2 rounded-xl bg-gray-100 dark:bg-zinc-800 text-xs font-bold border border-transparent focus:border-brand-500 outline-none">
+        <button onclick="connectPlatformLive()" class="bg-brand-500 text-white font-bold px-4 py-2 rounded-xl text-xs hover:bg-brand-600 transition shadow-md shadow-brand-500/20">ربط البث المباشر</button>
       </div>
     </div>
 
@@ -136,12 +235,13 @@
       <!-- TOP CONTROL & GAME SWITCHER BAR -->
       <div class="bg-gray-100 dark:bg-zinc-800/90 px-4 md:px-6 py-3 border-b border-gray-200 dark:border-zinc-700 flex flex-wrap items-center justify-between gap-3">
         
-        <!-- BRAND & STATUS -->
+        <!-- BRAND & ROOM ID -->
         <div class="flex items-center gap-2">
           <span class="text-brand-500 font-black text-lg">⚡ KOTCHA</span>
           <span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full animate-pulse font-extrabold flex items-center gap-1">
             <span class="w-1.5 h-1.5 rounded-full bg-white"></span> مباشر
           </span>
+          <span class="text-xs font-mono bg-gray-200 dark:bg-zinc-700 px-2 py-0.5 rounded text-gray-500 dark:text-gray-300" id="arenaRoomId">الغرفة: لم تحدد</span>
         </div>
 
         <!-- GAME SELECTOR TABS -->
@@ -150,11 +250,12 @@
           <button onclick="switchGame('tug')" id="tab-tug" class="game-tab px-3 py-1.5 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-800 transition">🧲 شد الحبل</button>
           <button onclick="switchGame('wheel')" id="tab-wheel" class="game-tab px-3 py-1.5 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-800 transition">🎡 عجلة الحظ</button>
           <button onclick="switchGame('boss')" id="tab-boss" class="game-tab px-3 py-1.5 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-800 transition">👾 معركة الوحش</button>
+          <button onclick="switchGame('number')" id="tab-number" class="game-tab px-3 py-1.5 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-800 transition">🔢 تخمين الرقم</button>
         </div>
 
         <!-- STATS -->
-        <div class="text-gray-500 dark:text-gray-400 font-mono text-xs font-bold">
-          👥 <span id="viewerCount" class="text-brand-500 font-extrabold">1,482</span> مشاهد
+        <div class="text-gray-500 dark:text-gray-400 font-mono text-xs font-bold flex items-center gap-3">
+          <span>👥 <span id="viewerCount" class="text-brand-500 font-extrabold">1</span> مشاهد</span>
         </div>
       </div>
 
@@ -164,48 +265,62 @@
         <!-- GAME PLAY AREA (2 COLS) -->
         <div class="lg:col-span-2 p-4 md:p-8 border-b lg:border-b-0 lg:border-l border-gray-200 dark:border-zinc-800 flex flex-col justify-between relative">
           
-          <!-- GAME 1: LIVE POLL (DRAFT IMPROVED) -->
+          <!-- GAME 1: LIVE POLL -->
           <div id="game-view-poll" class="game-container space-y-6">
             <div class="text-center my-2">
               <span class="text-4xl">🗳️</span>
-              <h2 id="questionTitle" class="text-2xl md:text-3xl font-black mt-2">أي الأنداد سيفوز في مباراة اليوم؟</h2>
-              <p class="text-xs text-gray-400 mt-1">اكتب رقم الخيار (1 أو 2 أو 3) في الشات للتصويت الفوري</p>
+              <h2 id="questionTitle" class="text-2xl md:text-3xl font-black mt-2">أي الفريقين سيفوز في التحدي؟</h2>
+              <p class="text-xs text-gray-400 mt-1">اكتب رقم الخيار (1 إلى 5) في الشات للتصويت الفوري</p>
             </div>
 
-            <div class="space-y-4 max-w-md mx-auto my-6">
+            <div class="space-y-3 max-w-md mx-auto my-6">
               <div class="space-y-1">
-                <div class="flex justify-between text-xs font-bold"><span>1️⃣ خيار [ 1 ] - الفريق الأول</span><span id="v1-val">0 صوت (0%)</span></div>
-                <div class="w-full h-4 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden p-0.5">
+                <div class="flex justify-between text-xs font-bold"><span>1️⃣ الخيار الأول</span><span id="v1-val">0 صوت (0%)</span></div>
+                <div class="w-full h-3.5 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden p-0.5">
                   <div id="bar-1" class="h-full bg-brand-500 rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
               </div>
               <div class="space-y-1">
-                <div class="flex justify-between text-xs font-bold"><span>2️⃣ خيار [ 2 ] - الفريق الثاني</span><span id="v2-val">0 صوت (0%)</span></div>
-                <div class="w-full h-4 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden p-0.5">
+                <div class="flex justify-between text-xs font-bold"><span>2️⃣ الخيار الثاني</span><span id="v2-val">0 صوت (0%)</span></div>
+                <div class="w-full h-3.5 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden p-0.5">
                   <div id="bar-2" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
               </div>
               <div class="space-y-1">
-                <div class="flex justify-between text-xs font-bold"><span>3️⃣ خيار [ 3 ] - التعادل</span><span id="v3-val">0 صوت (0%)</span></div>
-                <div class="w-full h-4 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden p-0.5">
+                <div class="flex justify-between text-xs font-bold"><span>3️⃣ الخيار الثالث</span><span id="v3-val">0 صوت (0%)</span></div>
+                <div class="w-full h-3.5 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden p-0.5">
                   <div id="bar-3" class="h-full bg-orange-400 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+              </div>
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs font-bold"><span>4️⃣ الخيار الرابع</span><span id="v4-val">0 صوت (0%)</span></div>
+                <div class="w-full h-3.5 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden p-0.5">
+                  <div id="bar-4" class="h-full bg-red-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+              </div>
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs font-bold"><span>5️⃣ الخيار الخامس</span><span id="v5-val">0 صوت (0%)</span></div>
+                <div class="w-full h-3.5 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden p-0.5">
+                  <div id="bar-5" class="h-full bg-purple-500 rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
               </div>
             </div>
 
-            <div class="flex gap-2 justify-center pt-2">
-              <button onclick="castVote(1)" class="flex-1 max-w-[110px] bg-brand-500 hover:bg-brand-600 text-white font-black py-2.5 rounded-xl shadow-md transition text-xs">توصيت [ 1 ]</button>
-              <button onclick="castVote(2)" class="flex-1 max-w-[110px] bg-amber-500 hover:bg-amber-600 text-white font-black py-2.5 rounded-xl shadow-md transition text-xs">تصويت [ 2 ]</button>
-              <button onclick="castVote(3)" class="flex-1 max-w-[110px] bg-orange-400 hover:bg-orange-500 text-white font-black py-2.5 rounded-xl shadow-md transition text-xs">تصويت [ 3 ]</button>
+            <div class="flex gap-2 justify-center pt-2 flex-wrap">
+              <button onclick="castVote(1)" class="bg-brand-500 hover:bg-brand-600 text-white font-black px-4 py-2 rounded-xl shadow-md transition text-xs">تصويت [1]</button>
+              <button onclick="castVote(2)" class="bg-amber-500 hover:bg-amber-600 text-white font-black px-4 py-2 rounded-xl shadow-md transition text-xs">تصويت [2]</button>
+              <button onclick="castVote(3)" class="bg-orange-400 hover:bg-orange-500 text-white font-black px-4 py-2 rounded-xl shadow-md transition text-xs">تصويت [3]</button>
+              <button onclick="castVote(4)" class="bg-red-500 hover:bg-red-600 text-white font-black px-4 py-2 rounded-xl shadow-md transition text-xs">تصويت [4]</button>
+              <button onclick="castVote(5)" class="bg-purple-500 hover:bg-purple-600 text-white font-black px-4 py-2 rounded-xl shadow-md transition text-xs">تصويت [5]</button>
             </div>
           </div>
 
-          <!-- GAME 2: TUG OF WAR (NEW) -->
+          <!-- GAME 2: TUG OF WAR -->
           <div id="game-view-tug" class="game-container hidden space-y-6 text-center">
             <div>
               <span class="text-4xl">🧲</span>
               <h2 class="text-2xl font-black mt-2">تحدي شد الحبل التفاعلي</h2>
-              <p class="text-xs text-gray-400">الفريق الأحـمر (اكتب 1) 🆚 الفريق الأزرق (اكتب 2)</p>
+              <p class="text-xs text-gray-400">الفريق الأحمر (اكتب 1) 🆚 الفريق الأزرق (اكتب 2)</p>
             </div>
 
             <div class="my-8 max-w-lg mx-auto">
@@ -222,12 +337,12 @@
             </div>
 
             <div class="flex justify-center gap-4">
-              <button onclick="pullTug(1)" class="bg-red-500 hover:bg-red-600 text-white font-extrabold px-6 py-2.5 rounded-xl text-xs transition">دعم الأحـمر (+!1)</button>
-              <button onclick="pullTug(2)" class="bg-blue-500 hover:bg-blue-600 text-white font-extrabold px-6 py-2.5 rounded-xl text-xs transition">دعم الأزرق (+!2)</button>
+              <button onclick="pullTug(1)" class="bg-red-500 hover:bg-red-600 text-white font-extrabold px-6 py-2.5 rounded-xl text-xs transition">دعم الأحمر (+1)</button>
+              <button onclick="pullTug(2)" class="bg-blue-500 hover:bg-blue-600 text-white font-extrabold px-6 py-2.5 rounded-xl text-xs transition">دعم الأزرق (+2)</button>
             </div>
           </div>
 
-          <!-- GAME 3: WHEEL OF FORTUNE (NEW) -->
+          <!-- GAME 3: WHEEL OF FORTUNE -->
           <div id="game-view-wheel" class="game-container hidden flex flex-col items-center space-y-4">
             <h2 class="text-xl font-black">🎡 عجلة الحظ والمكافآت المباشرة</h2>
             
@@ -240,12 +355,12 @@
             <div id="wheelWinner" class="text-sm font-black text-amber-500 min-h-[20px]"></div>
           </div>
 
-          <!-- GAME 4: BOSS FIGHT (NEW) -->
+          <!-- GAME 4: BOSS FIGHT -->
           <div id="game-view-boss" class="game-container hidden space-y-6 text-center">
             <div>
               <span class="text-5xl animate-pulse">👾</span>
-              <h2 class="text-2xl font-black mt-2">معركة التنين الشرير!</h2>
-              <p class="text-xs text-gray-400">اكتب "هجوم" أو أرسل هدية لإنقاص صحة الوحش</p>
+              <h2 class="text-2xl font-black mt-2">معركة التنين التفاعلي!</h2>
+              <p class="text-xs text-gray-400">اكتب "هجوم" أو أرسل خيار التفاعل لإنقاص صحة الوحش</p>
             </div>
 
             <div class="max-w-md mx-auto space-y-2">
@@ -264,10 +379,27 @@
             </div>
           </div>
 
+          <!-- GAME 5: NUMBER GUESSING -->
+          <div id="game-view-number" class="game-container hidden space-y-6 text-center">
+            <div>
+              <span class="text-4xl">🔢</span>
+              <h2 class="text-2xl font-black mt-2">تحدي تخمين الرقم السري</h2>
+              <p class="text-xs text-gray-400">خمّن الرقم بين 1 و 100 واكتبه بالدردشة!</p>
+            </div>
+
+            <div class="max-w-xs mx-auto space-y-3">
+              <input type="number" id="numberGuessInput" min="1" max="100" placeholder="أدخل رقمك هنا..." class="w-full px-4 py-3 rounded-2xl bg-gray-100 dark:bg-zinc-800 font-bold text-center text-lg outline-none focus:border-brand-500 border border-transparent">
+              <button onclick="submitNumberGuess()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-extrabold py-3 rounded-xl transition text-xs">إرسال التخمين</button>
+            </div>
+
+            <div id="numberGuessFeedback" class="text-sm font-bold text-amber-500 min-h-[24px]"></div>
+          </div>
+
           <!-- HOST GAME CONTROL BUTTONS -->
           <div class="mt-6 pt-4 border-t border-gray-100 dark:border-zinc-800 flex flex-wrap items-center justify-between text-xs font-bold gap-2">
-            <span class="text-gray-400">أدوات التحكم بالبث:</span>
+            <span class="text-gray-400">أدوات التحكم باللعبة:</span>
             <div class="flex gap-2">
+              <button onclick="startGameOnServer()" class="bg-brand-500 text-white px-3 py-1.5 rounded-lg transition">بدء اللعبة سيرفر 🚀</button>
               <button onclick="resetCurrentGame()" class="bg-gray-100 dark:bg-zinc-800 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg transition">إعادة الجولة 🔄</button>
               <button onclick="playSound('win')" class="bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white px-3 py-1.5 rounded-lg transition">صوت الفوز 🎉</button>
             </div>
@@ -285,10 +417,7 @@
             
             <div id="chatBox" class="space-y-2.5 h-80 overflow-y-auto pr-1 text-xs custom-scrollbar">
               <div class="bg-white dark:bg-zinc-900 p-2.5 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm">
-                <span class="font-bold text-brand-500">أحمد:</span> مرحباً بالجميع! 🔥
-              </div>
-              <div class="bg-white dark:bg-zinc-900 p-2.5 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm">
-                <span class="font-bold text-brand-500">سارة:</span> تصويتي للخيار الأول 1️⃣
+                <span class="font-bold text-brand-500">مرحباً بك!</span> تم الاتصال بالغرفة المباشرة.
               </div>
             </div>
           </div>
@@ -301,28 +430,27 @@
 
       </div>
 
-      <!-- BOTTOM LEADERBOARD & POINTS BAR -->
+      <!-- LEADERBOARD BAR -->
       <div class="bg-gray-100 dark:bg-zinc-800/90 px-6 py-3 border-t border-gray-200 dark:border-zinc-700 flex flex-wrap items-center justify-between gap-4 font-bold text-xs">
         <div class="flex items-center gap-2 overflow-x-auto">
-          <span>🏆 المتصدرون:</span>
+          <span>🏆 لائحة المتصدرين:</span>
           <div id="topLeaderboard" class="flex items-center gap-2">
-            <span class="bg-brand-500/10 text-brand-600 px-2.5 py-1 rounded-lg">🥇 خالد (240)</span>
-            <span class="bg-amber-500/10 text-amber-600 px-2.5 py-1 rounded-lg">🥈 ريم (180)</span>
+            <span class="bg-brand-500/10 text-brand-600 px-2.5 py-1 rounded-lg">🥇 جاري التحميل...</span>
           </div>
         </div>
         <div class="text-brand-500 font-extrabold text-sm">
-          ⚡ نقاطك: <span id="myPoints">120</span>
+          ⚡ النقاط: <span id="myPoints">100</span>
         </div>
       </div>
 
     </div>
   </section>
 
-  <!-- SCREEN 3: SUBSCRIPTION & CODE ACTIVATION -->
+  <!-- ================= SCREEN 5: SUBSCRIPTIONS ================= -->
   <section id="page-subscribe" class="page-view hidden flex-1 p-6 max-w-5xl mx-auto w-full flex flex-col justify-center">
     <div class="text-center mb-10">
       <h2 class="text-3xl font-black mb-2">تفعيل الاشتراكات وباقات صناع المحتوى</h2>
-      <p class="text-gray-500 text-xs md:text-sm">احصل على كود التفعيل من الموزعين المعتمدين واستمتع بكافة المزايا</p>
+      <p class="text-gray-500 text-xs md:text-sm">احصل على كود التفعيل واستمتع بكافة مزايا البث المباشر والألعاب</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
@@ -330,7 +458,7 @@
       <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-gray-200 dark:border-zinc-800 shadow-xl flex flex-col justify-between">
         <div>
           <h3 class="text-xl font-bold mb-2 flex items-center gap-2">🔑 تفعيل كود الاشتراك</h3>
-          <p class="text-xs text-gray-500 mb-6">أدخل كود التفعيل الخاص بك والمكون من 12 خانة لتجديد حسابك فوراً</p>
+          <p class="text-xs text-gray-500 mb-6">أدخل كود التفعيل لتجديد وترقية حسابك فوراً</p>
           <input type="text" id="activationCodeInput" placeholder="KOTCHA-XXXX-XXXX" class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 font-mono font-bold text-center tracking-widest uppercase mb-4 outline-none focus:border-brand-500 text-sm">
         </div>
         <button onclick="redeemCode()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-extrabold py-3.5 rounded-xl shadow-lg shadow-brand-500/20 transition text-sm">تفعيل الحساب الآن</button>
@@ -343,10 +471,10 @@
           <h3 class="text-2xl font-black">الباقة الشاملة VIP</h3>
           <div class="my-4 text-4xl font-black">49 <span class="text-xs font-medium text-gray-500">ر.س / شهرياً</span></div>
           <ul class="space-y-3 text-xs font-bold text-gray-600 dark:text-gray-300">
-            <li class="flex items-center gap-2"><span class="text-brand-500">✓</span> ربط مباشر وغير محدود مع TikTok Live</li>
-            <li class="flex items-center gap-2"><span class="text-brand-500">✓</span> تفعيل الألعاب الأربعة بالكامل مع المؤثرات الصوتية</li>
+            <li class="flex items-center gap-2"><span class="text-brand-500">✓</span> ربط مباشر وغير محدود مع TikTok, Twitch, Kick</li>
+            <li class="flex items-center gap-2"><span class="text-brand-500">✓</span> تفعيل الألعاب التفاعلية بالكامل مع المؤثرات الصوتية</li>
             <li class="flex items-center gap-2"><span class="text-brand-500">✓</span> شاشة تراكب خاصة ببرنامج OBS Studio</li>
-            <li class="flex items-center gap-2"><span class="text-brand-500">✓</span> دعم فني مباشر واستضافة سيرفر خاصة</li>
+            <li class="flex items-center gap-2"><span class="text-brand-500">✓</span> استضافة غرف خاصة بعصا استجابة فائقة السرعة</li>
           </ul>
         </div>
         <button onclick="alert('تواصل مع الدعم الفني لشراء كود التفعيل: @KotchaSupport')" class="w-full bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 font-extrabold py-3.5 rounded-xl mt-6 transition text-sm">طلب كود جديد</button>
@@ -354,14 +482,14 @@
     </div>
   </section>
 
-  <!-- SCREEN 4: ISOLATED ADMIN DASHBOARD -->
+  <!-- ================= SCREEN 6: ADMIN DASHBOARD ================= -->
   <section id="page-admin" class="page-view hidden flex-1 p-6 max-w-6xl mx-auto w-full">
     <div class="bg-red-500/10 border border-red-500/30 p-6 rounded-3xl mb-8 flex items-center justify-between">
       <div>
         <h2 class="text-2xl font-black text-red-500">لوحة تحكم الأدمن (Admin Dashboard)</h2>
-        <p class="text-xs text-red-400 font-medium">إدارة السيرفر وتوليد الأكواد ومراقبة الغرف النشطة</p>
+        <p class="text-xs text-red-400 font-medium">إدارة الغرف وتوليد الأكواد ومراقبة حالة الخادم</p>
       </div>
-      <span class="bg-red-500 text-white font-mono text-xs px-3 py-1 rounded-lg font-bold">DEVELOPER ACCESS</span>
+      <span class="bg-red-500 text-white font-mono text-xs px-3 py-1 rounded-lg font-bold">SERVER ADMIN</span>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -376,54 +504,53 @@
 
       <!-- SYSTEM METRICS -->
       <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-200 dark:border-zinc-800 col-span-2 space-y-4">
-        <h3 class="font-bold text-sm">حالة السيرفرات والغرف النشطة</h3>
+        <h3 class="font-bold text-sm">حالة سيرفر الخادم المباشر</h3>
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-center">
           <div class="p-4 bg-gray-50 dark:bg-zinc-800 rounded-xl">
-            <div class="text-[10px] text-gray-500 font-bold">الغرف النشطة</div>
-            <div class="text-xl font-black text-brand-500 mt-1">1 Main Room</div>
+            <div class="text-[10px] text-gray-500 font-bold">الحالة</div>
+            <div class="text-xl font-black text-green-500 mt-1">متصل LIVE</div>
           </div>
           <div class="p-4 bg-gray-50 dark:bg-zinc-800 rounded-xl">
-            <div class="text-[10px] text-gray-500 font-bold">الاتصالات الفعالة</div>
-            <div class="text-xl font-black text-amber-500 mt-1">1,482</div>
+            <div class="text-[10px] text-gray-500 font-bold">رابط الخادم</div>
+            <div class="text-xs font-black text-brand-500 mt-2 truncate">Cloudflare Worker</div>
           </div>
           <div class="p-4 bg-gray-50 dark:bg-zinc-800 rounded-xl col-span-2 sm:col-span-1">
-            <div class="text-[10px] text-gray-500 font-bold">استجابة السيرفر</div>
-            <div class="text-xl font-black text-green-500 mt-1">12 ms</div>
+            <div class="text-[10px] text-gray-500 font-bold">زمن الاستجابة</div>
+            <div id="serverPing" class="text-xl font-black text-green-500 mt-1">-- ms</div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- SCREEN 5: AUTHENTICATION -->
-  <section id="page-auth" class="page-view hidden flex-1 p-6 max-w-md mx-auto w-full flex flex-col justify-center">
-    <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-gray-200 dark:border-zinc-800 shadow-xl">
-      <h2 class="text-2xl font-black text-center mb-6">تسجيل الدخول المنصة</h2>
-      <div class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-gray-500 mb-1">اسم المستخدم</label>
-          <input type="text" id="authUsername" placeholder="مثال: Streamer2026" class="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-sm font-bold outline-none focus:border-brand-500">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-500 mb-1">كلمة المرور</label>
-          <input type="password" placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-sm font-bold outline-none focus:border-brand-500">
-        </div>
-        <button onclick="handleAuthSubmit()" class="w-full bg-brand-500 text-white font-extrabold py-3 rounded-xl shadow-lg shadow-brand-500/20 text-sm">دخول</button>
-      </div>
-    </div>
-  </section>
-
+  <!-- ================= JAVASCRIPT LOGIC & API INTEGRATION ================= -->
   <script>
-    // WEB AUDIO SOUND ENGINE (EXPANDED SYNTHESIZER)
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // API & SERVER CONFIGURATION
+    const WORKER_URL = "https://kotcha.ig999x.workers.dev";
+    const WS_URL = "wss://kotcha.ig999x.workers.dev";
+
+    // GLOBAL APPLICATION STATE
+    let currentUser = null;
+    let currentRoomId = null;
+    let roomOwnerToken = null;
+    let wsConnection = null;
+    let currentGame = 'poll';
+    let userPoints = 100;
     
+    // GAME DATA STATES
+    let pollVotes = [0, 0, 0, 0, 0];
+    let tugValue = 50;
+    let bossHp = 1000;
+
+    // WEB AUDIO SOUND SYNTHESIZER
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
     function playSound(type) {
       if (audioCtx.state === 'suspended') audioCtx.resume();
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.connect(gain);
       gain.connect(audioCtx.destination);
-
       const now = audioCtx.currentTime;
 
       if (type === 'vote') {
@@ -455,17 +582,29 @@
       }
     }
 
-    // STATE MANAGEMENT
-    const WORKER_URL = "https://kotcha.ig999x.workers.dev";
-    let currentGame = 'poll';
-    let votes = [0, 0, 0];
-    let points = 120;
-    let tugVal = 50;
-    let bossHp = 1000;
+    // INITIALIZATION ON LOAD
+    window.addEventListener('DOMContentLoaded', () => {
+      checkStoredUserSession();
+      checkHealth();
+    });
 
+    // TOAST NOTIFICATIONS
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').innerText = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 3500);
+    }
+
+    // UI PAGE SWITCHER
     function showPage(pageId) {
       document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
-      document.getElementById(`page-${pageId}`).classList.remove('hidden');
+      const target = document.getElementById(`page-${pageId}`);
+      if (target) target.classList.remove('hidden');
+
+      if (pageId === 'game' && currentRoomId && !wsConnection) {
+        connectRoomWebSocket(currentRoomId);
+      }
     }
 
     function toggleTheme() {
@@ -473,61 +612,305 @@
     }
 
     function toggleOBSMode() {
-      const header = document.getElementById('mainHeader');
-      header.classList.toggle('hidden');
+      document.getElementById('mainHeader').classList.toggle('hidden');
       document.body.classList.toggle('obs-overlay');
     }
 
-    // GAME SWITCHING LOGIC
+    // AUTHENTICATION LOGIC
+    function checkStoredUserSession() {
+      const stored = localStorage.getItem('kotcha_user');
+      if (stored) {
+        try {
+          currentUser = JSON.parse(stored);
+          updateUserUI();
+        } catch(e) {}
+      }
+    }
+
+    function updateUserUI() {
+      const container = document.getElementById('userHeaderProfile');
+      if (currentUser) {
+        container.innerHTML = `
+          <div class="flex items-center gap-2 bg-gray-100 dark:bg-zinc-800 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-zinc-700 text-xs font-bold">
+            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+            <span>${currentUser.displayName || currentUser.username}</span>
+            <button onclick="logoutUser()" class="text-red-500 hover:underline mr-1">خروج</button>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <button onclick="showPage('auth')" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-5 py-2 rounded-xl shadow-md shadow-brand-500/20 transition text-sm">تسجيل الدخول</button>
+        `;
+      }
+    }
+
+    function switchAuthTab(type) {
+      if (type === 'login') {
+        document.getElementById('form-login').classList.remove('hidden');
+        document.getElementById('form-signup').classList.add('hidden');
+        document.getElementById('authTab-login').className = "flex-1 pb-3 text-center border-b-2 border-brand-500 text-brand-500 transition";
+        document.getElementById('authTab-signup').className = "flex-1 pb-3 text-center border-b-2 border-transparent text-gray-400 hover:text-gray-200 transition";
+      } else {
+        document.getElementById('form-login').classList.add('hidden');
+        document.getElementById('form-signup').classList.remove('hidden');
+        document.getElementById('authTab-signup').className = "flex-1 pb-3 text-center border-b-2 border-brand-500 text-brand-500 transition";
+        document.getElementById('authTab-login').className = "flex-1 pb-3 text-center border-b-2 border-transparent text-gray-400 hover:text-gray-200 transition";
+      }
+    }
+
+    function handleAuthSubmit(e, type) {
+      e.preventDefault();
+      if (type === 'login') {
+        const username = document.getElementById('loginUsername').value.trim();
+        currentUser = {
+          id: 'user_' + Date.now(),
+          username: username,
+          displayName: username,
+          avatar: null
+        };
+      } else {
+        const username = document.getElementById('signupUsername').value.trim();
+        const display = document.getElementById('signupDisplayName').value.trim() || username;
+        currentUser = {
+          id: 'user_' + Date.now(),
+          username: username,
+          displayName: display,
+          avatar: null
+        };
+      }
+      localStorage.setItem('kotcha_user', JSON.stringify(currentUser));
+      updateUserUI();
+      showToast("تم تسجيل الدخول بنجاح! 🎉");
+      showPage('explore');
+    }
+
+    function logoutUser() {
+      localStorage.removeItem('kotcha_user');
+      currentUser = null;
+      updateUserUI();
+      showToast("تم تسجيل الخروج");
+      showPage('home');
+    }
+
+    // SERVER HEALTH CHECK
+    async function checkHealth() {
+      try {
+        const start = Date.now();
+        const res = await fetch(`${WORKER_URL}/health`);
+        const latency = Date.now() - start;
+        document.getElementById('serverPing').innerText = `${latency} ms`;
+      } catch (err) {
+        document.getElementById('serverPing').innerText = 'غير متصل';
+      }
+    }
+
+    // ROOM MANAGEMENT SYSTEM
+    async function createNewRoom() {
+      showToast("جاري إنشاء الغرفة عبر السيرفر...");
+      try {
+        const res = await fetch(`${WORKER_URL}/api/room/create`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          currentRoomId = data.roomId;
+          roomOwnerToken = data.ownerToken || null;
+          showToast(`تم إنشاء الغرفة: ${currentRoomId}`);
+          updateActiveRoomCard();
+          connectRoomWebSocket(currentRoomId);
+          showPage('game');
+        } else {
+          showToast("فشل إنشاء الغرفة!");
+        }
+      } catch (err) {
+        showToast("خطأ في الاتصال بالسيرفر!");
+      }
+    }
+
+    function joinRoomById() {
+      const id = document.getElementById('manualRoomIdInput').value.trim();
+      if (!id) return alert("يرجى كتابة معرّف الغرفة!");
+      currentRoomId = id;
+      updateActiveRoomCard();
+      connectRoomWebSocket(currentRoomId);
+      showPage('game');
+    }
+
+    function updateActiveRoomCard() {
+      document.getElementById('activeRoomIdDisplay').innerText = currentRoomId;
+      document.getElementById('arenaRoomId').innerText = `الغرفة: ${currentRoomId}`;
+      document.getElementById('activeRoomInfoCard').classList.remove('hidden');
+    }
+
+    // WEBSOCKET REAL-TIME ENGINE
+    function connectRoomWebSocket(roomId) {
+      if (wsConnection) wsConnection.close();
+
+      const wsUri = `${WS_URL}/room/${encodeURIComponent(roomId)}`;
+      wsConnection = new WebSocket(wsUri);
+
+      wsConnection.onopen = () => {
+        document.getElementById('activeRoomConnStatus').innerText = "متصل LIVE";
+        
+        // AUTHENTICATE WS SESSION
+        const authPayload = {
+          type: "AUTH",
+          platform: "kotcha",
+          user: currentUser || { username: "Guest_" + Math.floor(Math.random()*1000) },
+          ownerToken: roomOwnerToken
+        };
+        wsConnection.send(JSON.stringify(authPayload));
+      };
+
+      wsConnection.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          handleWebSocketPayload(msg);
+        } catch(e) {}
+      };
+
+      wsConnection.onclose = () => {
+        document.getElementById('activeRoomConnStatus').innerText = "منقطع";
+        wsConnection = null;
+      };
+    }
+
+    function handleWebSocketPayload(msg) {
+      if (msg.type === 'CHAT') {
+        appendChatMessage(msg.data);
+        playSound('chat');
+        parseGameCommandsFromChat(msg.data.message);
+      } else if (msg.type === 'VOTE') {
+        pollVotes = msg.votes;
+        updateVoteBars();
+      } else if (msg.type === 'CONNECTED' || msg.type === 'USER_JOINED' || msg.type === 'USER_LEFT') {
+        if (msg.viewers) {
+          document.getElementById('viewerCount').innerText = msg.viewers;
+        }
+      }
+    }
+
+    // PLATFORM LIVE CONNECTOR (TIKTOK / TWITCH / KICK)
+    function connectPlatformLive() {
+      const platform = document.getElementById('platformSelect').value;
+      const username = document.getElementById('liveUsernameInput').value.trim();
+
+      if (!username) return alert("يرجى إدخال اسم المستخدم للقناة!");
+      if (!currentRoomId) return alert("يرجى الانضمام أو إنشاء غرفة أولاً!");
+
+      if (wsConnection && wsConnection.readyState === WebSocket.OPEN) {
+        wsConnection.send(JSON.stringify({
+          type: "AUTH",
+          platform: platform,
+          user: { username: username, displayName: username },
+          ownerToken: roomOwnerToken
+        }));
+        showToast(`تم ربط ${platform.toUpperCase()} بحساب: ${username}`);
+      } else {
+        showToast("خطأ: WebSocket غير متصل بالسيرفر!");
+      }
+    }
+
+    // LIVE CHAT ENGINE
+    function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      if (wsConnection && wsConnection.readyState === WebSocket.OPEN) {
+        wsConnection.send(JSON.stringify({
+          type: "CHAT_MESSAGE",
+          message: text
+        }));
+        input.value = '';
+      } else {
+        showToast("يرجى الاتصال بالغرفة أولاً إو إعادة التحديث!");
+      }
+    }
+
+    function appendChatMessage(chatData) {
+      const box = document.getElementById('chatBox');
+      const div = document.createElement('div');
+      div.className = "bg-white dark:bg-zinc-900 p-2.5 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm transition-all";
+      const name = chatData.user ? (chatData.user.displayName || chatData.user.username) : "Anonymous";
+      const platformBadge = chatData.platform ? `[${chatData.platform.toUpperCase()}] ` : '';
+
+      div.innerHTML = `<span class="font-bold text-brand-500">${platformBadge}${name}:</span> ${escapeHTML(chatData.message)}`;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
+
+    // PARSE CHAT FOR INTERACTIVE GAMES
+    function parseGameCommandsFromChat(msgText) {
+      const clean = msgText.trim().toLowerCase();
+      if (currentGame === 'poll') {
+        const num = parseInt(clean);
+        if (num >= 1 && num <= 5) castVote(num);
+      } else if (currentGame === 'tug') {
+        if (clean === '1' || clean === 'احمر' || clean === 'أحمر') pullTug(1);
+        if (clean === '2' || clean === 'ازرق' || clean === 'أزرق') pullTug(2);
+      } else if (currentGame === 'boss') {
+        if (clean.includes('هجوم') || clean.includes('ضربة') || clean.includes('1')) damageBoss(40);
+      }
+    }
+
+    // GAME CONTROLS & SWITCHING
     function switchGame(gameId) {
       currentGame = gameId;
       document.querySelectorAll('.game-container').forEach(el => el.classList.add('hidden'));
       document.getElementById(`game-view-${gameId}`).classList.remove('hidden');
 
-      document.querySelectorAll('.game-tab').forEach(el => {
-        el.classList.remove('bg-brand-500', 'text-white');
-      });
+      document.querySelectorAll('.game-tab').forEach(el => el.classList.remove('bg-brand-500', 'text-white'));
       document.getElementById(`tab-${gameId}`).classList.add('bg-brand-500', 'text-white');
 
       if (gameId === 'wheel') initWheelCanvas();
     }
 
     // GAME 1: POLL SYSTEM
-    function updateVoteBars(newVotes) {
-      votes = newVotes;
-      const total = votes.reduce((a, b) => a + b, 0) || 1;
-      
-      for (let i = 1; i <= 3; i++) {
-        const count = votes[i-1] || 0;
+    function castVote(optionIndex) {
+      playSound('vote');
+      if (!currentRoomId) {
+        pollVotes[optionIndex - 1]++;
+        updateVoteBars();
+        return;
+      }
+      fetch(`${WORKER_URL}/room/${encodeURIComponent(currentRoomId)}/api/vote/cast`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ value: optionIndex, user: currentUser })
+      }).catch(e => {});
+    }
+
+    function updateVoteBars() {
+      const total = pollVotes.reduce((a, b) => a + b, 0) || 1;
+      for (let i = 1; i <= 5; i++) {
+        const count = pollVotes[i - 1] || 0;
         const pct = Math.round((count / total) * 100);
         document.getElementById(`bar-${i}`).style.width = pct + '%';
         document.getElementById(`v${i}-val`).innerText = `${count} صوت (${pct}%)`;
       }
     }
 
-    function castVote(val) {
-      playSound('vote');
-      votes[val-1]++;
-      updateVoteBars(votes);
-      addPoints(10);
-    }
-
     // GAME 2: TUG OF WAR
     function pullTug(team) {
       playSound('hit');
-      if (team === 1) tugVal = Math.min(100, tugVal + 5);
-      else tugVal = Math.max(0, tugVal - 5);
+      if (team === 1) tugValue = Math.min(100, tugValue + 4);
+      else tugValue = Math.max(0, tugValue - 4);
 
-      document.getElementById('tugBar1').style.width = tugVal + '%';
-      document.getElementById('tugTeam1').innerText = tugVal;
-      document.getElementById('tugTeam2').innerText = 100 - tugVal;
+      document.getElementById('tugBar1').style.width = tugValue + '%';
+      document.getElementById('tugTeam1').innerText = tugValue;
+      document.getElementById('tugTeam2').innerText = 100 - tugValue;
 
-      if (tugVal >= 100) { playSound('win'); alert('🎉 فاز الفريق الأحمر!'); tugVal = 50; }
-      else if (tugVal <= 0) { playSound('win'); alert('🎉 فاز الفريق الأزرق!'); tugVal = 50; }
+      if (tugValue >= 100) { playSound('win'); showToast('🎉 فاز الفريق الأحمر!'); tugValue = 50; }
+      else if (tugValue <= 0) { playSound('win'); showToast('🎉 فاز الفريق الأزرق!'); tugValue = 50; }
     }
 
-    // GAME 3: WHEEL OF FORTUNE (CANVAS 2D)
-    const wheelItems = ["100 نقطة 🌟", "حظ أوفر ❌", "هدية مجانية 🎁", "50 نقطة ⭐", "تحدي جديد 🎯", "مضاعفة النقاط 🚀"];
+    // GAME 3: WHEEL OF FORTUNE
+    const wheelItems = ["100 نقطة 🌟", "حظ أوفر ❌", "هدية VIP 🎁", "50 نقطة ⭐", "تحدي جديد 🎯", "مضاعفة النقاط 🚀"];
     let wheelAngle = 0;
 
     function initWheelCanvas() {
@@ -536,157 +919,126 @@
       const ctx = canvas.getContext('2d');
       const numItems = wheelItems.length;
       const arc = (2 * Math.PI) / numItems;
-
-      ctx.clearRect(0, 0, 300, 300);
       const colors = ["#ff6b00", "#f59e0b", "#ea580c", "#d97706", "#c2410c", "#b45309"];
 
+      ctx.clearRect(0, 0, 300, 300);
       for (let i = 0; i < numItems; i++) {
         const angle = wheelAngle + i * arc;
-        ctx.beginPath();
         ctx.fillStyle = colors[i % colors.length];
-        ctx.moveTo(150, 150);
-        ctx.arc(150, 150, 140, angle, angle + arc);
+        ctx.beginPath();
+        ctx.arc(150, 150, 140, angle, angle + arc, false);
+        ctx.lineTo(150, 150);
         ctx.fill();
 
         ctx.save();
-        ctx.translate(150, 150);
-        ctx.rotate(angle + arc / 2);
-        ctx.textAlign = "right";
         ctx.fillStyle = "#ffffff";
         ctx.font = "bold 12px Tajawal";
-        ctx.fillText(wheelItems[i], 130, 5);
+        ctx.translate(150 + Math.cos(angle + arc / 2) * 90, 150 + Math.sin(angle + arc / 2) * 90);
+        ctx.rotate(angle + arc / 2 + Math.PI / 2);
+        ctx.fillText(wheelItems[i], -ctx.measureText(wheelItems[i]).width / 2, 0);
         ctx.restore();
       }
     }
 
     function spinWheel() {
-      playSound('vote');
-      const spinAngle = Math.random() * 2000 + 1000;
+      playSound('hit');
+      const extraSpin = Math.floor(Math.random() * 360) + 1440;
       let start = null;
 
-      function animate(timestamp) {
+      function animateWheel(timestamp) {
         if (!start) start = timestamp;
         const progress = timestamp - start;
-        wheelAngle += (spinAngle / 100) * Math.exp(-progress / 1000);
-        initWheelCanvas();
-
-        if (progress < 2500) {
-          requestAnimationFrame(animate);
+        if (progress < 3000) {
+          wheelAngle += (extraSpin * (1 - progress / 3000)) * (Math.PI / 180) * 0.05;
+          initWheelCanvas();
+          requestAnimationFrame(animateWheel);
         } else {
           playSound('win');
-          const winningIndex = Math.floor((wheelItems.length - ((wheelAngle / (2 * Math.PI)) % wheelItems.length)) % wheelItems.length);
-          document.getElementById('wheelWinner').innerText = `🎉 الفائز: ${wheelItems[winningIndex]}`;
+          const winIndex = Math.floor(Math.random() * wheelItems.length);
+          document.getElementById('wheelWinner').innerText = `🎉 النتيجة: ${wheelItems[winIndex]}`;
         }
       }
-      requestAnimationFrame(animate);
+      requestAnimationFrame(animateWheel);
     }
 
     // GAME 4: BOSS FIGHT
-    function damageBoss(dmg) {
+    function damageBoss(amount) {
       playSound('hit');
-      bossHp = Math.max(0, bossHp - dmg);
-      const pct = (bossHp / 1000) * 100;
-      document.getElementById('bossHpBar').style.width = pct + '%';
+      bossHp = Math.max(0, bossHp - amount);
       document.getElementById('bossHpText').innerText = `${bossHp} / 1000`;
+      document.getElementById('bossHpBar').style.width = (bossHp / 10) + '%';
 
       if (bossHp <= 0) {
         playSound('win');
-        alert('🎉 تم القضاء على الوحش وبنجاح!');
+        showToast("🎉 تم القضاء على الوحش بصلابة!");
         bossHp = 1000;
-        document.getElementById('bossHpBar').style.width = '100%';
-        document.getElementById('bossHpText').innerText = `1000 / 1000`;
       }
+    }
+
+    // GAME 5: NUMBER GUESSING
+    async function submitNumberGuess() {
+      const input = document.getElementById('numberGuessInput');
+      const val = parseInt(input.value);
+      if (!val || val < 1 || val > 100) return alert("أدخل رقماً صحيحاً بين 1 و 100!");
+
+      if (!currentRoomId) return alert("يرجى الدخول لغرفة أولاً!");
+
+      try {
+        const res = await fetch(`${WORKER_URL}/room/${encodeURIComponent(currentRoomId)}/api/number/guess`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ guess: val, user: currentUser })
+        });
+        const data = await res.json();
+        if (data.success) {
+          playSound('vote');
+          document.getElementById('numberGuessFeedback').innerText = `النتيجة: ${data.event.result}`;
+        }
+      } catch(e) {}
+    }
+
+    // HOST CONTROLS
+    async function startGameOnServer() {
+      if (!currentRoomId || !roomOwnerToken) return alert("يتطلب هذا الإجراء أن تكون مالك الغرفة!");
+
+      try {
+        const res = await fetch(`${WORKER_URL}/room/${encodeURIComponent(currentRoomId)}/api/room/start-game`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${roomOwnerToken}`
+          },
+          body: JSON.stringify({ gameType: currentGame.toUpperCase(), word: "KOTCHA" })
+        });
+        const data = await res.json();
+        if (data.success) showToast("تم تشغيل اللعبة رسمياً على الخادم!");
+        else alert("خطأ: " + data.error);
+      } catch(e) {}
     }
 
     function resetCurrentGame() {
-      votes = [0, 0, 0]; updateVoteBars(votes);
-      tugVal = 50; pullTug(0);
-      bossHp = 1000; damageBoss(0);
+      pollVotes = [0, 0, 0, 0, 0];
+      tugValue = 50;
+      bossHp = 1000;
+      updateVoteBars();
+      damageBoss(0);
+      showToast("تم إعادة ضبط الجولة الحاليّة");
     }
 
-    // LIVE CHAT & UTILS
-    function sendChatMessage() {
-      const input = document.getElementById('chatInput');
-      const msg = input.value.trim();
-      if (!msg) return;
-
-      appendChatMessage("أنت", msg);
-      playSound('chat');
-
-      if (currentGame === 'poll' && ['1','2','3'].includes(msg)) castVote(parseInt(msg));
-      if (currentGame === 'tug') {
-        if (msg === '1' || msg === '!1') pullTug(1);
-        if (msg === '2' || msg === '!2') pullTug(2);
-      }
-      if (currentGame === 'boss' && msg.includes('هجوم')) damageBoss(100);
-
-      input.value = "";
-    }
-
-    function appendChatMessage(user, msg) {
-      const box = document.getElementById('chatBox');
-      const div = document.createElement('div');
-      div.className = "bg-white dark:bg-zinc-900 p-2.5 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm text-xs";
-      div.innerHTML = `<span class="font-bold text-brand-500">${user}:</span> ${msg}`;
-      box.appendChild(div);
-      box.scrollTop = box.scrollHeight;
-    }
-
-    function addPoints(pts) {
-      points += pts;
-      document.getElementById('myPoints').innerText = points;
-    }
-
-    function simulateActivity() {
-      const users = ["محمد", "علي", "فاطمة", "سارة", "عبدالله"];
-      const randomUser = users[Math.floor(Math.random() * users.length)];
-      
-      if (currentGame === 'poll') {
-        const choice = Math.floor(Math.random() * 3) + 1;
-        appendChatMessage(randomUser, `${choice}`);
-        castVote(choice);
-      } else if (currentGame === 'tug') {
-        const team = Math.random() > 0.5 ? 1 : 2;
-        appendChatMessage(randomUser, `!${team}`);
-        pullTug(team);
-      } else if (currentGame === 'boss') {
-        appendChatMessage(randomUser, "هجوم! ⚔️");
-        damageBoss(50);
-      }
-    }
-
-    async function connectTikTok() {
-      const username = document.getElementById('tiktokUser').value.trim();
-      if (!username) return alert('يرجى إدخال اسم مستخدم حساب TikTok');
-      alert(`جاري ربط البث المباشر للحساب ${username}... (وضع العرض التوضيحي متصل)`);
-    }
-
-    async function redeemCode() {
+    // SUBSCRIPTIONS & ADMIN CODE REDEMPTION
+    function redeemCode() {
       const code = document.getElementById('activationCodeInput').value.trim();
-      if (!code) return alert('يرجى كتابة كود التفعيل أولاً');
-      alert('✅ تم تفعيل الاشتراك بنجاح! تم فتح كافة المزايا والالعاب.');
+      if (!code) return alert("أدخل كود التفعيل أولاً!");
+      showToast("تم تفعيل كود الاشتراك بنجاح! 🎉");
     }
 
     function generateAdminCode() {
       const days = document.getElementById('adminCodeDays').value;
-      const randomCode = 'KOTCHA-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + days + 'D';
-      const box = document.getElementById('generatedCodeResult');
-      box.innerText = `الكود المُنشأ: ${randomCode}`;
-      box.classList.remove('hidden');
+      const code = `KOTCHA-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+      const res = document.getElementById('generatedCodeResult');
+      res.innerText = `الكود المُنشأ (${days} يوم): ${code}`;
+      res.classList.remove('hidden');
     }
-
-    function handleAuthSubmit() {
-      const user = document.getElementById('authUsername').value;
-      if (user) {
-        document.getElementById('authBtn').innerText = user;
-        showPage('game');
-      }
-    }
-
-    window.onload = () => {
-      showPage('game');
-      initWheelCanvas();
-    };
   </script>
 </body>
 </html>
