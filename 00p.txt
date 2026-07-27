@@ -1,0 +1,3439 @@
+// ============================================================
+// KOTCHA API v8.0.0
+// Cloudflare Workers
+// Durable Objects
+// WebSocket
+// Real-Time Interactive Gaming
+// ============================================================
+
+const VERSION = "8.0.0";
+
+const API_NAME = "KOTCHA API";
+
+
+// ============================================================
+// CORS
+// ============================================================
+
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Max-Age": "86400"
+};
+
+
+// ============================================================
+// GAME TYPES
+// ============================================================
+
+const GAME_TYPES = Object.freeze({
+
+  VOTE: "VOTE",
+
+  NUMBER_GUESS: "NUMBER_GUESS",
+
+  WORD_BATTLE: "WORD_BATTLE",
+
+  QUIZ: "QUIZ",
+
+  TEAM_BATTLE: "TEAM_BATTLE",
+
+  REACTION: "REACTION"
+
+});
+
+
+// ============================================================
+// PLATFORMS
+// ============================================================
+
+const PLATFORMS = Object.freeze({
+
+  tiktok: "TikTok",
+
+  twitch: "Twitch",
+
+  kick: "Kick",
+
+  kotcha: "KOTCHA"
+
+});
+
+
+// ============================================================
+// RESPONSE
+// ============================================================
+
+function json(data, status = 200) {
+
+  return new Response(
+
+    JSON.stringify(data, null, 2),
+
+    {
+
+      status,
+
+      headers: {
+
+        ...CORS_HEADERS,
+
+        "Content-Type":
+          "application/json; charset=utf-8"
+
+      }
+
+    }
+
+  );
+
+}
+
+
+function emptyResponse() {
+
+  return new Response(
+
+    null,
+
+    {
+
+      status: 204,
+
+      headers: CORS_HEADERS
+
+    }
+
+  );
+
+}
+
+
+function methodNotAllowed(methods) {
+
+  return json(
+
+    {
+
+      success: false,
+
+      error: "METHOD_NOT_ALLOWED",
+
+      allowedMethods: methods
+
+    },
+
+    405
+
+  );
+
+}
+
+
+// ============================================================
+// UTILITIES
+// ============================================================
+
+function cleanString(value, maxLength = 500) {
+
+  if (typeof value !== "string") {
+
+    return "";
+
+  }
+
+  return value
+
+    .trim()
+
+    .slice(0, maxLength);
+
+}
+
+
+function safeUser(user) {
+
+  if (!user || typeof user !== "object") {
+
+    return {
+
+      id: null,
+
+      username: "Anonymous",
+
+      displayName: "Anonymous",
+
+      avatar: null
+
+    };
+
+  }
+
+  return {
+
+    id:
+      cleanString(user.id, 100)
+      || null,
+
+    username:
+      cleanString(user.username, 100)
+      || "Anonymous",
+
+    displayName:
+      cleanString(user.displayName, 100)
+      ||
+      cleanString(user.username, 100)
+      ||
+      "Anonymous",
+
+    avatar:
+      cleanString(user.avatar, 1000)
+      ||
+      null
+
+  };
+
+}
+
+
+function isValidGameType(type) {
+
+  return Object.values(GAME_TYPES)
+
+    .includes(type);
+
+}
+
+
+function isValidPlatform(platform) {
+
+  return Object.prototype
+
+    .hasOwnProperty
+
+    .call(
+
+      PLATFORMS,
+
+      platform
+
+    );
+
+}
+
+
+function getBearerToken(request) {
+
+  const authorization =
+
+    request.headers
+
+      .get("Authorization")
+
+      || "";
+
+  if (
+
+    !authorization
+
+      .toLowerCase()
+
+      .startsWith("bearer ")
+
+  ) {
+
+    return null;
+
+  }
+
+  return authorization
+
+    .slice(7)
+
+    .trim();
+
+}
+
+
+async function parseJSON(request) {
+
+  try {
+
+    return await request.json();
+
+  } catch {
+
+    return null;
+
+  }
+
+}
+
+
+function createGameState() {
+
+  return {
+
+    type: null,
+
+    active: false,
+
+    data: {},
+
+    votes: [0, 0, 0, 0, 0],
+
+    players: {},
+
+    leaderboard: [],
+
+    startTime: null,
+
+    roundId: null
+
+  };
+
+}
+
+
+function createOwnerToken() {
+
+  return (
+
+    crypto.randomUUID()
+
+    + "-"
+
+    + crypto.randomUUID()
+
+  );
+
+}
+
+
+// ============================================================
+// ROOM ID
+// ============================================================
+
+function extractRoomId(pathname) {
+
+  const parts =
+
+    pathname
+
+      .split("/")
+
+      .filter(Boolean);
+
+  if (
+
+    parts[0] === "room"
+
+    &&
+
+    parts[1]
+
+  ) {
+
+    return decodeURIComponent(
+
+      parts[1]
+
+    );
+
+  }
+
+  return null;
+
+}
+
+
+// ============================================================
+// DURABLE OBJECT
+// ============================================================
+
+export class KOTCHARoom {
+
+  constructor(state, env) {
+
+    this.state = state;
+
+    this.env = env;
+
+    this.sessions = new Map();
+
+    this.ownerToken = null;
+
+    this.createdAt = Date.now();
+
+    this.gameState =
+
+      createGameState();
+
+    this.chatHistory = [];
+
+    this.eventLog = [];
+
+    this.initialized =
+
+      this.state.blockConcurrencyWhile(
+
+        async () => {
+
+          const stored =
+
+            await this.state.storage.get(
+
+              "room"
+
+            );
+
+          if (!stored) {
+
+            return;
+
+          }
+
+          this.ownerToken =
+
+            stored.ownerToken
+
+            || null;
+
+          this.createdAt =
+
+            stored.createdAt
+
+            || Date.now();
+
+          this.gameState = {
+
+            ...createGameState(),
+
+            ...(stored.gameState || {})
+
+          };
+
+          this.chatHistory =
+
+            Array.isArray(
+
+              stored.chatHistory
+
+            )
+
+              ? stored.chatHistory
+
+              : [];
+
+          this.eventLog =
+
+            Array.isArray(
+
+              stored.eventLog
+
+            )
+
+              ? stored.eventLog
+
+              : [];
+
+        }
+
+      );
+
+  }
+
+
+  // ==========================================================
+  // STORAGE
+  // ==========================================================
+
+  async save() {
+
+    await this.state.storage.put(
+
+      "room",
+
+      {
+
+        ownerToken:
+
+          this.ownerToken,
+
+        createdAt:
+
+          this.createdAt,
+
+        gameState:
+
+          this.gameState,
+
+        chatHistory:
+
+          this.chatHistory.slice(-500),
+
+        eventLog:
+
+          this.eventLog.slice(-500)
+
+      }
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // FETCH
+  // ==========================================================
+
+  async fetch(request) {
+
+    await this.initialized;
+
+    const url =
+
+      new URL(
+
+        request.url
+
+      );
+
+    if (
+
+      request.method ===
+
+      "OPTIONS"
+
+    ) {
+
+      return emptyResponse();
+
+    }
+
+
+    const upgrade =
+
+      request.headers
+
+        .get("Upgrade")
+
+        ?.toLowerCase();
+
+
+    if (
+
+      upgrade === "websocket"
+
+    ) {
+
+      if (
+
+        request.method !== "GET"
+
+      ) {
+
+        return methodNotAllowed(
+
+          ["GET"]
+
+        );
+
+      }
+
+      return this.handleWebSocket(
+
+        request
+
+      );
+
+    }
+
+
+    const pathname =
+
+      url.pathname;
+
+
+    if (
+
+      pathname === "/"
+
+    ) {
+
+      return this.roomInfo();
+
+    }
+
+
+    switch (
+
+      pathname
+
+    ) {
+
+      case "/api/room/status":
+
+        if (
+
+          request.method !== "GET"
+
+        ) {
+
+          return methodNotAllowed(
+
+            ["GET"]
+
+          );
+
+        }
+
+        return this.roomStatus();
+
+
+      case "/api/room/create":
+
+        if (
+
+          request.method !== "POST"
+
+        ) {
+
+          return methodNotAllowed(
+
+            ["POST"]
+
+          );
+
+        }
+
+        return this.createRoom();
+
+
+      case "/api/room/start-game":
+
+        if (
+
+          request.method !== "POST"
+
+        ) {
+
+          return methodNotAllowed(
+
+            ["POST"]
+
+          );
+
+        }
+
+        return this.startGame(
+
+          request
+
+        );
+
+
+      case "/api/room/stop-game":
+
+        if (
+
+          request.method !== "POST"
+
+        ) {
+
+          return methodNotAllowed(
+
+            ["POST"]
+
+          );
+
+        }
+
+        return this.stopGame(
+
+          request
+
+        );
+
+
+      case "/api/room/reset":
+
+        if (
+
+          request.method !== "POST"
+
+        ) {
+
+          return methodNotAllowed(
+
+            ["POST"]
+
+          );
+
+        }
+
+        return this.resetGame(
+
+          request
+
+        );
+
+
+      case "/api/game/state":
+
+        if (
+
+          request.method !== "GET"
+
+        ) {
+
+          return methodNotAllowed(
+
+            ["GET"]
+
+          );
+
+        }
+
+        return this.gameStateAPI();
+
+
+      case "/api/chat/send":
+
+        if (
+
+          request.method !== "POST"
+
+        ) {
+
+          return methodNotAllowed(
+
+            ["POST"]
+
+          );
+
+        }
+
+        return this.chatSend(
+
+          request
+
+        );
+
+
+      case "/api/chat/history":
+
+        if (
+
+          request.method !== "GET"
+
+        ) {
+
+          return methodNotAllowed(
+
+            ["GET"]
+
+          );
+
+        }
+
+        return this.chatHistoryAPI();
+
+
+      case "/api/events":
+
+        if (
+
+          request.method !== "GET"
+
+        ) {
+
+          return methodNotAllowed(
+
+            ["GET"]
+
+          );
+
+        }
+
+        return this.eventsAPI();
+
+
+      case "/api/stats":
+
+        if (
+
+          request.method !== "GET"
+
+        ) {
+
+          return methodNotAllowed(
+
+            ["GET"]
+
+          );
+
+        }
+
+        return this.statsAPI();
+
+
+      case "/api/vote/cast":
+
+        if (
+
+          request.method !== "POST"
+
+        ) {
+
+          return methodNotAllowed(
+
+            ["POST"]
+
+          );
+
+        }
+
+        return this.voteAPI(
+
+          request
+
+        );
+
+
+      case "/api/number/guess":
+
+        if (
+
+          request.method !== "POST"
+
+        ) {
+
+          return methodNotAllowed(
+
+            ["POST"]
+
+          );
+
+        }
+
+        return this.numberGuessAPI(
+
+          request
+
+        );
+
+
+      case "/api/leaderboard":
+
+        if (
+
+          request.method !== "GET"
+
+        ) {
+
+          return methodNotAllowed(
+
+            ["GET"]
+
+          );
+
+        }
+
+        return this.leaderboardAPI();
+
+
+      default:
+
+        return json(
+
+          {
+
+            success: false,
+
+            error: "NOT_FOUND",
+
+            roomId:
+
+              this.roomId(),
+
+            path: pathname
+
+          },
+
+          404
+
+        );
+
+    }
+
+  }
+
+
+  // ==========================================================
+  // ROOM ID
+  // ==========================================================
+
+  roomId() {
+
+    return (
+
+      this.state.id.name
+
+      ||
+
+      this.state.id.toString()
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // ROOM INFO
+  // ==========================================================
+
+  roomInfo() {
+
+    const roomId =
+
+      this.roomId();
+
+    return json(
+
+      {
+
+        success: true,
+
+        service: "KOTCHA_ROOM",
+
+        version: VERSION,
+
+        roomId,
+
+        status: "online",
+
+        websocket: true,
+
+        viewers:
+
+          this.sessions.size,
+
+        activeGame:
+
+          this.gameState.active,
+
+        gameType:
+
+          this.gameState.type,
+
+        endpoints: {
+
+          status:
+
+            `/room/${roomId}/api/room/status`,
+
+          state:
+
+            `/room/${roomId}/api/game/state`,
+
+          startGame:
+
+            `/room/${roomId}/api/room/start-game`,
+
+          stopGame:
+
+            `/room/${roomId}/api/room/stop-game`,
+
+          reset:
+
+            `/room/${roomId}/api/room/reset`,
+
+          chat:
+
+            `/room/${roomId}/api/chat/send`,
+
+          history:
+
+            `/room/${roomId}/api/chat/history`,
+
+          events:
+
+            `/room/${roomId}/api/events`,
+
+          stats:
+
+            `/room/${roomId}/api/stats`,
+
+          vote:
+
+            `/room/${roomId}/api/vote/cast`,
+
+          number:
+
+            `/room/${roomId}/api/number/guess`,
+
+          leaderboard:
+
+            `/room/${roomId}/api/leaderboard`
+
+        },
+
+        timestamp:
+
+          Date.now()
+
+      }
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // CREATE ROOM
+  // ==========================================================
+
+  async createRoom() {
+
+    if (
+
+      this.ownerToken
+
+    ) {
+
+      return json(
+
+        {
+
+          success: true,
+
+          existing: true,
+
+          roomId:
+
+            this.roomId(),
+
+          createdAt:
+
+            this.createdAt,
+
+          message:
+
+            "Room already exists"
+
+        }
+
+      );
+
+    }
+
+    this.ownerToken =
+
+      createOwnerToken();
+
+    this.createdAt =
+
+      Date.now();
+
+    await this.save();
+
+    return json(
+
+      {
+
+        success: true,
+
+        existing: false,
+
+        roomId:
+
+          this.roomId(),
+
+        ownerToken:
+
+          this.ownerToken,
+
+        createdAt:
+
+          this.createdAt,
+
+        message:
+
+          "Room created successfully"
+
+      }
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // OWNER
+  // ==========================================================
+
+  isOwner(request) {
+
+    const token =
+
+      getBearerToken(
+
+        request
+
+      );
+
+    return Boolean(
+
+      token
+
+      &&
+
+      this.ownerToken
+
+      &&
+
+      token ===
+
+        this.ownerToken
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // STATUS
+  // ==========================================================
+
+  roomStatus() {
+
+    return json(
+
+      {
+
+        success: true,
+
+        roomId:
+
+          this.roomId(),
+
+        active:
+
+          this.gameState.active,
+
+        gameType:
+
+          this.gameState.type,
+
+        viewers:
+
+          this.sessions.size,
+
+        messages:
+
+          this.chatHistory.length,
+
+        events:
+
+          this.eventLog.length,
+
+        uptime:
+
+          this.gameState.startTime
+
+            ? Date.now()
+
+              -
+
+              this.gameState.startTime
+
+            : 0,
+
+        createdAt:
+
+          this.createdAt,
+
+        timestamp:
+
+          Date.now()
+
+      }
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // GAME STATE
+  // ==========================================================
+
+  gameStateAPI() {
+
+    return json(
+
+      {
+
+        success: true,
+
+        roomId:
+
+          this.roomId(),
+
+        game:
+
+          this.publicGameState(),
+
+        timestamp:
+
+          Date.now()
+
+      }
+
+    );
+
+  }
+
+
+  publicGameState() {
+
+    return {
+
+      type:
+
+        this.gameState.type,
+
+      active:
+
+        this.gameState.active,
+
+      votes:
+
+        [
+
+          ...this.gameState.votes
+
+        ],
+
+      leaderboard:
+
+        this.gameState.leaderboard
+
+          .slice(-50),
+
+      startTime:
+
+        this.gameState.startTime,
+
+      roundId:
+
+        this.gameState.roundId,
+
+      data: {
+
+        hasSecretNumber:
+
+          Boolean(
+
+            this.gameState.data
+
+              .secretNumber
+
+          ),
+
+        hasTargetWord:
+
+          Boolean(
+
+            this.gameState.data
+
+              .targetWord
+
+          )
+
+      }
+
+    };
+
+  }
+
+
+  // ==========================================================
+  // START GAME
+  // ==========================================================
+
+  async startGame(request) {
+
+    if (
+
+      !this.isOwner(request)
+
+    ) {
+
+      return json(
+
+        {
+
+          success: false,
+
+          error: "OWNER_ONLY"
+
+        },
+
+        403
+
+      );
+
+    }
+
+    const body =
+
+      await parseJSON(
+
+        request
+
+      );
+
+    if (
+
+      !body
+
+    ) {
+
+      return json(
+
+        {
+
+          success: false,
+
+          error: "INVALID_JSON"
+
+        },
+
+        400
+
+      );
+
+    }
+
+    const type =
+
+      cleanString(
+
+        body.gameType,
+
+        50
+
+      ).toUpperCase();
+
+    if (
+
+      !isValidGameType(type)
+
+    ) {
+
+      return json(
+
+        {
+
+          success: false,
+
+          error:
+
+            "INVALID_GAME_TYPE",
+
+          validGames:
+
+            Object.values(
+
+              GAME_TYPES
+
+            )
+
+        },
+
+        400
+
+      );
+
+    }
+
+    const data = {};
+
+    if (
+
+      type ===
+
+      GAME_TYPES.NUMBER_GUESS
+
+    ) {
+
+      data.secretNumber =
+
+        Math.floor(
+
+          Math.random()
+
+          *
+
+          100
+
+        )
+
+        +
+
+        1;
+
+    }
+
+    if (
+
+      type ===
+
+      GAME_TYPES.WORD_BATTLE
+
+    ) {
+
+      const word =
+
+        cleanString(
+
+          body.word,
+
+          100
+
+        )
+
+        .toLowerCase();
+
+      if (!word) {
+
+        return json(
+
+          {
+
+            success: false,
+
+            error:
+
+              "WORD_REQUIRED"
+
+          },
+
+          400
+
+        );
+
+      }
+
+      data.targetWord =
+
+        word;
+
+    }
+
+    const roundId =
+
+      crypto.randomUUID();
+
+    this.gameState = {
+
+      ...createGameState(),
+
+      type,
+
+      active: true,
+
+      data,
+
+      roundId,
+
+      startTime:
+
+        Date.now()
+
+    };
+
+    const event = {
+
+      type: "GAME_STARTED",
+
+      game: type,
+
+      roundId,
+
+      timestamp:
+
+        Date.now()
+
+    };
+
+    this.eventLog.push(
+
+      event
+
+    );
+
+    await this.save();
+
+    this.broadcast(
+
+      event
+
+    );
+
+    return json(
+
+      {
+
+        success: true,
+
+        event,
+
+        game:
+
+          this.publicGameState()
+
+      }
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // STOP GAME
+  // ==========================================================
+
+  async stopGame(request) {
+
+    if (
+
+      !this.isOwner(request)
+
+    ) {
+
+      return json(
+
+        {
+
+          success: false,
+
+          error: "OWNER_ONLY"
+
+        },
+
+        403
+
+      );
+
+    }
+
+    this.gameState.active =
+
+      false;
+
+    const event = {
+
+      type:
+
+        "GAME_STOPPED",
+
+      game:
+
+        this.gameState.type,
+
+      finalState:
+
+        this.publicGameState(),
+
+      timestamp:
+
+        Date.now()
+
+    };
+
+    this.eventLog.push(
+
+      event
+
+    );
+
+    await this.save();
+
+    this.broadcast(
+
+      event
+
+    );
+
+    return json(
+
+      {
+
+        success: true,
+
+        event
+
+      }
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // RESET
+  // ==========================================================
+
+  async resetGame(request) {
+
+    if (
+
+      !this.isOwner(request)
+
+    ) {
+
+      return json(
+
+        {
+
+          success: false,
+
+          error: "OWNER_ONLY"
+
+        },
+
+        403
+
+      );
+
+    }
+
+    this.gameState =
+
+      createGameState();
+
+    const event = {
+
+      type:
+
+        "GAME_RESET",
+
+      timestamp:
+
+        Date.now()
+
+    };
+
+    this.eventLog.push(
+
+      event
+
+    );
+
+    await this.save();
+
+    this.broadcast(
+
+      event
+
+    );
+
+    return json(
+
+      {
+
+        success: true,
+
+        event
+
+      }
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // VOTE
+  // ==========================================================
+
+  async voteAPI(request) {
+
+    const body =
+
+      await parseJSON(
+
+        request
+
+      );
+
+    if (!body) {
+
+      return json(
+
+        {
+
+          success: false,
+
+          error:
+
+            "INVALID_JSON"
+
+        },
+
+        400
+
+      );
+
+    }
+
+    if (
+
+      !this.gameState.active
+
+      ||
+
+      this.gameState.type !==
+
+        GAME_TYPES.VOTE
+
+    ) {
+
+      return json(
+
+        {
+
+          success: false,
+
+          error:
+
+            "GAME_NOT_ACTIVE"
+
+        },
+
+        400
+
+      );
+
+    }
+
+    const value =
+
+      Number(
+
+        body.value
+
+      );
+
+    if (
+
+      !Number.isInteger(value)
+
+      ||
+
+      value < 1
+
+      ||
+
+      value > 5
+
+    ) {
+
+      return json(
+
+        {
+
+          success: false,
+
+          error:
+
+            "INVALID_VOTE"
+
+        },
+
+        400
+
+      );
+
+    }
+
+    const user =
+
+      safeUser(
+
+        body.user
+
+      );
+
+    const userId =
+
+      user.id
+
+      ||
+
+      user.username
+
+      ||
+
+      user.displayName;
+
+    if (
+
+      this.gameState.players[userId]
+
+    ) {
+
+      return json(
+
+        {
+
+          success: false,
+
+          error:
+
+            "ALREADY_VOTED"
+
+        },
+
+        409
+
+      );
+
+    }
+
+    this.gameState.votes[value - 1]++;
+
+    this.gameState.players[userId] = {
+
+      user,
+
+      value,
+
+      timestamp:
+
+        Date.now()
+
+    };
+
+    const event = {
+
+      type:
+
+        GAME_TYPES.VOTE,
+
+      user,
+
+      value,
+
+      votes:
+
+        [
+
+          ...this.gameState.votes
+
+        ],
+
+      total:
+
+        this.gameState.votes
+
+          .reduce(
+
+            (a, b) => a + b,
+
+            0
+
+          ),
+
+      timestamp:
+
+        Date.now()
+
+    };
+
+    this.eventLog.push(
+
+      event
+
+    );
+
+    await this.save();
+
+    this.broadcast(
+
+      event
+
+    );
+
+    return json(
+
+      {
+
+        success: true,
+
+        event
+
+      }
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // NUMBER GUESS
+  // ==========================================================
+
+  async numberGuessAPI(request) {
+
+    const body =
+
+      await parseJSON(
+
+        request
+
+      );
+
+    if (!body) {
+
+      return json(
+
+        {
+
+          success: false,
+
+          error:
+
+            "INVALID_JSON"
+
+        },
+
+        400
+
+      );
+
+    }
+
+    if (
+
+      !this.gameState.active
+
+      ||
+
+      this.gameState.type !==
+
+        GAME_TYPES.NUMBER_GUESS
+
+    ) {
+
+      return json(
+
+        {
+
+          success: false,
+
+          error:
+
+            "GAME_NOT_ACTIVE"
+
+        },
+
+        400
+
+      );
+
+    }
+
+    const guess =
+
+      Number(
+
+        body.guess
+
+      );
+
+    if (
+
+      !Number.isInteger(guess)
+
+      ||
+
+      guess < 1
+
+      ||
+
+      guess > 100
+
+    ) {
+
+      return json(
+
+        {
+
+          success: false,
+
+          error:
+
+            "INVALID_GUESS"
+
+        },
+
+        400
+
+      );
+
+    }
+
+    const secret =
+
+      this.gameState.data
+
+        .secretNumber;
+
+    let result;
+
+    if (
+
+      guess === secret
+
+    ) {
+
+      result = "WIN";
+
+      this.gameState.active =
+
+        false;
+
+    }
+
+    else if (
+
+      Math.abs(
+
+        guess - secret
+
+      )
+
+      <= 5
+
+    ) {
+
+      result = "CLOSE";
+
+    }
+
+    else if (
+
+      guess < secret
+
+    ) {
+
+      result = "HIGHER";
+
+    }
+
+    else {
+
+      result = "LOWER";
+
+    }
+
+    const event = {
+
+      type:
+
+        GAME_TYPES.NUMBER_GUESS,
+
+      user:
+
+        safeUser(
+
+          body.user
+
+        ),
+
+      guess,
+
+      result,
+
+      timestamp:
+
+        Date.now()
+
+    };
+
+    this.gameState.leaderboard.push(
+
+      event
+
+    );
+
+    this.eventLog.push(
+
+      event
+
+    );
+
+    await this.save();
+
+    this.broadcast(
+
+      event
+
+    );
+
+    return json(
+
+      {
+
+        success: true,
+
+        event
+
+      }
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // CHAT
+  // ==========================================================
+
+  async chatSend(request) {
+
+    const body =
+
+      await parseJSON(
+
+        request
+
+      );
+
+    if (!body) {
+
+      return json(
+
+        {
+
+          success: false,
+
+          error:
+
+            "INVALID_JSON"
+
+        },
+
+        400
+
+      );
+
+    }
+
+    const message =
+
+      cleanString(
+
+        body.message,
+
+        500
+
+      );
+
+    if (!message) {
+
+      return json(
+
+        {
+
+          success: false,
+
+          error:
+
+            "EMPTY_MESSAGE"
+
+        },
+
+        400
+
+      );
+
+    }
+
+    const platform =
+
+      cleanString(
+
+        body.platform,
+
+        30
+
+      ).toLowerCase();
+
+    const chat = {
+
+      id:
+
+        crypto.randomUUID(),
+
+      type:
+
+        "CHAT",
+
+      user:
+
+        safeUser(
+
+          body.user
+
+        ),
+
+      message,
+
+      platform:
+
+        isValidPlatform(
+
+          platform
+
+        )
+
+          ? platform
+
+          : null,
+
+      timestamp:
+
+        Date.now()
+
+    };
+
+    this.chatHistory.push(
+
+      chat
+
+    );
+
+    this.chatHistory =
+
+      this.chatHistory.slice(
+
+        -500
+
+      );
+
+    await this.save();
+
+    const event = {
+
+      type:
+
+        "CHAT",
+
+      data:
+
+        chat
+
+    };
+
+    this.broadcast(
+
+      event
+
+    );
+
+    return json(
+
+      {
+
+        success: true,
+
+        event
+
+      }
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // CHAT HISTORY
+  // ==========================================================
+
+  chatHistoryAPI() {
+
+    return json(
+
+      {
+
+        success: true,
+
+        roomId:
+
+          this.roomId(),
+
+        messages:
+
+          this.chatHistory
+
+            .slice(-100)
+
+      }
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // EVENTS
+  // ==========================================================
+
+  eventsAPI() {
+
+    return json(
+
+      {
+
+        success: true,
+
+        roomId:
+
+          this.roomId(),
+
+        events:
+
+          this.eventLog
+
+            .slice(-100)
+
+      }
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // STATS
+  // ==========================================================
+
+  statsAPI() {
+
+    return json(
+
+      {
+
+        success: true,
+
+        roomId:
+
+          this.roomId(),
+
+        viewers:
+
+          this.sessions.size,
+
+        messages:
+
+          this.chatHistory.length,
+
+        events:
+
+          this.eventLog.length,
+
+        activeGame:
+
+          this.gameState.active,
+
+        gameType:
+
+          this.gameState.type,
+
+        votes:
+
+          [
+
+            ...this.gameState.votes
+
+          ],
+
+        totalVotes:
+
+          this.gameState.votes
+
+            .reduce(
+
+              (a, b) => a + b,
+
+              0
+
+            ),
+
+        timestamp:
+
+          Date.now()
+
+      }
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // LEADERBOARD
+  // ==========================================================
+
+  leaderboardAPI() {
+
+    return json(
+
+      {
+
+        success: true,
+
+        leaderboard:
+
+          this.gameState
+
+            .leaderboard
+
+            .slice(-50)
+
+            .reverse()
+
+      }
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // WEBSOCKET
+  // ==========================================================
+
+  handleWebSocket(request) {
+
+    const pair =
+
+      new WebSocketPair();
+
+    const client =
+
+      pair[0];
+
+    const server =
+
+      pair[1];
+
+    server.accept();
+
+    const sessionId =
+
+      crypto.randomUUID();
+
+    this.sessions.set(
+
+      sessionId,
+
+      {
+
+        ws: server,
+
+        authenticated: false,
+
+        platform: null,
+
+        user: null,
+
+        isOwner: false,
+
+        connectedAt:
+
+          Date.now()
+
+      }
+
+    );
+
+    this.send(
+
+      server,
+
+      {
+
+        type:
+
+          "CONNECTED",
+
+        sessionId,
+
+        roomId:
+
+          this.roomId(),
+
+        viewers:
+
+          this.sessions.size,
+
+        timestamp:
+
+          Date.now()
+
+      }
+
+    );
+
+    server.addEventListener(
+
+      "message",
+
+      async event => {
+
+        try {
+
+          const data =
+
+            JSON.parse(
+
+              event.data
+
+            );
+
+          await this.handleWebSocketMessage(
+
+            sessionId,
+
+            data,
+
+            server
+
+          );
+
+        }
+
+        catch {
+
+          this.send(
+
+            server,
+
+            {
+
+              type:
+
+                "ERROR",
+
+              error:
+
+                "INVALID_MESSAGE"
+
+            }
+
+          );
+
+        }
+
+      }
+
+    );
+
+    server.addEventListener(
+
+      "close",
+
+      () => {
+
+        this.sessions.delete(
+
+          sessionId
+
+        );
+
+        this.broadcast(
+
+          {
+
+            type:
+
+              "USER_LEFT",
+
+            sessionId,
+
+            viewers:
+
+              this.sessions.size,
+
+            timestamp:
+
+              Date.now()
+
+          }
+
+        );
+
+      }
+
+    );
+
+    return new Response(
+
+      null,
+
+      {
+
+        status: 101,
+
+        webSocket: client
+
+      }
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // WEBSOCKET MESSAGE
+  // ==========================================================
+
+  async handleWebSocketMessage(
+
+    sessionId,
+
+    data,
+
+    ws
+
+  ) {
+
+    const session =
+
+      this.sessions.get(
+
+        sessionId
+
+      );
+
+    if (!session) {
+
+      return;
+
+    }
+
+    switch (
+
+      data.type
+
+    ) {
+
+      case "AUTH": {
+
+        const platform =
+
+          cleanString(
+
+            data.platform,
+
+            30
+
+          ).toLowerCase();
+
+        if (
+
+          !isValidPlatform(
+
+            platform
+
+          )
+
+        ) {
+
+          this.send(
+
+            ws,
+
+            {
+
+              type:
+
+                "ERROR",
+
+              error:
+
+                "INVALID_PLATFORM"
+
+            }
+
+          );
+
+          return;
+
+        }
+
+        const user =
+
+          safeUser(
+
+            data.user
+
+          );
+
+        const token =
+
+          cleanString(
+
+            data.ownerToken,
+
+            500
+
+          );
+
+        session.platform =
+
+          platform;
+
+        session.user =
+
+          user;
+
+        session.isOwner =
+
+          Boolean(
+
+            token
+
+            &&
+
+            token ===
+
+              this.ownerToken
+
+          );
+
+        session.authenticated =
+
+          true;
+
+        this.send(
+
+          ws,
+
+          {
+
+            type:
+
+              "AUTH_SUCCESS",
+
+            user,
+
+            platform,
+
+            isOwner:
+
+              session.isOwner,
+
+            timestamp:
+
+              Date.now()
+
+          }
+
+        );
+
+        this.broadcast(
+
+          {
+
+            type:
+
+              "USER_JOINED",
+
+            user,
+
+            platform,
+
+            isOwner:
+
+              session.isOwner,
+
+            viewers:
+
+              this.sessions.size,
+
+            timestamp:
+
+              Date.now()
+
+          }
+
+        );
+
+        break;
+
+      }
+
+
+      case "CHAT_MESSAGE": {
+
+        if (
+
+          !session.authenticated
+
+        ) {
+
+          this.send(
+
+            ws,
+
+            {
+
+              type:
+
+                "ERROR",
+
+              error:
+
+                "AUTH_REQUIRED"
+
+            }
+
+          );
+
+          return;
+
+        }
+
+        const message =
+
+          cleanString(
+
+            data.message,
+
+            500
+
+          );
+
+        if (!message) {
+
+          return;
+
+        }
+
+        const chat = {
+
+          id:
+
+            crypto.randomUUID(),
+
+          type:
+
+            "CHAT",
+
+          user:
+
+            session.user,
+
+          message,
+
+          platform:
+
+            session.platform,
+
+          timestamp:
+
+            Date.now()
+
+        };
+
+        this.chatHistory.push(
+
+          chat
+
+        );
+
+        this.chatHistory =
+
+          this.chatHistory.slice(
+
+            -500
+
+          );
+
+        await this.save();
+
+        this.broadcast(
+
+          {
+
+            type:
+
+              "CHAT",
+
+            data:
+
+              chat
+
+          }
+
+        );
+
+        break;
+
+      }
+
+
+      case "PING": {
+
+        this.send(
+
+          ws,
+
+          {
+
+            type:
+
+              "PONG",
+
+            timestamp:
+
+              Date.now()
+
+          }
+
+        );
+
+        break;
+
+      }
+
+
+      default: {
+
+        this.send(
+
+          ws,
+
+          {
+
+            type:
+
+              "ERROR",
+
+            error:
+
+              "UNKNOWN_MESSAGE_TYPE"
+
+          }
+
+        );
+
+      }
+
+    }
+
+  }
+
+
+  // ==========================================================
+  // SEND
+  // ==========================================================
+
+  send(ws, message) {
+
+    try {
+
+      ws.send(
+
+        JSON.stringify(
+
+          message
+
+        )
+
+      );
+
+    }
+
+    catch {}
+
+  }
+
+
+  // ==========================================================
+  // BROADCAST
+  // ==========================================================
+
+  broadcast(message) {
+
+    const payload =
+
+      JSON.stringify(
+
+        message
+
+      );
+
+    for (
+
+      const [
+
+        sessionId,
+
+        session
+
+      ]
+
+      of this.sessions
+
+    ) {
+
+      try {
+
+        session.ws.send(
+
+          payload
+
+        );
+
+      }
+
+      catch {
+
+        this.sessions.delete(
+
+          sessionId
+
+        );
+
+      }
+
+    }
+
+  }
+
+}
+
+
+// ============================================================
+// MAIN WORKER
+// ============================================================
+
+export default {
+
+  async fetch(request, env) {
+
+    const url =
+
+      new URL(
+
+        request.url
+
+      );
+
+    if (
+
+      request.method ===
+
+      "OPTIONS"
+
+    ) {
+
+      return emptyResponse();
+
+    }
+
+
+    // ========================================================
+    // API ROOT
+    // ========================================================
+
+    if (
+
+      url.pathname === "/"
+
+      ||
+
+      url.pathname === "/api"
+
+    ) {
+
+      return json(
+
+        {
+
+          success: true,
+
+          service:
+
+            API_NAME,
+
+          version:
+
+            VERSION,
+
+          status:
+
+            "online",
+
+          api:
+
+            "https://kotcha.ig999x.workers.dev",
+
+          websocket:
+
+            "wss://kotcha.ig999x.workers.dev",
+
+          features: [
+
+            "Durable Objects",
+
+            "WebSocket",
+
+            "Real-Time Games",
+
+            "Chat",
+
+            "TikTok Integration",
+
+            "Twitch Integration",
+
+            "Kick Integration"
+
+          ],
+
+          endpoints: {
+
+            health:
+
+              "/health",
+
+            createRoom:
+
+              "/api/room/create",
+
+            room:
+
+              "/room/{roomId}"
+
+          },
+
+          timestamp:
+
+            Date.now()
+
+        }
+
+      );
+
+    }
+
+
+    // ========================================================
+    // HEALTH
+    // ========================================================
+
+    if (
+
+      url.pathname === "/health"
+
+    ) {
+
+      return json(
+
+        {
+
+          success: true,
+
+          service:
+
+            "KOTCHA",
+
+          status:
+
+            "healthy",
+
+          version:
+
+            VERSION,
+
+          timestamp:
+
+            Date.now()
+
+        }
+
+      );
+
+    }
+
+
+    // ========================================================
+    // CREATE ROOM
+    // ========================================================
+
+    if (
+
+      url.pathname ===
+
+      "/api/room/create"
+
+    ) {
+
+      if (
+
+        request.method !==
+
+        "POST"
+
+      ) {
+
+        return methodNotAllowed(
+
+          ["POST"]
+
+        );
+
+      }
+
+      if (
+
+        !env.KOTCHARoom
+
+      ) {
+
+        return json(
+
+          {
+
+            success: false,
+
+            error:
+
+              "DURABLE_OBJECT_BINDING_MISSING",
+
+            message:
+
+              "KOTCHARoom binding is missing"
+
+          },
+
+          500
+
+        );
+
+      }
+
+      const roomId =
+
+        crypto.randomUUID();
+
+      const id =
+
+        env.KOTCHARoom
+
+          .idFromName(
+
+            roomId
+
+          );
+
+      const room =
+
+        env.KOTCHARoom.get(
+
+          id
+
+        );
+
+      const internalRequest =
+
+        new Request(
+
+          "https://kotcha.internal/api/room/create",
+
+          {
+
+            method:
+
+              "POST"
+
+          }
+
+        );
+
+      const response =
+
+        await room.fetch(
+
+          internalRequest
+
+        );
+
+      const data =
+
+        await response.json();
+
+      return json(
+
+        {
+
+          ...data,
+
+          roomId
+
+        }
+
+      );
+
+    }
+
+
+    // ========================================================
+    // ROOM ROUTES
+    // ========================================================
+
+    const roomId =
+
+      extractRoomId(
+
+        url.pathname
+
+      );
+
+    if (
+
+      roomId
+
+    ) {
+
+      if (
+
+        !env.KOTCHARoom
+
+      ) {
+
+        return json(
+
+          {
+
+            success: false,
+
+            error:
+
+              "DURABLE_OBJECT_BINDING_MISSING"
+
+          },
+
+          500
+
+        );
+
+      }
+
+      const id =
+
+        env.KOTCHARoom
+
+          .idFromName(
+
+            roomId
+
+          );
+
+      const room =
+
+        env.KOTCHARoom.get(
+
+          id
+
+        );
+
+      const prefix =
+
+        `/room/${encodeURIComponent(
+
+          roomId
+
+        )}`;
+
+      const roomPath =
+
+        url.pathname
+
+          .slice(
+
+            prefix.length
+
+          )
+
+          ||
+
+          "/";
+
+      const internalURL =
+
+        new URL(
+
+          request.url
+
+        );
+
+      internalURL.pathname =
+
+        roomPath;
+
+      const forwardedRequest =
+
+        new Request(
+
+          internalURL,
+
+          request
+
+        );
+
+      return room.fetch(
+
+        forwardedRequest
+
+      );
+
+    }
+
+
+    return json(
+
+      {
+
+        success: false,
+
+        error:
+
+          "NOT_FOUND",
+
+        path:
+
+          url.pathname,
+
+        method:
+
+          request.method
+
+      },
+
+      404
+
+    );
+
+  }
+
+}; اريد ان تنشى لي INDEX.HTML كامل متكامل مدمج معه css javascript  ومؤثرات وتحسينات واضافات ودون اخطاء او مشاكل ابدا كامل متكامل يشمل نظام تسجيل دخول وانشاء حساب وانشاء غرف واسكشاف غرف و اختيار العاب وربط منصات tiktok twitch kick 
