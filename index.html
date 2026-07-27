@@ -1,150 +1,2329 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>KOTCHA Room Control Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KOTCHA - منصة البث التفاعلي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        /* ============================================================
+           KOTCHA - Styles v9.0.0
+           ============================================================ */
+        :root {
+            --brand-primary: #FF6B35;
+            --brand-secondary: #F7931E;
+            --brand-gradient: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            --bg-primary: #0A0A1A;
+            --bg-secondary: #12122A;
+            --bg-card: rgba(18, 18, 42, 0.95);
+            --bg-glass: rgba(255, 255, 255, 0.05);
+            --text-primary: #FFFFFF;
+            --text-secondary: #B0B0C8;
+            --text-muted: #6B6B8A;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(255, 107, 53, 0.3);
+            --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.4);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --radius-full: 9999px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #F8F9FA;
+            --bg-secondary: #FFFFFF;
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --bg-glass: rgba(0, 0, 0, 0.03);
+            --text-primary: #1A1A2E;
+            --text-secondary: #4A4A6A;
+            --text-muted: #8A8AAA;
+            --border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+
+        body {
+            font-family: 'Cairo', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: var(--transition);
+            min-height: 100vh;
+        }
+
+        ::selection {
+            background: var(--brand-primary);
+            color: white;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--brand-gradient);
+            border-radius: 5px;
+        }
+
+        .gradient-text {
+            background: var(--brand-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 26, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.8rem 0;
+            transition: var(--transition);
+        }
+
+        [data-theme="light"] .navbar {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .navbar .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--brand-gradient);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.2rem;
+            color: white;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .brand-name {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 600;
+            font-size: 0.95rem;
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--brand-primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--brand-gradient);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .theme-toggle:hover {
+            background: var(--brand-primary);
+            color: white;
+            border-color: var(--brand-primary);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.8rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--brand-gradient);
+            color: white;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--brand-primary);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--brand-primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--brand-primary);
+            color: white;
+        }
+
+        .btn-glass {
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-lg {
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 1.2rem;
+            font-size: 0.85rem;
+        }
+
+        .btn-success {
+            background: #2ED573;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #FF4757;
+            color: white;
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 100px 0 0;
+        }
+
+        .hero .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 2rem;
+        }
+
+        .hero-description {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin-bottom: 2rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--brand-primary);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-orb {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 107, 53, 0.15), transparent 70%);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: orbFloat 8s ease-in-out infinite;
+        }
+
+        .hero-orb.orb-2 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(247, 147, 30, 0.1), transparent 70%);
+            animation-delay: -4s;
+        }
+
+        @keyframes orbFloat {
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 1;
+            }
+        }
+
+        /* Features */
+        .features {
+            padding: 6rem 0;
+            background: var(--bg-secondary);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            background: var(--bg-glass);
+            padding: 0.3rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            color: var(--brand-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-glow);
+            box-shadow: 0 8px 40px rgba(255, 107, 53, 0.1);
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+        }
+
+        /* Games Preview */
+        .games-preview {
+            padding: 6rem 0;
+        }
+
+        .games-slider {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .game-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-glow);
+        }
+
+        .game-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .game-card h4 {
+            margin-bottom: 0.3rem;
+        }
+
+        .game-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .game-tag {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: var(--bg-glass);
+            color: var(--brand-primary);
+            margin-top: 0.5rem;
+        }
+
+        /* Subscription */
+        .subscription-section {
+            padding: 6rem 0;
+            background: var(--bg-secondary);
+        }
+
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .plan-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .plan-card.featured {
+            border-color: var(--brand-primary);
+            transform: scale(1.05);
+            box-shadow: 0 8px 40px rgba(255, 107, 53, 0.2);
+        }
+
+        .plan-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--brand-gradient);
+            color: white;
+            padding: 0.3rem 1.5rem;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .plan-price {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--brand-primary);
+            margin: 1rem 0;
+        }
+
+        .plan-price span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+
+        .plan-features {
+            list-style: none;
+            text-align: left;
+            margin: 1.5rem 0;
+        }
+
+        .plan-features li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .plan-features li .fa-check {
+            color: #2ED573;
+        }
+
+        .plan-features li .fa-times {
+            color: #FF4757;
+        }
+
+        /* CTA */
+        .cta-section {
+            padding: 6rem 0;
+            background: var(--bg-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-content {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-content h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-content p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .cta-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 4rem 0 2rem;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-brand p {
+            color: var(--text-secondary);
+            margin: 0.5rem 0 1rem;
+            max-width: 300px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            background: var(--brand-primary);
+            color: white;
+            border-color: var(--brand-primary);
+        }
+
+        .footer-links h4 {
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .footer-links a {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.3rem 0;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--brand-primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            animation: modalIn 0.3s ease-out;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--brand-primary);
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--brand-primary);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-error {
+            color: #FF4757;
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .form-error.show {
+            display: block;
+        }
+
+        .form-success {
+            color: #2ED573;
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .form-success.show {
+            display: block;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toast {
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slideInRight 0.3s ease-out;
+            min-width: 300px;
+        }
+
+        .toast-success {
+            border-color: #2ED573;
+        }
+
+        .toast-error {
+            border-color: #FF4757;
+        }
+
+        .toast-info {
+            border-color: #3498DB;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero .container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-description {
+                margin: 0 auto 2rem;
+            }
+
+            .hero-stats {
+                justify-content: center;
+            }
+
+            .hero-actions {
+                justify-content: center;
+            }
+
+            .hero-visual {
+                display: none;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--bg-card);
+                padding: 1rem 2rem;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .nav-links.open {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: center;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .plans-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .plan-card.featured {
+                transform: none;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+
+            .games-slider {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .section-header h2 {
+                font-size: 1.8rem;
+            }
+
+            .cta-content h2 {
+                font-size: 2rem;
+            }
+
+            .btn {
+                padding: 0.5rem 1.2rem;
+                font-size: 0.85rem;
+            }
+
+            .btn-lg {
+                padding: 0.8rem 1.8rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--brand-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-content p {
+            margin-top: 1rem;
+            color: var(--text-secondary);
+        }
+    </style>
 </head>
 <body>
-  <header class="header">
-    <h1>KOTCHA API v8.0.0 – Room Dashboard</h1>
-    <div class="room-config">
-      <label>
-        Base URL:
-        <input id="baseUrl" type="text" placeholder="https://your-worker.example.workers.dev" />
-      </label>
-      <label>
-        Room ID:
-        <input id="roomId" type="text" placeholder="room-123" />
-      </label>
-      <label>
-        Owner Token (Bearer):
-        <input id="ownerToken" type="text" placeholder="optional for owner actions" />
-      </label>
-      <button id="btnConnectRoom">Load Room Info</button>
-      <button id="btnConnectWS">Connect WebSocket</button>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>جاري التحميل...</p>
+        </div>
     </div>
-    <div id="connectionStatus" class="status-bar"></div>
-  </header>
 
-  <main class="main">
-    <section class="card">
-      <h2>Room Info</h2>
-      <pre id="roomInfo"></pre>
-    </section>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
 
-    <section class="card">
-      <h2>Room Status</h2>
-      <button id="btnRefreshStatus">Refresh Status</button>
-      <pre id="roomStatus"></pre>
-    </section>
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-brand" onclick="navigateTo('/')">
+                <div class="brand-icon">K</div>
+                <span class="brand-name">KOTCHA</span>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="/" class="active" data-page="home"><i class="fas fa-home"></i> الرئيسية</a>
+                <a href="/room" data-page="room"><i class="fas fa-gamepad"></i> الغرف</a>
+                <a href="/subscription" data-page="subscription"><i class="fas fa-crown"></i> الاشتراك</a>
+                <a href="#" onclick="showAbout()"><i class="fas fa-info-circle"></i> عن المنصة</a>
+            </div>
+            <div class="nav-actions">
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <div id="authButtons">
+                    <button class="btn btn-outline btn-sm" onclick="showLogin()">
+                        <i class="fas fa-sign-in-alt"></i> دخول
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="showSignup()">
+                        <i class="fas fa-user-plus"></i> حساب
+                    </button>
+                </div>
+                <div id="userMenu" style="display:none;">
+                    <span class="user-name" id="userNameDisplay"></span>
+                    <button class="btn btn-secondary btn-sm" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
 
-    <section class="card">
-      <h2>Game Control</h2>
-      <div class="form-row">
-        <label>
-          Game Type:
-          <select id="gameType">
-            <option value="VOTE">VOTE</option>
-            <option value="NUMBER_GUESS">NUMBER_GUESS</option>
-            <option value="WORD_BATTLE">WORD_BATTLE</option>
-            <option value="QUIZ">QUIZ</option>
-            <option value="TEAM_BATTLE">TEAM_BATTLE</option>
-            <option value="REACTION">REACTION</option>
-          </select>
-        </label>
-        <label>
-          Word (for WORD_BATTLE):
-          <input id="wordBattleWord" type="text" placeholder="target word" />
-        </label>
-      </div>
-      <div class="buttons-row">
-        <button id="btnStartGame">Start Game</button>
-        <button id="btnStopGame">Stop Game</button>
-        <button id="btnResetGame">Reset Game</button>
-        <button id="btnGameState">Get Game State</button>
-      </div>
-      <pre id="gameState"></pre>
-    </section>
+    <!-- Main Content -->
+    <main id="mainContent">
+        <!-- Hero Section -->
+        <section class="hero" id="homeSection">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        <span class="gradient-text">KOTCHA</span><br />
+                        حيث المشاهد <span class="gradient-text">يلعب</span>
+                    </h1>
+                    <p class="hero-description">
+                        منصة تفاعلية للبث المباشر تجمع بين الترفيه والتفاعل.
+                        المشاهد لا يشاهد فقط، بل يشارك ويلعب مع المضيف في آن واحد.
+                    </p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="statUsers">0</span>
+                            <span class="stat-label">مستخدم نشط</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="statRooms">0</span>
+                            <span class="stat-label">غرفة تفاعلية</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="statInteractions">0</span>
+                            <span class="stat-label">تفاعل يومي</span>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary btn-lg" onclick="createRoom()">
+                            <i class="fas fa-plus-circle"></i> إنشاء غرفة
+                        </button>
+                        <button class="btn btn-secondary btn-lg" onclick="joinRoom()">
+                            <i class="fas fa-sign-in-alt"></i> انضم لغرفة
+                        </button>
+                        <button class="btn btn-glass btn-lg" onclick="exploreRooms()">
+                            <i class="fas fa-compass"></i> استكشف
+                        </button>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="hero-orb"></div>
+                    <div class="hero-orb orb-2"></div>
+                </div>
+            </div>
+        </section>
 
-    <section class="card">
-      <h2>Voting (VOTE)</h2>
-      <div class="form-row">
-        <label>
-          Vote (1–5):
-          <input id="voteValue" type="number" min="1" max="5" />
-        </label>
-        <label>
-          Username:
-          <input id="voteUsername" type="text" placeholder="username" />
-        </label>
-      </div>
-      <button id="btnCastVote">Cast Vote</button>
-      <pre id="voteResult"></pre>
-    </section>
+        <!-- Features -->
+        <section class="features" id="featuresSection">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">المميزات</span>
+                    <h2>لماذا <span class="gradient-text">KOTCHA</span>؟</h2>
+                    <p>منصة متكاملة تجمع بين البث المباشر والألعاب التفاعلية</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #FF6B35, #FF8A5C);">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <h3>ألعاب تفاعلية</h3>
+                        <p>تصويت، تخمين أرقام، معارك كلمات، مسابقات، فرق، وتفاعلات فورية</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #6C5CE7, #A29BFE);">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3>أداء فوري</h3>
+                        <p>تقنية WebSocket و Durable Objects لتجربة سلسة وخالية من التأخير</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #00B894, #55EFC4);">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h3>دعم متعدد المنصات</h3>
+                        <p>تكامل مع TikTok، Twitch، Kick، YouTube ومنصة KOTCHA الخاصة</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #FD79A8, #FDCB6E);">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <h3>اشتراكات مميزة</h3>
+                        <p>خطط مرنة مع ميزات حصرية للمضيفين والمشاهدين المميزين</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #0984E3, #74B9FF);">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>أمان متقدم</h3>
+                        <p>حماية كاملة للبيانات، تشفير WebSocket، ومصادقة آمنة</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #E17055, #D63031);">
+                            <i class="fas fa-palette"></i>
+                        </div>
+                        <h3>تصميم عصري</h3>
+                        <p>واجهة مستخدم أنيقة مع دعم الوضعين الليلي والنهاري</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <section class="card">
-      <h2>Number Guess (NUMBER_GUESS)</h2>
-      <div class="form-row">
-        <label>
-          Guess (1–100):
-          <input id="guessValue" type="number" min="1" max="100" />
-        </label>
-        <label>
-          Username:
-          <input id="guessUsername" type="text" placeholder="username" />
-        </label>
-      </div>
-      <button id="btnSendGuess">Send Guess</button>
-      <pre id="guessResult"></pre>
-    </section>
+        <!-- Games Preview -->
+        <section class="games-preview">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">الألعاب</span>
+                    <h2>استمتع بألعاب <span class="gradient-text">متنوعة</span></h2>
+                    <p>اختر من بين مجموعة واسعة من الألعاب التفاعلية</p>
+                </div>
+                <div class="games-slider">
+                    <div class="game-card" onclick="startGame('VOTE')">
+                        <div class="game-image" style="background: linear-gradient(135deg, #FF6B35, #F7931E);">
+                            <i class="fas fa-vote-yea"></i>
+                        </div>
+                        <h4>التصويت المباشر</h4>
+                        <p>صوّت على الخيارات وشاهد النتائج فوراً</p>
+                        <span class="game-tag">شائع</span>
+                    </div>
+                    <div class="game-card" onclick="startGame('NUMBER_GUESS')">
+                        <div class="game-image" style="background: linear-gradient(135deg, #6C5CE7, #A29BFE);">
+                            <i class="fas fa-dice"></i>
+                        </div>
+                        <h4>تخمين الرقم</h4>
+                        <p>خمن الرقم السري واربح الجوائز</p>
+                        <span class="game-tag">ممتع</span>
+                    </div>
+                    <div class="game-card" onclick="startGame('WORD_BATTLE')">
+                        <div class="game-image" style="background: linear-gradient(135deg, #00B894, #55EFC4);">
+                            <i class="fas fa-font"></i>
+                        </div>
+                        <h4>معركة الكلمات</h4>
+                        <p>تحدى الآخرين في لعبة الكلمات</p>
+                        <span class="game-tag">تحدي</span>
+                    </div>
+                    <div class="game-card" onclick="startGame('QUIZ')">
+                        <div class="game-image" style="background: linear-gradient(135deg, #FD79A8, #FDCB6E);">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <h4>مسابقات</h4>
+                        <p>اختبر معلوماتك في مختلف المجالات</p>
+                        <span class="game-tag">تعليمي</span>
+                    </div>
+                    <div class="game-card" onclick="startGame('TEAM_BATTLE')">
+                        <div class="game-image" style="background: linear-gradient(135deg, #0984E3, #74B9FF);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4>معركة الفرق</h4>
+                        <p>تحدى بين فريقين في جو من الحماس</p>
+                        <span class="game-tag">جماعي</span>
+                    </div>
+                    <div class="game-card" onclick="startGame('REACTION')">
+                        <div class="game-image" style="background: linear-gradient(135deg, #E17055, #D63031);">
+                            <i class="fas fa-smile"></i>
+                        </div>
+                        <h4>التفاعل السريع</h4>
+                        <p>تفاعل مع البث عبر ردود الفعل الفورية</p>
+                        <span class="game-tag">سريع</span>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <section class="card">
-      <h2>Chat</h2>
-      <div class="form-row">
-        <label>
-          Message:
-          <input id="chatMessage" type="text" placeholder="Type message..." />
-        </label>
-        <label>
-          Platform:
-          <select id="chatPlatform">
-            <option value="">(none)</option>
-            <option value="tiktok">TikTok</option>
-            <option value="twitch">Twitch</option>
-            <option value="kick">Kick</option>
-            <option value="kotcha">KOTCHA</option>
-          </select>
-        </label>
-        <label>
-          Username:
-          <input id="chatUsername" type="text" placeholder="username" />
-        </label>
-      </div>
-      <button id="btnSendChat">Send Chat</button>
-      <button id="btnLoadChatHistory">Load Chat History</button>
-      <pre id="chatHistory"></pre>
-    </section>
+        <!-- Subscription -->
+        <section class="subscription-section" id="subscriptionSection">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">الاشتراك</span>
+                    <h2>اختر خطتك <span class="gradient-text">المثالية</span></h2>
+                    <p>خطط تناسب جميع الاحتياجات مع ميزات حصرية</p>
+                </div>
+                <div class="plans-grid" id="plansGrid">
+                    <!-- Will be rendered by JS -->
+                </div>
+            </div>
+        </section>
 
-    <section class="card">
-      <h2>Events & Stats</h2>
-      <div class="buttons-row">
-        <button id="btnLoadEvents">Load Events</button>
-        <button id="btnLoadStats">Load Stats</button>
-        <button id="btnLoadLeaderboard">Load Leaderboard</button>
-      </div>
-      <pre id="events"></pre>
-      <pre id="stats"></pre>
-      <pre id="leaderboard"></pre>
-    </section>
+        <!-- CTA -->
+        <section class="cta-section">
+            <div class="container">
+                <div class="cta-content">
+                    <h2>جاهز لبدء <span class="gradient-text">رحلة التفاعل</span>؟</h2>
+                    <p>انضم إلى آلاف المستخدمين الذين يختبرون مستقبل البث التفاعلي</p>
+                    <div class="cta-actions">
+                        <button class="btn btn-primary btn-lg" onclick="createRoom()">
+                            <i class="fas fa-rocket"></i> ابدأ الآن
+                        </button>
+                        <button class="btn btn-glass btn-lg" onclick="watchDemo()">
+                            <i class="fas fa-play-circle"></i> شاهد العرض
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 
-    <section class="card">
-      <h2>WebSocket Live Stream</h2>
-      <pre id="wsLog"></pre>
-    </section>
-  </main>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                        <div class="brand-icon">K</div>
+                        <span class="brand-name">KOTCHA</span>
+                    </div>
+                    <p>منصة البث التفاعلي المباشر التي تحول المشاهدين إلى لاعبين</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>المنصة</h4>
+                    <a href="#" onclick="navigateTo('/')">الرئيسية</a>
+                    <a href="#" onclick="navigateTo('/room')">الغرف</a>
+                    <a href="#" onclick="navigateTo('/subscription')">الاشتراك</a>
+                </div>
+                <div class="footer-links">
+                    <h4>الدعم</h4>
+                    <a href="#" onclick="showFAQ()">الأسئلة الشائعة</a>
+                    <a href="#" onclick="showSupport()">الدعم الفني</a>
+                    <a href="#" onclick="showPrivacy()">سياسة الخصوصية</a>
+                </div>
+                <div class="footer-links">
+                    <h4>المطورين</h4>
+                    <a href="#" onclick="showDocs()">التوثيق</a>
+                    <a href="#" onclick="showAPI()">واجهة البرمجة</a>
+                    <a href="#" onclick="showGitHub()">المساهمة</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 KOTCHA. جميع الحقوق محفوظة.</p>
+                <p>الإصدار 9.0.0 - مدعوم من Cloudflare Workers</p>
+            </div>
+        </div>
+    </footer>
 
-  <script src="app.js"></script>
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</h3>
+                <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+            </div>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="loginEmail" placeholder="example@email.com" required />
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required />
+                </div>
+                <div class="form-error" id="loginError"></div>
+                <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+                    <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                </button>
+                <p style="text-align:center; margin-top:1rem; color:var(--text-secondary);">
+                    ليس لديك حساب؟ <a href="#" onclick="closeModal('loginModal'); showSignup();" style="color:var(--brand-primary);">إنشاء حساب</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div class="modal-overlay" id="signupModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> إنشاء حساب</h3>
+                <button class="modal-close" onclick="closeModal('signupModal')">&times;</button>
+            </div>
+            <form onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label>اسم المستخدم</label>
+                    <input type="text" id="signupUsername" placeholder="أدخل اسم المستخدم" required />
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="signupEmail" placeholder="example@email.com" required />
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="signupPassword" placeholder="••••••••" required minlength="6" />
+                </div>
+                <div class="form-error" id="signupError"></div>
+                <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+                    <i class="fas fa-user-plus"></i> إنشاء حساب
+                </button>
+                <p style="text-align:center; margin-top:1rem; color:var(--text-secondary);">
+                    لديك حساب؟ <a href="#" onclick="closeModal('signupModal'); showLogin();" style="color:var(--brand-primary);">تسجيل الدخول</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Join Room Modal -->
+    <div class="modal-overlay" id="joinRoomModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-sign-in-alt"></i> انضم إلى غرفة</h3>
+                <button class="modal-close" onclick="closeModal('joinRoomModal')">&times;</button>
+            </div>
+            <form onsubmit="handleJoinRoom(event)">
+                <div class="form-group">
+                    <label>معرف الغرفة</label>
+                    <input type="text" id="joinRoomId" placeholder="أدخل معرف الغرفة (مثال: ABC123)" required />
+                </div>
+                <div class="form-error" id="joinRoomError"></div>
+                <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+                    <i class="fas fa-sign-in-alt"></i> انضم
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Room Modal -->
+    <div class="modal-overlay" id="roomModal">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-gamepad"></i> غرفة اللعب</h3>
+                <button class="modal-close" onclick="closeModal('roomModal')">&times;</button>
+            </div>
+            <div id="roomContent">
+                <div style="text-align:center; padding:2rem;">
+                    <div class="spinner" style="margin:0 auto;"></div>
+                    <p style="margin-top:1rem; color:var(--text-secondary);">جاري تحميل الغرفة...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // KOTCHA - Main Application
+        // ============================================================
+
+        const CONFIG = {
+            API: 'https://kotcha.ig999x.workers.dev',
+            WS: 'wss://kotcha.ig999x.workers.dev',
+            VERSION: '9.0.0'
+        };
+
+        // State
+        let state = {
+            user: null,
+            roomId: null,
+            ws: null,
+            isOwner: false,
+            gameState: null,
+            viewers: 0,
+            messages: [],
+            connected: false,
+            theme: localStorage.getItem('kotcha-theme') || 'dark'
+        };
+
+        // ============================================================
+        // DOM Ready
+        // ============================================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme(state.theme);
+            loadPlans();
+            loadStats();
+            checkAuth();
+            setupEventListeners();
+        });
+
+        // ============================================================
+        // Theme
+        // ============================================================
+
+        function toggleTheme() {
+            state.theme = state.theme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('kotcha-theme', state.theme);
+            applyTheme(state.theme);
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const icon = document.getElementById('themeIcon');
+            if (icon) {
+                icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+            }
+        }
+
+        // ============================================================
+        // Navigation
+        // ============================================================
+
+        function navigateTo(page) {
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.nav-links a[data-page="${page}"]`);
+            if (link) link.classList.add('active');
+
+            if (page === 'home') {
+                document.getElementById('homeSection').scrollIntoView({ behavior: 'smooth' });
+            } else if (page === 'room') {
+                showRoomUI();
+            } else if (page === 'subscription') {
+                document.getElementById('subscriptionSection').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('navLinks').classList.toggle('open');
+        }
+
+        // ============================================================
+        // Auth
+        // ============================================================
+
+        function checkAuth() {
+            const user = localStorage.getItem('kotcha-user');
+            if (user) {
+                try {
+                    state.user = JSON.parse(user);
+                    updateUIForAuth();
+                } catch {
+                    localStorage.removeItem('kotcha-user');
+                }
+            }
+        }
+
+        function updateUIForAuth() {
+            document.getElementById('authButtons').style.display = 'none';
+            document.getElementById('userMenu').style.display = 'flex';
+            document.getElementById('userNameDisplay').textContent = state.user?.displayName || state.user?.username || 'User';
+        }
+
+        function showLogin() {
+            document.getElementById('loginError').className = 'form-error';
+            document.getElementById('loginModal').classList.add('active');
+        }
+
+        function showSignup() {
+            document.getElementById('signupError').className = 'form-error';
+            document.getElementById('signupModal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // Simulate login - In production, call API
+            state.user = {
+                id: 'user_' + Math.random().toString(36).substring(2, 10),
+                username: email.split('@')[0],
+                displayName: email.split('@')[0],
+                email: email,
+                avatar: null
+            };
+
+            localStorage.setItem('kotcha-user', JSON.stringify(state.user));
+            updateUIForAuth();
+            closeModal('loginModal');
+            showToast('تم تسجيل الدخول بنجاح!', 'success');
+        }
+
+        function handleSignup(event) {
+            event.preventDefault();
+            const username = document.getElementById('signupUsername').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+
+            state.user = {
+                id: 'user_' + Math.random().toString(36).substring(2, 10),
+                username: username,
+                displayName: username,
+                email: email,
+                avatar: null
+            };
+
+            localStorage.setItem('kotcha-user', JSON.stringify(state.user));
+            updateUIForAuth();
+            closeModal('signupModal');
+            showToast('تم إنشاء الحساب بنجاح!', 'success');
+        }
+
+        function logout() {
+            localStorage.removeItem('kotcha-user');
+            state.user = null;
+            document.getElementById('authButtons').style.display = 'flex';
+            document.getElementById('userMenu').style.display = 'none';
+            showToast('تم تسجيل الخروج', 'info');
+        }
+
+        // ============================================================
+        // Room Functions
+        // ============================================================
+
+        async function createRoom() {
+            showLoading(true);
+            try {
+                const response = await fetch(`${CONFIG.API}/api/room/create`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    state.roomId = data.roomId;
+                    state.isOwner = true;
+                    showToast(`تم إنشاء الغرفة: ${data.roomId}`, 'success');
+                    connectToRoom(data.roomId);
+                } else {
+                    showToast('فشل إنشاء الغرفة', 'error');
+                }
+            } catch (error) {
+                showToast('خطأ في الاتصال', 'error');
+                console.error(error);
+            }
+            showLoading(false);
+        }
+
+        function joinRoom() {
+            document.getElementById('joinRoomError').className = 'form-error';
+            document.getElementById('joinRoomModal').classList.add('active');
+        }
+
+        function handleJoinRoom(event) {
+            event.preventDefault();
+            const roomId = document.getElementById('joinRoomId').value.toUpperCase();
+            if (roomId) {
+                closeModal('joinRoomModal');
+                connectToRoom(roomId);
+            }
+        }
+
+        function exploreRooms() {
+            showToast('استكشاف الغرف المتاحة...', 'info');
+            // In production, fetch available rooms
+        }
+
+        async function connectToRoom(roomId) {
+            showLoading(true);
+            state.roomId = roomId;
+
+            try {
+                // Update URL
+                window.history.pushState({}, '', `/?room=${roomId}`);
+
+                // Connect WebSocket
+                await connectWebSocket(roomId);
+
+                // Show room UI
+                showRoomUI();
+
+                // Load room state
+                await loadRoomState(roomId);
+
+                showToast(`تم الاتصال بالغرفة: ${roomId}`, 'success');
+            } catch (error) {
+                showToast('فشل الاتصال بالغرفة', 'error');
+                console.error(error);
+            }
+            showLoading(false);
+        }
+
+        function showRoomUI() {
+            document.getElementById('roomModal').classList.add('active');
+            document.getElementById('roomContent').innerHTML = `
+                <div id="roomUI">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+                        <div>
+                            <h4 style="margin:0;">غرفة: ${state.roomId}</h4>
+                            <span style="color:var(--text-secondary); font-size:0.9rem;">
+                                <i class="fas fa-users"></i> <span id="roomViewers">0</span> مشاهد
+                            </span>
+                        </div>
+                        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                            <span id="roomStatus" class="status-badge" style="padding:0.3rem 1rem; border-radius:20px; background:rgba(255,71,87,0.2); color:#FF4757; font-size:0.85rem;">
+                                ⏳ في انتظار اللعبة
+                            </span>
+                            ${state.isOwner ? `
+                                <button class="btn btn-primary btn-sm" onclick="startGame('VOTE')">
+                                    <i class="fas fa-play"></i> بدء اللعبة
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="stopGame()">
+                                    <i class="fas fa-stop"></i> إيقاف
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div id="gameContent" style="background:var(--bg-glass); border-radius:var(--radius-md); padding:1.5rem; min-height:200px; margin-bottom:1rem;">
+                        <div style="text-align:center; padding:2rem; color:var(--text-secondary);">
+                            <p style="font-size:3rem; margin-bottom:1rem;">🎯</p>
+                            <p>اللعبة غير نشطة حالياً</p>
+                            <p style="font-size:0.9rem;">انتظر حتى يبدأ المضيف اللعبة</p>
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div style="background:var(--bg-glass); border-radius:var(--radius-md); padding:1rem;">
+                            <h5 style="margin-bottom:0.5rem;"><i class="fas fa-comments"></i> الدردشة</h5>
+                            <div id="chatMessages" style="height:200px; overflow-y:auto; margin-bottom:0.5rem; background:var(--bg-primary); border-radius:var(--radius-sm); padding:0.5rem;">
+                                <div style="text-align:center; color:var(--text-muted); padding:2rem;">💬 ابدأ المحادثة</div>
+                            </div>
+                            <div style="display:flex; gap:0.5rem;">
+                                <input type="text" id="chatInput" placeholder="اكتب رسالة..." style="flex:1; padding:0.5rem 1rem; background:var(--bg-glass); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary);" />
+                                <button class="btn btn-primary btn-sm" onclick="sendChat()">إرسال</button>
+                            </div>
+                        </div>
+                        <div style="background:var(--bg-glass); border-radius:var(--radius-md); padding:1rem;">
+                            <h5 style="margin-bottom:0.5rem;"><i class="fas fa-chart-bar"></i> الإحصائيات</h5>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+                                <div style="background:var(--bg-primary); padding:0.5rem; border-radius:var(--radius-sm); text-align:center;">
+                                    <div style="font-size:1.5rem; font-weight:800; color:var(--brand-primary);" id="statViewers">0</div>
+                                    <div style="font-size:0.8rem; color:var(--text-secondary);">مشاهد</div>
+                                </div>
+                                <div style="background:var(--bg-primary); padding:0.5rem; border-radius:var(--radius-sm); text-align:center;">
+                                    <div style="font-size:1.5rem; font-weight:800; color:var(--brand-primary);" id="statMessages">0</div>
+                                    <div style="font-size:0.8rem; color:var(--text-secondary);">رسائل</div>
+                                </div>
+                            </div>
+                            <div style="margin-top:0.5rem; background:var(--bg-primary); padding:0.5rem; border-radius:var(--radius-sm);">
+                                <div style="font-size:0.85rem; color:var(--text-secondary);">الحالة: <span id="connectionStatus" style="color:#2ED573;">🟢 متصل</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Setup chat input
+            document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendChat();
+            });
+
+            // Load room state
+            loadRoomState(state.roomId);
+        }
+
+        // ============================================================
+        // WebSocket
+        // ============================================================
+
+        function connectWebSocket(roomId) {
+            return new Promise((resolve, reject) => {
+                try {
+                    const wsUrl = `${CONFIG.WS}/room/${roomId}`;
+                    state.ws = new WebSocket(wsUrl);
+
+                    state.ws.onopen = () => {
+                        state.connected = true;
+                        updateConnectionStatus(true);
+                        authenticate();
+                        resolve();
+                    };
+
+                    state.ws.onmessage = (event) => {
+                        try {
+                            const data = JSON.parse(event.data);
+                            handleWebSocketMessage(data);
+                        } catch (e) {
+                            console.error('Failed to parse message:', e);
+                        }
+                    };
+
+                    state.ws.onclose = () => {
+                        state.connected = false;
+                        updateConnectionStatus(false);
+                        setTimeout(() => connectWebSocket(roomId), 3000);
+                    };
+
+                    state.ws.onerror = (error) => {
+                        console.error('WebSocket error:', error);
+                        reject(error);
+                    };
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        }
+
+        function sendWebSocketMessage(data) {
+            if (state.ws && state.ws.readyState === WebSocket.OPEN) {
+                state.ws.send(JSON.stringify(data));
+            }
+        }
+
+        function authenticate() {
+            const user = state.user || {
+                id: 'guest_' + Math.random().toString(36).substring(2, 10),
+                username: 'Guest_' + Math.floor(Math.random() * 10000),
+                displayName: 'Guest_' + Math.floor(Math.random() * 10000)
+            };
+
+            sendWebSocketMessage({
+                type: 'AUTH',
+                user: user,
+                platform: 'kotcha'
+            });
+        }
+
+        // ============================================================
+        // WebSocket Message Handler
+        // ============================================================
+
+        function handleWebSocketMessage(data) {
+            console.log('WebSocket message:', data);
+
+            switch (data.type) {
+                case 'CONNECTED':
+                    state.viewers = data.viewers || 0;
+                    updateRoomStats();
+                    break;
+
+                case 'AUTH_SUCCESS':
+                    state.isOwner = data.isOwner || false;
+                    if (state.isOwner) {
+                        document.querySelector('#roomUI .btn-primary')?.style.setProperty('display', 'inline-flex');
+                    }
+                    break;
+
+                case 'USER_JOINED':
+                    state.viewers = data.viewers || state.viewers;
+                    updateRoomStats();
+                    showToast(`${data.user?.displayName || 'مستخدم'} انضم إلى الغرفة`, 'info');
+                    break;
+
+                case 'USER_LEFT':
+                    state.viewers = data.viewers || state.viewers;
+                    updateRoomStats();
+                    break;
+
+                case 'CHAT':
+                    if (data.data) {
+                        state.messages.push(data.data);
+                        renderChat();
+                    }
+                    break;
+
+                case 'GAME_STARTED':
+                    updateRoomStatus('active', data.game);
+                    loadRoomState(state.roomId);
+                    showToast(`بدأت اللعبة: ${data.game}`, 'success');
+                    break;
+
+                case 'GAME_STOPPED':
+                    updateRoomStatus('inactive');
+                    loadRoomState(state.roomId);
+                    showToast('تم إيقاف اللعبة', 'info');
+                    break;
+
+                case 'GAME_RESET':
+                    loadRoomState(state.roomId);
+                    showToast('تم إعادة تعيين اللعبة', 'info');
+                    break;
+
+                case 'VOTE':
+                    loadRoomState(state.roomId);
+                    break;
+
+                case 'NUMBER_GUESS':
+                    loadRoomState(state.roomId);
+                    break;
+
+                case 'ERROR':
+                    showToast(data.error || 'خطأ في الخادم', 'error');
+                    break;
+
+                default:
+                    console.log('Unhandled message type:', data.type);
+            }
+        }
+
+        // ============================================================
+        // API Methods
+        // ============================================================
+
+        async function apiRequest(endpoint, options = {}) {
+            const url = `${CONFIG.API}/room/${state.roomId}${endpoint}`;
+            const headers = {
+                'Content-Type': 'application/json',
+                ...(options.headers || {})
+            };
+
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers,
+                    body: options.body ? JSON.stringify(options.body) : undefined
+                });
+                return await response.json();
+            } catch (error) {
+                console.error('API request failed:', error);
+                throw error;
+            }
+        }
+
+        async function loadRoomState(roomId) {
+            try {
+                const response = await apiRequest('/api/game/state');
+                if (response.success) {
+                    state.gameState = response.game;
+                    renderGame();
+                    updateRoomStats();
+                }
+            } catch (error) {
+                console.error('Failed to load room state:', error);
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch(`${CONFIG.API}/api`);
+                if (response.ok) {
+                    const data = await response.json();
+                    // Update stats with real data if available
+                }
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        // ============================================================
+        // Game Functions
+        // ============================================================
+
+        async function startGame(gameType = 'VOTE') {
+            if (!state.isOwner) {
+                showToast('فقط مالك الغرفة يمكنه بدء اللعبة', 'error');
+                return;
+            }
+
+            showLoading(true);
+            try {
+                const response = await apiRequest('/api/room/start-game', {
+                    method: 'POST',
+                    body: { gameType }
+                });
+
+                if (response.success) {
+                    state.gameState = response.game;
+                    renderGame();
+                    updateRoomStatus('active', gameType);
+                    showToast(`بدأت لعبة ${gameType}`, 'success');
+                } else {
+                    showToast(response.error || 'فشل بدء اللعبة', 'error');
+                }
+            } catch (error) {
+                showToast('خطأ في الاتصال', 'error');
+                console.error(error);
+            }
+            showLoading(false);
+        }
+
+        async function stopGame() {
+            if (!state.isOwner) {
+                showToast('فقط مالك الغرفة يمكنه إيقاف اللعبة', 'error');
+                return;
+            }
+
+            showLoading(true);
+            try {
+                const response = await apiRequest('/api/room/stop-game', {
+                    method: 'POST'
+                });
+
+                if (response.success) {
+                    state.gameState = null;
+                    renderGame();
+                    updateRoomStatus('inactive');
+                    showToast('تم إيقاف اللعبة', 'info');
+                } else {
+                    showToast(response.error || 'فشل إيقاف اللعبة', 'error');
+                }
+            } catch (error) {
+                showToast('خطأ في الاتصال', 'error');
+                console.error(error);
+            }
+            showLoading(false);
+        }
+
+        async function castVote(value) {
+            try {
+                const response = await apiRequest('/api/vote/cast', {
+                    method: 'POST',
+                    body: {
+                        value,
+                        user: state.user || { id: 'guest', username: 'Guest' }
+                    }
+                });
+
+                if (response.success) {
+                    state.gameState = response.game;
+                    renderGame();
+                } else {
+                    showToast(response.error || 'فشل التصويت', 'error');
+                }
+            } catch (error) {
+                showToast('خطأ في الاتصال', 'error');
+                console.error(error);
+            }
+        }
+
+        async function guessNumber() {
+            const input = document.getElementById('guessInput');
+            const guess = parseInt(input?.value);
+            if (!guess || guess < 1 || guess > 100) {
+                showToast('الرجاء إدخال رقم بين 1 و 100', 'error');
+                return;
+            }
+
+            try {
+                const response = await apiRequest('/api/number/guess', {
+                    method: 'POST',
+                    body: {
+                        guess,
+                        user: state.user || { id: 'guest', username: 'Guest' }
+                    }
+                });
+
+                if (response.success) {
+                    state.gameState = response.game;
+                    renderGame();
+                    if (input) input.value = '';
+                } else {
+                    showToast(response.error || 'فشل التخمين', 'error');
+                }
+            } catch (error) {
+                showToast('خطأ في الاتصال', 'error');
+                console.error(error);
+            }
+        }
+
+        // ============================================================
+        // Render Functions
+        // ============================================================
+
+        function renderGame() {
+            const container = document.getElementById('gameContent');
+            if (!container) return;
+
+            if (!state.gameState || !state.gameState.active) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:2rem; color:var(--text-secondary);">
+                        <p style="font-size:3rem; margin-bottom:1rem;">🎯</p>
+                        <p>اللعبة غير نشطة حالياً</p>
+                        <p style="font-size:0.9rem;">انتظر حتى يبدأ المضيف اللعبة</p>
+                    </div>
+                `;
+                return;
+            }
+
+            switch (state.gameState.type) {
+                case 'VOTE':
+                    renderVoteGame(container);
+                    break;
+                case 'NUMBER_GUESS':
+                    renderNumberGuess(container);
+                    break;
+                default:
+                    container.innerHTML = `
+                        <div style="text-align:center; padding:2rem; color:var(--text-secondary);">
+                            <p style="font-size:2rem; margin-bottom:1rem;">🎮</p>
+                            <p>اللعبة: ${state.gameState.type}</p>
+                            <p style="font-size:0.9rem;">اللعبة نشطة حالياً</p>
+                        </div>
+                    `;
+            }
+        }
+
+        function renderVoteGame(container) {
+            const votes = state.gameState.votes || [0, 0, 0, 0, 0];
+            const total = votes.reduce((a, b) => a + b, 0) || 1;
+
+            container.innerHTML = `
+                <div>
+                    <h5 style="margin-bottom:1rem;">📊 التصويت</h5>
+                    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:0.5rem; margin-bottom:1rem;">
+                        ${[1, 2, 3, 4, 5].map(i => `
+                            <button onclick="castVote(${i})" style="padding:0.8rem; text-align:center; background:var(--bg-glass); border:2px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary); font-weight:700; cursor:pointer; transition:var(--transition);">
+                                ${i}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:0.5rem;">
+                        ${votes.map((count, i) => `
+                            <div style="text-align:center; padding:0.5rem; background:var(--bg-glass); border-radius:var(--radius-sm);">
+                                <div style="font-weight:700;">${i + 1}</div>
+                                <div style="width:100%; height:6px; background:var(--border-color); border-radius:3px; overflow:hidden; margin:0.25rem 0;">
+                                    <div style="height:100%; background:var(--brand-gradient); width:${(count / total * 100)}%; transition:width 0.5s ease;"></div>
+                                </div>
+                                <div style="font-size:0.8rem; color:var(--text-secondary);">${count}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderNumberGuess(container) {
+            container.innerHTML = `
+                <div>
+                    <h5 style="margin-bottom:1rem;">🔢 تخمين الرقم</h5>
+                    <p style="color:var(--text-secondary); margin-bottom:1rem;">خمن رقم بين 1 و 100</p>
+                    <div style="display:flex; gap:0.5rem;">
+                        <input type="number" id="guessInput" min="1" max="100" placeholder="أدخل رقم..." style="flex:1; padding:0.5rem 1rem; background:var(--bg-glass); border:1px solid var(--border-color); border-radius:var(--radius-sm); color:var(--text-primary);" />
+                        <button class="btn btn-primary" onclick="guessNumber()">خمن</button>
+                    </div>
+                    <div id="guessFeedback" style="margin-top:1rem;"></div>
+                </div>
+            `;
+        }
+
+        function renderChat() {
+            const container = document.getElementById('chatMessages');
+            if (!container) return;
+
+            if (state.messages.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; color:var(--text-muted); padding:2rem;">💬 ابدأ المحادثة</div>
+                `;
+                return;
+            }
+
+            container.innerHTML = state.messages.slice(-50).map(msg => `
+                <div style="display:flex; gap:0.5rem; padding:0.3rem 0; animation:slideIn 0.3s ease-out;">
+                    <div style="width:28px; height:28px; border-radius:50%; background:var(--brand-gradient); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.7rem; color:white;">
+                        ${(msg.user?.displayName || 'U')[0]}
+                    </div>
+                    <div>
+                        <div style="font-weight:600; font-size:0.8rem; color:var(--brand-primary);">${msg.user?.displayName || 'Anonymous'}</div>
+                        <div style="color:var(--text-secondary); word-break:break-word;">${escapeHtml(msg.message)}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function renderPlans(plans) {
+            const grid = document.getElementById('plansGrid');
+            if (!grid) return;
+
+            const plansData = plans || [
+                { id: 'free', name: 'مجاني', price: 0, currency: 'د.إ', features: ['دردشة أساسية', 'ألعاب قياسية', '100 مشاهد'] },
+                { id: 'premium', name: 'مميز', price: 29, currency: 'د.إ', features: ['دردشة متقدمة', 'جميع الألعاب', '500 مشاهد', 'علامة تجارية مخصصة', 'تحليلات متقدمة', 'دعم فني'], featured: true },
+                { id: 'pro', name: 'محترف', price: 99, currency: 'د.إ', features: ['جميع ميزات المميز', 'مشاهدين غير محدود', 'ألعاب مخصصة', 'واجهة برمجة كاملة', 'دعم VIP', 'استضافة حصرية'] }
+            ];
+
+            grid.innerHTML = plansData.map(plan => `
+                <div class="plan-card ${plan.featured ? 'featured' : ''}">
+                    ${plan.featured ? '<div class="plan-badge">الأكثر اختياراً</div>' : ''}
+                    <div class="plan-header">
+                        <h3>${plan.name}</h3>
+                        <div class="plan-price">${plan.price}<span>/${plan.currency}</span></div>
+                        <p style="color:var(--text-secondary);">شهرياً</p>
+                    </div>
+                    <ul class="plan-features">
+                        ${plan.features.map(f => `
+                            <li><i class="fas fa-check" style="color:#2ED573;"></i> ${f}</li>
+                        `).join('')}
+                    </ul>
+                    <button class="btn ${plan.featured ? 'btn-primary' : 'btn-secondary'}" onclick="selectPlan('${plan.id}')">
+                        ${plan.price === 0 ? 'اختيار الخطة' : 'ابدأ الآن'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // ============================================================
+        // Utility Functions
+        // ============================================================
+
+        function updateRoomStatus(status, gameType) {
+            const badge = document.getElementById('roomStatus');
+            if (!badge) return;
+
+            if (status === 'active') {
+                badge.style.background = 'rgba(46,213,115,0.2)';
+                badge.style.color = '#2ED573';
+                badge.textContent = `🟢 نشطة: ${gameType || 'اللعبة'}`;
+            } else {
+                badge.style.background = 'rgba(255,71,87,0.2)';
+                badge.style.color = '#FF4757';
+                badge.textContent = '⏳ في انتظار اللعبة';
+            }
+        }
+
+        function updateRoomStats() {
+            const viewers = document.getElementById('roomViewers');
+            const statViewers = document.getElementById('statViewers');
+            const statMessages = document.getElementById('statMessages');
+
+            if (viewers) viewers.textContent = state.viewers || 0;
+            if (statViewers) statViewers.textContent = state.viewers || 0;
+            if (statMessages) statMessages.textContent = state.messages.length;
+        }
+
+        function updateConnectionStatus(connected) {
+            const status = document.getElementById('connectionStatus');
+            if (status) {
+                status.textContent = connected ? '🟢 متصل' : '🔴 غير متصل';
+                status.style.color = connected ? '#2ED573' : '#FF4757';
+            }
+        }
+
+        function sendChat() {
+            const input = document.getElementById('chatInput');
+            const message = input?.value?.trim();
+            if (!message) return;
+
+            sendWebSocketMessage({
+                type: 'CHAT_MESSAGE',
+                message: message
+            });
+
+            if (input) input.value = '';
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️'
+            };
+            toast.innerHTML = `
+                <span>${icons[type] || 'ℹ️'}</span>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.classList.toggle('active', show);
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function selectPlan(planId) {
+            if (!state.user) {
+                showToast('الرجاء تسجيل الدخول أولاً', 'error');
+                showLogin();
+                return;
+            }
+            showToast(`تم اختيار خطة ${planId}`, 'success');
+            // In production, handle payment flow
+        }
+
+        function loadPlans() {
+            renderPlans();
+        }
+
+        function watchDemo() {
+            showToast('جاري تحميل العرض التوضيحي...', 'info');
+        }
+
+        function showAbout() {
+            showToast('KOTCHA v9.0.0 - منصة البث التفاعلي المباشر', 'info');
+        }
+
+        function showFAQ() {
+            showToast('سيتم عرض الأسئلة الشائعة قريباً', 'info');
+        }
+
+        function showSupport() {
+            showToast('للتواصل مع الدعم الفني: support@kotcha.com', 'info');
+        }
+
+        function showPrivacy() {
+            showToast('سياسة الخصوصية متاحة قريباً', 'info');
+        }
+
+        function showDocs() {
+            window.open('https://docs.kotcha.com', '_blank');
+        }
+
+        function showAPI() {
+            window.open('https://kotcha.ig999x.workers.dev/api', '_blank');
+        }
+
+        function showGitHub() {
+            window.open('https://github.com/kotcha', '_blank');
+        }
+
+        // ============================================================
+        // Event Listeners
+        // ============================================================
+
+        function setupEventListeners() {
+            // Close modals on overlay click
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.modal-overlay.active').forEach(el => {
+                        el.classList.remove('active');
+                    });
+                }
+            });
+
+            // Handle room ID from URL
+            const params = new URLSearchParams(window.location.search);
+            const roomId = params.get('room');
+            if (roomId) {
+                setTimeout(() => connectToRoom(roomId), 500);
+            }
+        }
+
+        // ============================================================
+        // Auto-start if room ID in URL
+        // ============================================================
+
+        (function autoStart() {
+            const params = new URLSearchParams(window.location.search);
+            const roomId = params.get('room');
+            if (roomId) {
+                state.roomId = roomId;
+                // Wait for DOM to be ready
+                if (document.readyState === 'complete') {
+                    connectToRoom(roomId);
+                } else {
+                    document.addEventListener('DOMContentLoaded', () => {
+                        connectToRoom(roomId);
+                    });
+                }
+            }
+        })();
+
+        console.log('KOTCHA v9.0.0 loaded successfully!');
+        console.log('API:', CONFIG.API);
+        console.log('WebSocket:', CONFIG.WS);
+    </script>
 </body>
 </html>
