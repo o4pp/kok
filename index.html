@@ -1,2518 +1,4435 @@
 <!DOCTYPE html>
-
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KOTCHA — Real-Time Interactive Games</title>
+<title>KOTCHA — Interactive Live Gaming</title>
 
 <style>
-:root {
-    --bg: #08090d;
-    --panel: #11131a;
-    --panel-2: #181b24;
-    --border: rgba(255,255,255,.09);
-    --text: #f5f7fb;
-    --muted: #9298a8;
-    --primary: #7c5cff;
-    --primary-2: #9d86ff;
-    --danger: #ff4d6d;
-    --success: #31d69b;
-    --warning: #ffbd59;
-    --shadow: 0 20px 60px rgba(0,0,0,.35);
+:root{
+  --bg:#07080d;
+  --panel:#11131b;
+  --panel2:#171a24;
+  --border:rgba(255,255,255,.09);
+  --text:#f7f8fc;
+  --muted:#9ca3b3;
+  --primary:#7c3aed;
+  --primary2:#a855f7;
+  --danger:#ef4444;
+  --success:#22c55e;
+  --warning:#f59e0b;
+  --shadow:0 20px 60px rgba(0,0,0,.35);
+  --radius:22px;
 }
 
-* {
-    box-sizing: border-box;
+*{
+  box-sizing:border-box;
 }
 
-body {
-    margin: 0;
-    min-height: 100vh;
-    background:
-        radial-gradient(circle at 15% 10%, rgba(124,92,255,.18), transparent 30%),
-        radial-gradient(circle at 85% 20%, rgba(255,77,109,.12), transparent 25%),
-        var(--bg);
-    color: var(--text);
-    font-family:
-        Inter,
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  background:
+    radial-gradient(
+      circle at 10% 10%,
+      rgba(124,58,237,.18),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 90% 0%,
+      rgba(168,85,247,.12),
+      transparent 25%
+    ),
+    var(--bg);
+  color:var(--text);
 }
 
 button,
 input,
-select,
-textarea {
-    font: inherit;
+select{
+  font:inherit;
 }
 
-button {
-    cursor: pointer;
+button{
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+.app{
+  min-height:100vh;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header{
+  position:sticky;
+  top:0;
+  z-index:50;
+  height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 24px;
+  border-bottom:1px solid var(--border);
+  background:rgba(7,8,13,.82);
+  backdrop-filter:blur(22px);
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:-.5px;
+}
+
+.logo-mark{
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  display:grid;
+  place-items:center;
+  color:white;
+  background:
+    linear-gradient(
+      135deg,
+      var(--primary),
+      var(--primary2)
+    );
+  box-shadow:
+    0 0 30px rgba(124,58,237,.45);
+}
+
+.header-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn{
+  border:1px solid var(--border);
+  background:var(--panel2);
+  color:var(--text);
+  padding:11px 16px;
+  border-radius:13px;
+  transition:.2s ease;
+}
+
+.btn:hover{
+  transform:translateY(-1px);
+  border-color:rgba(168,85,247,.5);
+}
+
+.btn.primary{
+  border:none;
+  background:
+    linear-gradient(
+      135deg,
+      var(--primary),
+      var(--primary2)
+    );
+  box-shadow:
+    0 8px 28px rgba(124,58,237,.25);
+}
+
+.btn.danger{
+  background:rgba(239,68,68,.12);
+  border-color:rgba(239,68,68,.3);
+  color:#fca5a5;
+}
+
+.btn.success{
+  background:rgba(34,197,94,.12);
+  border-color:rgba(34,197,94,.3);
+  color:#86efac;
+}
+
+/* =========================
+   LAYOUT
+========================= */
+
+.main{
+  max-width:1500px;
+  margin:auto;
+  padding:32px 20px 80px;
 }
 
-.app {
-    display: grid;
-    grid-template-columns: 280px 1fr 350px;
-    min-height: 100vh;
+.hero{
+  display:grid;
+  grid-template-columns:
+    minmax(0,1.3fr)
+    minmax(320px,.7fr);
+  gap:24px;
+  margin-bottom:24px;
 }
 
-.sidebar {
-    padding: 24px 18px;
-    border-left: 1px solid var(--border);
-    background: rgba(10,11,16,.82);
-    backdrop-filter: blur(20px);
+.card{
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.045),
+      rgba(255,255,255,.015)
+    );
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
 }
 
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 35px;
+.hero-card{
+  padding:42px;
+  min-height:300px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
 }
 
-.brand-logo {
-    width: 44px;
-    height: 44px;
-    display: grid;
-    place-items: center;
-    border-radius: 14px;
-    background: linear-gradient(135deg, var(--primary), #ff4d9d);
-    font-size: 22px;
-    font-weight: 900;
-    box-shadow: 0 10px 35px rgba(124,92,255,.35);
+.hero-card h1{
+  margin:0 0 16px;
+  font-size:clamp(34px,5vw,70px);
+  line-height:1.02;
+  letter-spacing:-3px;
 }
 
-.brand h1 {
-    margin: 0;
-    font-size: 21px;
+.hero-card h1 span{
+  color:var(--primary2);
 }
 
-.brand small {
-    display: block;
-    color: var(--muted);
-    margin-top: 3px;
+.hero-card p{
+  max-width:720px;
+  color:var(--muted);
+  font-size:17px;
+  line-height:1.8;
 }
 
-.nav-title {
-    color: var(--muted);
-    font-size: 12px;
-    margin: 24px 10px 10px;
+.hero-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:20px;
 }
 
-.nav-button {
-    width: 100%;
-    padding: 13px 14px;
-    border: 1px solid transparent;
-    background: transparent;
-    color: var(--muted);
-    text-align: right;
-    border-radius: 12px;
-    margin-bottom: 6px;
-    transition: .2s;
+.status-card{
+  padding:24px;
 }
 
-.nav-button:hover,
-.nav-button.active {
-    color: white;
-    background: rgba(124,92,255,.14);
-    border-color: rgba(124,92,255,.25);
+.status-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:24px;
 }
 
-.platforms {
-    display: grid;
-    gap: 8px;
-    margin-top: 12px;
+.status-dot{
+  width:11px;
+  height:11px;
+  display:inline-block;
+  border-radius:50%;
+  background:var(--danger);
+  margin-left:8px;
 }
 
-.platform {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 11px 12px;
-    background: rgba(255,255,255,.035);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    font-size: 13px;
+.status-dot.online{
+  background:var(--success);
+  box-shadow:0 0 16px var(--success);
 }
 
-.platform span:last-child {
-    color: var(--success);
-    font-size: 11px;
+.status-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
 }
 
-.main {
-    padding: 24px;
-    overflow: hidden;
+.stat{
+  padding:18px;
+  border:1px solid var(--border);
+  background:rgba(0,0,0,.18);
+  border-radius:16px;
 }
 
-.topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    margin-bottom: 24px;
+.stat-label{
+  color:var(--muted);
+  font-size:13px;
 }
 
-.room-box {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.stat-value{
+  margin-top:8px;
+  font-size:25px;
+  font-weight:900;
 }
 
-.room-input {
-    width: 250px;
-    padding: 12px 14px;
-    border: 1px solid var(--border);
-    background: var(--panel);
-    color: white;
-    border-radius: 12px;
-    outline: none;
+/* =========================
+   TABS
+========================= */
+
+.tabs{
+  display:flex;
+  gap:8px;
+  overflow:auto;
+  padding:8px;
+  margin-bottom:22px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.025);
+  border-radius:18px;
+}
+
+.tab{
+  white-space:nowrap;
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  padding:12px 18px;
+  border-radius:12px;
+}
+
+.tab.active{
+  color:white;
+  background:
+    linear-gradient(
+      135deg,
+      var(--primary),
+      var(--primary2)
+    );
+}
+
+/* =========================
+   DASHBOARD
+========================= */
+
+.dashboard{
+  display:grid;
+  grid-template-columns:
+    minmax(0,1.6fr)
+    minmax(300px,.8fr);
+  gap:22px;
+}
+
+.panel{
+  padding:24px;
 }
 
-.room-input:focus {
-    border-color: var(--primary);
+.panel-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:20px;
 }
 
-.btn {
-    border: 0;
-    border-radius: 11px;
-    padding: 12px 17px;
-    color: white;
-    background: var(--panel-2);
-    border: 1px solid var(--border);
-    transition: .2s;
+.panel-title h2,
+.panel-title h3{
+  margin:0;
 }
 
-.btn:hover {
-    transform: translateY(-1px);
-    border-color: rgba(255,255,255,.2);
+/* =========================
+   GAME AREA
+========================= */
+
+.game-stage{
+  min-height:500px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  border-radius:20px;
+  border:1px solid var(--border);
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(124,58,237,.15),
+      transparent 55%
+    ),
+    #08090e;
 }
 
-.btn-primary {
-    background: linear-gradient(135deg, var(--primary), #6045df);
-    border: 0;
+.game-empty{
+  text-align:center;
+  color:var(--muted);
 }
 
-.btn-danger {
-    background: linear-gradient(135deg, #ff4d6d, #c9284a);
-    border: 0;
+.game-empty .icon{
+  font-size:60px;
+  margin-bottom:16px;
 }
+
+/* =========================
+   GAME CARDS
+========================= */
 
-.btn-success {
-    background: linear-gradient(135deg, #24c997, #139b74);
-    border: 0;
+.game-card{
+  width:min(100%,760px);
+  padding:28px;
+  text-align:center;
 }
 
-.status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--muted);
-    font-size: 13px;
+.game-card h2{
+  font-size:32px;
+  margin-top:0;
 }
 
-.status-dot {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: var(--danger);
+.game-card p{
+  color:var(--muted);
 }
 
-.status-dot.online {
-    background: var(--success);
-    box-shadow: 0 0 14px var(--success);
+.game-actions{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:12px;
+  margin-top:24px;
 }
 
-.hero {
-    padding: 32px;
-    border-radius: 22px;
-    border: 1px solid var(--border);
-    background:
-        linear-gradient(135deg, rgba(124,92,255,.18), rgba(255,255,255,.025)),
-        var(--panel);
-    box-shadow: var(--shadow);
-    margin-bottom: 20px;
+.game-input{
+  width:100%;
+  max-width:320px;
+  padding:15px;
+  color:white;
+  background:#0d0f16;
+  border:1px solid var(--border);
+  border-radius:14px;
+  outline:none;
 }
 
-.hero h2 {
-    margin: 0 0 10px;
-    font-size: 32px;
+.game-input:focus{
+  border-color:var(--primary2);
 }
 
-.hero p {
-    color: var(--muted);
-    max-width: 700px;
-    line-height: 1.8;
-    margin: 0 0 20px;
+/* =========================
+   WHEEL
+========================= */
+
+.wheel-wrap{
+  position:relative;
+  width:300px;
+  height:300px;
+  margin:20px auto;
 }
 
-.stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
+.wheel{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  border:12px solid #242735;
+  background:
+    conic-gradient(
+      #7c3aed 0deg 45deg,
+      #ef4444 45deg 90deg,
+      #f59e0b 90deg 135deg,
+      #22c55e 135deg 180deg,
+      #3b82f6 180deg 225deg,
+      #ec4899 225deg 270deg,
+      #14b8a6 270deg 315deg,
+      #f97316 315deg 360deg
+    );
+  box-shadow:
+    0 0 50px rgba(124,58,237,.35);
+  transition:transform 4s cubic-bezier(.12,.72,.18,1);
 }
 
-.stat {
-    padding: 18px;
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    background: var(--panel);
+.wheel-pointer{
+  position:absolute;
+  top:-20px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:2;
+  font-size:34px;
 }
 
-.stat-label {
-    color: var(--muted);
-    font-size: 12px;
-    margin-bottom: 10px;
+/* =========================
+   CHAT
+========================= */
+
+.chat{
+  display:flex;
+  flex-direction:column;
+  height:500px;
 }
 
-.stat-value {
-    font-size: 25px;
-    font-weight: 800;
+.chat-messages{
+  flex:1;
+  overflow:auto;
+  padding:10px;
+  border-radius:16px;
+  background:rgba(0,0,0,.2);
 }
 
-.game-panel {
-    border: 1px solid var(--border);
-    background: var(--panel);
-    border-radius: 20px;
-    padding: 22px;
+.chat-message{
+  padding:10px 12px;
+  margin-bottom:8px;
+  border-radius:12px;
+  background:rgba(255,255,255,.04);
 }
 
-.panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 18px;
+.chat-user{
+  font-weight:800;
+  color:var(--primary2);
 }
 
-.panel-header h3 {
-    margin: 0;
+.chat-text{
+  margin-top:4px;
+  color:#e5e7eb;
 }
 
-.game-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+.chat-form{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
 }
 
-.game-card {
-    position: relative;
-    min-height: 145px;
-    padding: 18px;
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    background:
-        linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.015));
-    transition: .2s;
+.chat-form input{
+  flex:1;
+  min-width:0;
+  padding:13px;
+  color:white;
+  background:#0d0f16;
+  border:1px solid var(--border);
+  border-radius:13px;
 }
+
+/* =========================
+   GAMES LIST
+========================= */
 
-.game-card:hover {
-    transform: translateY(-3px);
-    border-color: rgba(124,92,255,.5);
+.games-grid{
+  display:grid;
+  grid-template-columns:
+    repeat(auto-fit,minmax(230px,1fr));
+  gap:16px;
 }
 
-.game-icon {
-    font-size: 30px;
-    margin-bottom: 15px;
+.game-option{
+  padding:20px;
+  cursor:pointer;
+  border:1px solid var(--border);
+  border-radius:18px;
+  background:rgba(255,255,255,.025);
+  transition:.2s ease;
 }
 
-.game-card h4 {
-    margin: 0 0 7px;
+.game-option:hover{
+  transform:translateY(-4px);
+  border-color:var(--primary2);
+  box-shadow:
+    0 12px 35px rgba(124,58,237,.15);
 }
 
-.game-card p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.6;
+.game-option .emoji{
+  font-size:36px;
 }
 
-.game-card button {
-    position: absolute;
-    bottom: 14px;
-    left: 14px;
-    padding: 7px 11px;
-    font-size: 12px;
+.game-option h3{
+  margin:12px 0 8px;
 }
 
-.game-controls {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
+.game-option p{
+  margin:0;
+  color:var(--muted);
+  line-height:1.6;
 }
 
-.game-controls select,
-.game-controls input {
-    width: 100%;
-    padding: 12px;
-    background: var(--panel-2);
-    border: 1px solid var(--border);
-    color: white;
-    border-radius: 10px;
-    margin-bottom: 10px;
+/* =========================
+   CREATOR
+========================= */
+
+.creator-layout{
+  display:grid;
+  grid-template-columns:
+    260px
+    minmax(0,1fr);
+  gap:20px;
 }
 
-.controls-row {
-    display: flex;
-    gap: 10px;
+.creator-sidebar{
+  padding:16px;
+  height:max-content;
 }
 
-.controls-row > * {
-    flex: 1;
+.creator-nav{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
 }
 
-.rightbar {
-    padding: 24px 18px;
-    border-right: 1px solid var(--border);
-    background: rgba(10,11,16,.82);
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+.creator-nav button{
+  text-align:right;
+  border:0;
+  color:var(--muted);
+  background:transparent;
+  padding:14px;
+  border-radius:12px;
 }
 
-.profile {
-    padding: 16px;
-    border-radius: 16px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    margin-bottom: 16px;
+.creator-nav button.active,
+.creator-nav button:hover{
+  color:white;
+  background:rgba(124,58,237,.18);
 }
 
-.profile-title {
-    color: var(--muted);
-    font-size: 12px;
-    margin-bottom: 12px;
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
 }
 
-.profile input,
-.profile select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 8px;
-    border-radius: 9px;
-    background: var(--panel-2);
-    border: 1px solid var(--border);
-    color: white;
+.form-group{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
 }
 
-.chat {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 400px;
+.form-group.full{
+  grid-column:1/-1;
 }
 
-.chat-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 12px;
+.form-group label{
+  color:var(--muted);
+  font-size:13px;
 }
 
-.chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    background: rgba(0,0,0,.16);
+.form-group input,
+.form-group select,
+.form-group textarea{
+  width:100%;
+  color:white;
+  background:#0c0e14;
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:13px;
+  outline:none;
 }
 
-.message {
-    padding: 9px 10px;
-    margin-bottom: 8px;
-    border-radius: 10px;
-    background: rgba(255,255,255,.045);
+.form-group textarea{
+  min-height:120px;
+  resize:vertical;
 }
 
-.message-user {
-    display: flex;
-    justify-content: space-between;
-    color: var(--primary-2);
-    font-size: 12px;
-    margin-bottom: 4px;
+/* =========================
+   SUBSCRIPTIONS
+========================= */
+
+.plans{
+  display:grid;
+  grid-template-columns:
+    repeat(auto-fit,minmax(240px,1fr));
+  gap:16px;
 }
 
-.message-text {
-    font-size: 13px;
-    line-height: 1.6;
-    word-break: break-word;
+.plan{
+  padding:26px;
+  position:relative;
+  overflow:hidden;
 }
 
-.chat-form {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
+.plan.featured{
+  border-color:var(--primary2);
+  box-shadow:
+    0 0 40px rgba(124,58,237,.15);
 }
 
-.chat-form input {
-    flex: 1;
-    padding: 11px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--panel);
-    color: white;
-    outline: none;
+.plan h3{
+  font-size:22px;
 }
 
-.event-log {
-    max-height: 180px;
-    overflow-y: auto;
-    margin-top: 16px;
-    padding: 10px;
-    border-radius: 12px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    font-size: 11px;
-    color: var(--muted);
+.plan-price{
+  font-size:38px;
+  font-weight:900;
+  margin:18px 0;
 }
 
-.event-item {
-    padding: 7px 0;
-    border-bottom: 1px solid rgba(255,255,255,.05);
+.plan ul{
+  list-style:none;
+  padding:0;
+  color:var(--muted);
+  line-height:2;
 }
+
+/* =========================
+   LIVE
+========================= */
 
-.toast {
-    position: fixed;
-    left: 24px;
-    bottom: 24px;
-    z-index: 100;
-    padding: 14px 18px;
-    border-radius: 12px;
-    background: #20232d;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    transform: translateY(100px);
-    opacity: 0;
-    transition: .3s;
+.live-box{
+  min-height:260px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  border:1px dashed rgba(168,85,247,.45);
+  border-radius:20px;
+  background:
+    radial-gradient(
+      circle,
+      rgba(124,58,237,.15),
+      transparent 60%
+    );
 }
 
-.toast.show {
-    transform: translateY(0);
-    opacity: 1;
+.live-status{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(239,68,68,.12);
+  color:#fca5a5;
 }
 
-.modal {
-    position: fixed;
-    inset: 0;
-    z-index: 50;
-    display: none;
-    place-items: center;
-    background: rgba(0,0,0,.7);
-    backdrop-filter: blur(8px);
+/* =========================
+   TOAST
+========================= */
+
+#toast-container{
+  position:fixed;
+  left:20px;
+  bottom:20px;
+  z-index:100;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
 
-.modal.show {
-    display: grid;
+.toast{
+  min-width:280px;
+  max-width:420px;
+  padding:14px 16px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:#151822;
+  box-shadow:var(--shadow);
+  animation:toastIn .25s ease;
 }
 
-.modal-box {
-    width: min(500px, calc(100% - 30px));
-    padding: 25px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: var(--panel);
+.toast.success{
+  border-color:rgba(34,197,94,.35);
 }
 
-.modal-box h3 {
-    margin-top: 0;
+.toast.error{
+  border-color:rgba(239,68,68,.35);
 }
 
-.modal-box input {
-    width: 100%;
-    padding: 13px;
-    margin: 8px 0;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--panel-2);
-    color: white;
+@keyframes toastIn{
+  from{
+    opacity:0;
+    transform:translateY(12px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
 }
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:1000px){
 
-@media (max-width: 1200px) {
-    .app {
-        grid-template-columns: 220px 1fr;
-    }
+  .hero,
+  .dashboard{
+    grid-template-columns:1fr;
+  }
 
-    .rightbar {
-        display: none;
-    }
+  .creator-layout{
+    grid-template-columns:1fr;
+  }
+
 }
+
+@media(max-width:650px){
+
+  .header{
+    padding:0 12px;
+  }
 
-@media (max-width: 800px) {
-    .app {
-        display: block;
-    }
+  .header-actions .btn:not(.primary){
+    display:none;
+  }
 
-    .sidebar {
-        display: none;
-    }
+  .main{
+    padding:20px 12px 60px;
+  }
 
-    .main {
-        padding: 14px;
-    }
+  .hero-card{
+    padding:26px;
+  }
 
-    .topbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
+  .hero-card h1{
+    font-size:42px;
+  }
 
-    .room-box {
-        flex-direction: column;
-    }
+  .form-grid{
+    grid-template-columns:1fr;
+  }
 
-    .room-input {
-        width: 100%;
-    }
+  .form-group.full{
+    grid-column:auto;
+  }
 
-    .stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
+  .game-stage{
+    min-height:420px;
+  }
 
-    .game-grid {
-        grid-template-columns: 1fr;
-    }
 }
 </style>
-
 </head>
 
 <body>
 
 <div class="app">
 
-```
-<!-- SIDEBAR -->
-<aside class="sidebar">
+<header class="header">
 
-    <div class="brand">
-        <div class="brand-logo">K</div>
-        <div>
-            <h1>KOTCHA</h1>
-            <small>Interactive Live Games</small>
-        </div>
-    </div>
+  <div class="logo">
+    <div class="logo-mark">K</div>
+    <span>KOTCHA</span>
+  </div>
 
-    <div class="nav-title">المنصة</div>
+  <div class="header-actions">
 
-    <button class="nav-button active">
-        🎮 الألعاب
+    <button
+      class="btn"
+      id="openCreatorBtn">
+      🛠️ منشئ المحتوى
     </button>
 
-    <button class="nav-button">
-        🏆 المتصدرون
+    <button
+      class="btn primary"
+      id="createRoomBtn">
+      إنشاء غرفة
     </button>
 
-    <button class="nav-button">
-        📊 الإحصائيات
-    </button>
+  </div>
 
-    <button class="nav-button">
-        ⚙️ الإعدادات
-    </button>
+</header>
 
-    <div class="nav-title">المنصات المرتبطة</div>
-
-    <div class="platforms">
-        <div class="platform">
-            <span>🎵 TikTok</span>
-            <span>جاهز</span>
-        </div>
-
-        <div class="platform">
-            <span>🎮 Twitch</span>
-            <span>جاهز</span>
-        </div>
-
-        <div class="platform">
-            <span>⚡ Kick</span>
-            <span>جاهز</span>
-        </div>
-
-        <div class="platform">
-            <span>🟣 KOTCHA</span>
-            <span>متصل</span>
-        </div>
-    </div>
-
-</aside>
-
-
-<!-- MAIN -->
 <main class="main">
 
-    <div class="topbar">
+<section class="hero">
 
-        <div class="room-box">
-            <input
-                id="roomInput"
-                class="room-input"
-                placeholder="أدخل Room ID"
-            >
+  <div class="card hero-card">
 
-            <button
-                class="btn btn-primary"
-                onclick="joinRoom()"
-            >
-                دخول الغرفة
-            </button>
+    <h1>
+      العب.
+      <span>شارك.</span>
+      تحكم.
+    </h1>
 
-            <button
-                class="btn btn-success"
-                onclick="createRoom()"
-            >
-                إنشاء غرفة
-            </button>
-        </div>
+    <p>
+      منصة KOTCHA للألعاب التفاعلية المباشرة.
+      أنشئ غرفة، اربط جمهورك، وشغّل ألعابًا
+      فورية يتفاعل معها المشاهدون لحظة بلحظة.
+    </p>
 
-        <div class="status">
-            <span id="statusDot" class="status-dot"></span>
-            <span id="connectionStatus">
-                غير متصل
-            </span>
-        </div>
+    <div class="hero-actions">
+
+      <button
+        class="btn primary"
+        id="joinRoomBtn">
+        🎮 دخول غرفة
+      </button>
+
+      <button
+        class="btn"
+        id="browseGamesBtn">
+        استكشاف الألعاب
+      </button>
 
     </div>
 
+  </div>
 
-    <section class="hero">
+  <div class="card status-card">
 
-        <h2>
-            العب. تفاعل. سيطر.
-        </h2>
+    <div class="status-header">
 
-        <p>
-            منصة KOTCHA للألعاب التفاعلية المباشرة.
-            اجعل جمهورك يشارك في اللعبة مباشرة أثناء البث
-            عبر TikTok و Twitch و Kick.
-        </p>
+      <h3>حالة المنصة</h3>
 
-        <button
-            class="btn btn-primary"
-            onclick="openProfile()"
-        >
-            👤 إعداد حساب اللاعب
-        </button>
+      <div>
+        <span
+          class="status-dot"
+          id="statusDot"></span>
 
-    </section>
-
-
-    <section class="stats">
-
-        <div class="stat">
-            <div class="stat-label">
-                المشاهدون
-            </div>
-
-            <div
-                class="stat-value"
-                id="viewers"
-            >
-                0
-            </div>
-        </div>
-
-        <div class="stat">
-            <div class="stat-label">
-                الرسائل
-            </div>
-
-            <div
-                class="stat-value"
-                id="messages"
-            >
-                0
-            </div>
-        </div>
-
-        <div class="stat">
-            <div class="stat-label">
-                الأحداث
-            </div>
-
-            <div
-                class="stat-value"
-                id="events"
-            >
-                0
-            </div>
-        </div>
-
-        <div class="stat">
-            <div class="stat-label">
-                حالة اللعبة
-            </div>
-
-            <div
-                class="stat-value"
-                id="gameStatus"
-            >
-                متوقفة
-            </div>
-        </div>
-
-    </section>
-
-
-    <section class="game-panel">
-
-        <div class="panel-header">
-
-            <h3>
-                🎮 الألعاب التفاعلية
-            </h3>
-
-            <span
-                id="currentGame"
-                class="status"
-            >
-                لا توجد لعبة
-            </span>
-
-        </div>
-
-
-        <div class="game-grid">
-
-            <div class="game-card">
-
-                <div class="game-icon">
-                    🗳️
-                </div>
-
-                <h4>
-                    التصويت المباشر
-                </h4>
-
-                <p>
-                    الجمهور يصوت على الخيارات مباشرة.
-                </p>
-
-                <button
-                    class="btn btn-primary"
-                    onclick="selectGame('VOTE')"
-                >
-                    اختيار
-                </button>
-
-            </div>
-
-
-            <div class="game-card">
-
-                <div class="game-icon">
-                    🔢
-                </div>
-
-                <h4>
-                    خمن الرقم
-                </h4>
-
-                <p>
-                    حاول الوصول إلى الرقم السري.
-                </p>
-
-                <button
-                    class="btn btn-primary"
-                    onclick="selectGame('NUMBER_GUESS')"
-                >
-                    اختيار
-                </button>
-
-            </div>
-
-
-            <div class="game-card">
-
-                <div class="game-icon">
-                    🧠
-                </div>
-
-                <h4>
-                    معركة الكلمات
-                </h4>
-
-                <p>
-                    تحدي الكلمات بين المشاركين.
-                </p>
-
-                <button
-                    class="btn btn-primary"
-                    onclick="selectGame('WORD_BATTLE')"
-                >
-                    اختيار
-                </button>
-
-            </div>
-
-
-            <div class="game-card">
-
-                <div class="game-icon">
-                    ❓
-                </div>
-
-                <h4>
-                    Quiz
-                </h4>
-
-                <p>
-                    أسئلة وتحديات تفاعلية.
-                </p>
-
-                <button
-                    class="btn btn-primary"
-                    onclick="selectGame('QUIZ')"
-                >
-                    اختيار
-                </button>
-
-            </div>
-
-
-            <div class="game-card">
-
-                <div class="game-icon">
-                    ⚔️
-                </div>
-
-                <h4>
-                    Team Battle
-                </h4>
-
-                <p>
-                    فريق ضد فريق في الوقت الحقيقي.
-                </p>
-
-                <button
-                    class="btn btn-primary"
-                    onclick="selectGame('TEAM_BATTLE')"
-                >
-                    اختيار
-                </button>
-
-            </div>
-
-
-            <div class="game-card">
-
-                <div class="game-icon">
-                    ⚡
-                </div>
-
-                <h4>
-                    Reaction
-                </h4>
-
-                <p>
-                    الأسرع في التفاعل يفوز.
-                </p>
-
-                <button
-                    class="btn btn-primary"
-                    onclick="selectGame('REACTION')"
-                >
-                    اختيار
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <div class="game-controls">
-
-            <select id="gameSelect">
-
-                <option value="">
-                    اختر اللعبة
-                </option>
-
-                <option value="VOTE">
-                    🗳️ التصويت
-                </option>
-
-                <option value="NUMBER_GUESS">
-                    🔢 خمن الرقم
-                </option>
-
-                <option value="WORD_BATTLE">
-                    🧠 معركة الكلمات
-                </option>
-
-                <option value="QUIZ">
-                    ❓ Quiz
-                </option>
-
-                <option value="TEAM_BATTLE">
-                    ⚔️ Team Battle
-                </option>
-
-                <option value="REACTION">
-                    ⚡ Reaction
-                </option>
-
-            </select>
-
-
-            <div id="extraInputContainer"></div>
-
-
-            <div class="controls-row">
-
-                <button
-                    class="btn btn-success"
-                    onclick="startGame()"
-                >
-                    ▶️ بدء اللعبة
-                </button>
-
-                <button
-                    class="btn btn-danger"
-                    onclick="stopGame()"
-                >
-                    ⏹️ إيقاف
-                </button>
-
-                <button
-                    class="btn"
-                    onclick="resetGame()"
-                >
-                    🔄 إعادة
-                </button>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <section class="game-panel" style="margin-top:20px">
-
-        <div class="panel-header">
-            <h3>
-                🎯 لوحة التفاعل
-            </h3>
-        </div>
-
-        <div id="interactionArea">
-
-            <p style="color:var(--muted)">
-                ابدأ لعبة لعرض أدوات التفاعل.
-            </p>
-
-        </div>
-
-    </section>
-
-
-    <div class="event-log">
-
-        <strong>
-            سجل الأحداث
-        </strong>
-
-        <div id="eventLog"></div>
+        <span id="statusText">
+          جارٍ الاتصال...
+        </span>
+      </div>
 
     </div>
 
-</main>
+    <div class="status-grid">
 
-
-<!-- RIGHT BAR -->
-<aside class="rightbar">
-
-    <div class="profile">
-
-        <div class="profile-title">
-            حساب اللاعب
+      <div class="stat">
+        <div class="stat-label">
+          الإصدار
         </div>
-
-        <input
-            id="username"
-            placeholder="اسم المستخدم"
-            value="Guest"
-        >
-
-        <select id="platform">
-
-            <option value="kotcha">
-                🟣 KOTCHA
-            </option>
-
-            <option value="tiktok">
-                🎵 TikTok
-            </option>
-
-            <option value="twitch">
-                🎮 Twitch
-            </option>
-
-            <option value="kick">
-                ⚡ Kick
-            </option>
-
-        </select>
-
-    </div>
-
-
-    <div class="chat">
-
-        <div class="chat-header">
-
-            <strong>
-                💬 الدردشة المباشرة
-            </strong>
-
-            <span
-                id="chatCount"
-                style="color:var(--muted)"
-            >
-                0
-            </span>
-
-        </div>
-
 
         <div
-            id="chatMessages"
-            class="chat-messages"
-        ></div>
+          class="stat-value"
+          id="versionValue">
+          —
+        </div>
+      </div>
 
+      <div class="stat">
+        <div class="stat-label">
+          المشاهدون
+        </div>
+
+        <div
+          class="stat-value"
+          id="viewersValue">
+          0
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">
+          WebSocket
+        </div>
+
+        <div
+          class="stat-value"
+          id="wsValue">
+          —
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">
+          الغرفة الحالية
+        </div>
+
+        <div
+          class="stat-value"
+          id="roomValue">
+          —
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<nav class="tabs">
+
+  <button
+    class="tab active"
+    data-tab="home">
+    🏠 الرئيسية
+  </button>
+
+  <button
+    class="tab"
+    data-tab="games">
+    🎮 الألعاب
+  </button>
+
+  <button
+    class="tab"
+    data-tab="live">
+    🔴 Live
+  </button>
+
+  <button
+    class="tab"
+    data-tab="subscription">
+    💎 الاشتراك
+  </button>
+
+  <button
+    class="tab"
+    data-tab="creator">
+    🛠️ لوحة المطور
+  </button>
+
+</nav>
+
+<section
+  id="homeTab"
+  class="tab-content">
+
+  <div class="dashboard">
+
+    <div class="card panel">
+
+      <div class="panel-title">
+
+        <h2>
+          🎮 ساحة اللعب
+        </h2>
+
+        <span
+          id="activeGameLabel">
+          لا توجد لعبة
+        </span>
+
+      </div>
+
+      <div
+        id="gameStage"
+        class="game-stage">
+
+        <div class="game-empty">
+
+          <div class="icon">
+            🎮
+          </div>
+
+          <h2>
+            لا توجد لعبة نشطة
+          </h2>
+
+          <p>
+            أنشئ غرفة ثم شغّل لعبة من لوحة المطور.
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="card panel">
+
+      <div class="panel-title">
+
+        <h2>
+          💬 المحادثة
+        </h2>
+
+        <span
+          id="chatConnection">
+          Offline
+        </span>
+
+      </div>
+
+      <div class="chat">
+
+        <div
+          id="chatMessages"
+          class="chat-messages">
+        </div>
 
         <form
-            class="chat-form"
-            onsubmit="sendChat(event)"
-        >
+          id="chatForm"
+          class="chat-form">
 
-            <input
-                id="chatInput"
-                placeholder="اكتب رسالة..."
-                autocomplete="off"
-            >
+          <input
+            id="chatInput"
+            maxlength="500"
+            placeholder="اكتب رسالة..."
+            autocomplete="off">
 
-            <button
-                class="btn btn-primary"
-                type="submit"
-            >
-                إرسال
-            </button>
+          <button
+            class="btn primary">
+            إرسال
+          </button>
 
         </form>
 
+      </div>
+
     </div>
 
-</aside>
-```
+  </div>
+
+</section>
+
+<section
+  id="gamesTab"
+  class="tab-content hidden">
+
+  <div class="card panel">
+
+    <div class="panel-title">
+
+      <h2>
+        🎮 مكتبة الألعاب
+      </h2>
+
+      <span>
+        ألعاب تفاعلية مباشرة
+      </span>
+
+    </div>
+
+    <div
+      id="gamesGrid"
+      class="games-grid">
+    </div>
+
+  </div>
+
+</section>
+
+<section
+  id="liveTab"
+  class="tab-content hidden">
+
+  <div class="card panel">
+
+    <div class="panel-title">
+
+      <h2>
+        🔴 Live Integrations
+      </h2>
+
+      <span>
+        TikTok / Twitch / Kick
+      </span>
+
+    </div>
+
+    <div class="live-box">
+
+      <div>
+
+        <div class="live-status">
+          <span>●</span>
+          LIVE CONNECTOR
+        </div>
+
+        <h2>
+          ربط البث المباشر
+        </h2>
+
+        <p>
+          اربط حساب منشئ المحتوى مع
+          مزود البث المعتمد لإرسال أحداث
+          البث إلى KOTCHA.
+        </p>
+
+        <button
+          class="btn primary"
+          id="connectTikTokBtn">
+          🔗 ربط TikTok
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section
+  id="subscriptionTab"
+  class="tab-content hidden">
+
+  <div class="card panel">
+
+    <div class="panel-title">
+
+      <h2>
+        💎 اشتراكات KOTCHA
+      </h2>
+
+      <span>
+        اختر خطتك
+      </span>
+
+    </div>
+
+    <div class="plans">
+
+      <div class="card plan">
+
+        <h3>
+          Free
+        </h3>
+
+        <div class="plan-price">
+          0
+          <small>ر.س</small>
+        </div>
+
+        <ul>
+          <li>✓ ألعاب مجانية</li>
+          <li>✓ غرفة واحدة</li>
+          <li>✓ WebSocket</li>
+          <li>✓ Chat</li>
+        </ul>
+
+        <button
+          class="btn">
+          الخطة الحالية
+        </button>
+
+      </div>
+
+      <div class="card plan featured">
+
+        <h3>
+          Creator
+        </h3>
+
+        <div class="plan-price">
+          29
+          <small>ر.س / شهر</small>
+        </div>
+
+        <ul>
+          <li>✓ ألعاب Premium</li>
+          <li>✓ غرف متعددة</li>
+          <li>✓ أدوات Creator</li>
+          <li>✓ Live Integrations</li>
+          <li>✓ إحصائيات متقدمة</li>
+        </ul>
+
+        <button
+          class="btn primary"
+          id="subscribeCreatorBtn">
+          الاشتراك
+        </button>
+
+      </div>
+
+      <div class="card plan">
+
+        <h3>
+          Pro
+        </h3>
+
+        <div class="plan-price">
+          79
+          <small>ر.س / شهر</small>
+        </div>
+
+        <ul>
+          <li>✓ كل مزايا Creator</li>
+          <li>✓ غرف غير محدودة</li>
+          <li>✓ Branding</li>
+          <li>✓ تحليلات متقدمة</li>
+          <li>✓ API Access</li>
+        </ul>
+
+        <button
+          class="btn primary"
+          id="subscribeProBtn">
+          الترقية
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section
+  id="creatorTab"
+  class="tab-content hidden">
+
+  <div class="creator-layout">
+
+    <aside class="card creator-sidebar">
+
+      <div class="creator-nav">
+
+        <button
+          class="active"
+          data-creator-view="control">
+          🎛️ التحكم
+        </button>
+
+        <button
+          data-creator-view="room">
+          🏠 الغرفة
+        </button>
+
+        <button
+          data-creator-view="live">
+          🔴 Live
+        </button>
+
+        <button
+          data-creator-view="codes">
+          🔐 الأكواد
+        </button>
+
+        <button
+          data-creator-view="settings">
+          ⚙️ الإعدادات
+        </button>
+
+      </div>
+
+    </aside>
+
+    <div
+      id="creatorContent"
+      class="card panel">
+
+    </div>
+
+  </div>
+
+</section>
+
+</main>
 
 </div>
 
-<div
-    id="toast"
-    class="toast"
-></div>
-
-<div
-    id="profileModal"
-    class="modal"
->
-
-```
-<div class="modal-box">
-
-    <h3>
-        👤 إعداد حساب اللاعب
-    </h3>
-
-    <input
-        id="profileId"
-        placeholder="معرف اللاعب"
-    >
-
-    <input
-        id="profileName"
-        placeholder="اسم العرض"
-    >
-
-    <button
-        class="btn btn-primary"
-        onclick="saveProfile()"
-    >
-        حفظ
-    </button>
-
-    <button
-        class="btn"
-        onclick="closeProfile()"
-    >
-        إغلاق
-    </button>
-
-</div>
-```
-
-</div>
+<div id="toast-container"></div>
 
 <script>
 
-/* ============================================================
-   KOTCHA FRONTEND
-============================================================ */
+/* =========================================================
+   CONFIGURATION
+========================================================= */
 
-const API_BASE =
-    "https://kotcha.ig999x.workers.dev";
+const CONFIG = Object.freeze({
 
-let roomId = null;
-let ownerToken = null;
-let socket = null;
-let sessionId = null;
+  API_BASE:
+    "https://kotcha.ig999x.workers.dev",
 
-let selectedGame = null;
+  PAGE_BASE:
+    "https://kotcha.pages.dev",
 
-let player = {
-    id: null,
-    username: "Guest",
-    displayName: "Guest",
-    avatar: null
+  STORAGE_KEY:
+    "KOTCHA_CLIENT_STATE",
+
+  USER_STORAGE_KEY:
+    "KOTCHA_USER"
+
+});
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+const state = {
+
+  apiOnline:false,
+
+  version:null,
+
+  roomId:null,
+
+  ownerToken:null,
+
+  websocket:null,
+
+  websocketConnected:false,
+
+  websocketConnecting:false,
+
+  reconnectAttempts:0,
+
+  reconnectTimer:null,
+
+  user:null,
+
+  platform:"kotcha",
+
+  game:null,
+
+  chat:[],
+
+  creatorView:"control"
+
 };
 
 
-/* ============================================================
-   HELPERS
-============================================================ */
+/* =========================================================
+   GAME DEFINITIONS
+========================================================= */
 
-function $(id) {
-    return document.getElementById(id);
+const GAMES = [
+
+  {
+    type:"VOTE",
+    emoji:"🗳️",
+    title:"التصويت الجماهيري",
+    description:"الجمهور يختار بين خمسة خيارات.",
+    premium:false
+  },
+
+  {
+    type:"NUMBER_GUESS",
+    emoji:"🔢",
+    title:"خمن الرقم",
+    description:"أول لاعب يصل إلى الرقم السري يفوز.",
+    premium:false
+  },
+
+  {
+    type:"WORD_BATTLE",
+    emoji:"⚔️",
+    title:"معركة الكلمات",
+    description:"تحديات كلمات مباشرة بين المشاركين.",
+    premium:true
+  },
+
+  {
+    type:"QUIZ",
+    emoji:"🧠",
+    title:"المسابقة السريعة",
+    description:"أسئلة وإجابات مع ترتيب مباشر.",
+    premium:false
+  },
+
+  {
+    type:"REACTION",
+    emoji:"⚡",
+    title:"اختبار سرعة الاستجابة",
+    description:"من يستجيب أولًا؟",
+    premium:false
+  },
+
+  {
+    type:"WHEEL",
+    emoji:"🎡",
+    title:"عجلة الإقصاء",
+    description:"تحديد اللاعب الذي يخرج من الجولة.",
+    premium:true
+  },
+
+  {
+    type:"RUSSIAN_ROULETTE",
+    emoji:"🎲",
+    title:"الروليت العشوائي",
+    description:"نسخة ترفيهية رقمية غير مرتبطة بسلاح أو أذى.",
+    premium:true
+  },
+
+  {
+    type:"ELIMINATION",
+    emoji:"☠️",
+    title:"الإقصاء المتتابع",
+    description:"الجمهور يصوّت لإقصاء المشاركين.",
+    premium:true
+  },
+
+  {
+    type:"BATTLE_ROYALE",
+    emoji:"🏆",
+    title:"آخر لاعب صامد",
+    description:"منافسة جماعية حتى يبقى فائز واحد.",
+    premium:true
+  },
+
+  {
+    type:"TREASURE",
+    emoji:"💎",
+    title:"البحث عن الكنز",
+    description:"اختيارات مخفية ومفاجآت مباشرة.",
+    premium:true
+  }
+
+];
+
+
+/* =========================================================
+   UTILITIES
+========================================================= */
+
+function $(selector){
+
+  return document.querySelector(selector);
+
 }
 
 
-function showToast(message) {
+function $all(selector){
 
-    const toast = $("toast");
-
-    toast.textContent = message;
-
-    toast.classList.add("show");
-
-    setTimeout(() => {
-
-        toast.classList.remove("show");
-
-    }, 3000);
+  return [...document.querySelectorAll(selector)];
 
 }
 
 
-function getUser() {
+function escapeHTML(value){
 
-    return {
+  return String(value ?? "")
 
-        id:
-            player.id
-            ||
-            crypto.randomUUID(),
+    .replaceAll("&","&amp;")
 
-        username:
-            player.username
-            ||
-            $("username").value
-            ||
-            "Guest",
+    .replaceAll("<","&lt;")
 
-        displayName:
-            player.displayName
-            ||
-            $("username").value
-            ||
-            "Guest",
+    .replaceAll(">","&gt;")
 
-        avatar:
-            player.avatar
+    .replaceAll('"',"&quot;")
+
+    .replaceAll("'","&#039;");
+
+}
+
+
+function sleep(ms){
+
+  return new Promise(
+
+    resolve => setTimeout(resolve,ms)
+
+  );
+
+}
+
+
+function randomId(){
+
+  if(
+    crypto &&
+    crypto.randomUUID
+  ){
+
+    return crypto.randomUUID();
+
+  }
+
+  return Date.now().toString(36)
+
+    + Math.random().toString(36);
+
+}
+
+
+function showToast(
+
+  message,
+
+  type="info"
+
+){
+
+  const container =
+
+    $("#toast-container");
+
+  const toast =
+
+    document.createElement("div");
+
+  toast.className =
+
+    `toast ${type}`;
+
+  toast.textContent =
+
+    message;
+
+  container.appendChild(toast);
+
+  setTimeout(
+
+    () => toast.remove(),
+
+    4500
+
+  );
+
+}
+
+
+function loadState(){
+
+  try{
+
+    const saved =
+
+      localStorage.getItem(
+
+        CONFIG.STORAGE_KEY
+
+      );
+
+    if(saved){
+
+      Object.assign(
+
+        state,
+
+        JSON.parse(saved)
+
+      );
+
+    }
+
+    const user =
+
+      localStorage.getItem(
+
+        CONFIG.USER_STORAGE_KEY
+
+      );
+
+    if(user){
+
+      state.user =
+
+        JSON.parse(user);
+
+    }
+
+  }catch(error){
+
+    console.warn(
+
+      "State load failed",
+
+      error
+
+    );
+
+  }
+
+}
+
+
+function saveState(){
+
+  try{
+
+    localStorage.setItem(
+
+      CONFIG.STORAGE_KEY,
+
+      JSON.stringify({
+
+        roomId:
+
+          state.roomId,
+
+        ownerToken:
+
+          state.ownerToken,
+
+        user:
+
+          state.user,
+
+        platform:
+
+          state.platform
+
+      })
+
+    );
+
+  }catch(error){
+
+    console.warn(
+
+      "State save failed",
+
+      error
+
+    );
+
+  }
+
+}
+
+
+function getUser(){
+
+  if(state.user){
+
+    return state.user;
+
+  }
+
+  const user = {
+
+    id:
+
+      "web-" + randomId(),
+
+    username:
+
+      "Player_" +
+
+      Math.floor(
+
+        Math.random() * 99999
+
+      ),
+
+    displayName:
+
+      "لاعب KOTCHA",
+
+    avatar:null
+
+  };
+
+  state.user = user;
+
+  localStorage.setItem(
+
+    CONFIG.USER_STORAGE_KEY,
+
+    JSON.stringify(user)
+
+  );
+
+  saveState();
+
+  return user;
+
+}
+
+
+/* =========================================================
+   API CLIENT
+========================================================= */
+
+async function api(
+
+  path,
+
+  options={}
+
+){
+
+  const controller =
+
+    new AbortController();
+
+  const timeout =
+
+    setTimeout(
+
+      () => controller.abort(),
+
+      15000
+
+    );
+
+  try{
+
+    const headers = {
+
+      "Content-Type":
+
+        "application/json",
+
+      ...(options.headers || {})
 
     };
 
-}
+    if(
 
+      state.ownerToken
 
-function logEvent(event) {
+    ){
 
-    const container =
-        $("eventLog");
+      headers.Authorization =
 
-    const item =
-        document.createElement("div");
+        `Bearer ${state.ownerToken}`;
 
-    item.className =
-        "event-item";
-
-    item.textContent =
-        `[${new Date().toLocaleTimeString()}] ${event.type}`;
-
-    container.prepend(item);
-
-}
-
-
-async function api(path, options = {}) {
+    }
 
     const response =
-        await fetch(
 
-            API_BASE + path,
+      await fetch(
 
-            {
+        CONFIG.API_BASE + path,
 
-                ...options,
+        {
 
-                headers: {
+          ...options,
 
-                    "Content-Type":
-                        "application/json",
+          headers,
 
-                    ...(options.headers || {})
+          signal:
 
-                }
+            controller.signal
 
-            }
+        }
 
-        );
+      );
 
-    const data =
-        await response.json();
+    const text =
 
-    if (!response.ok) {
+      await response.text();
 
-        throw new Error(
+    let data = null;
 
-            data.error
-            ||
-            data.message
-            ||
-            "API Error"
+    try{
 
-        );
+      data =
+
+        text
+
+          ? JSON.parse(text)
+
+          : null;
+
+    }catch{
+
+      data = {
+
+        success:false,
+
+        error:"INVALID_SERVER_RESPONSE",
+
+        raw:text
+
+      };
+
+    }
+
+    if(
+
+      !response.ok
+
+    ){
+
+      throw new Error(
+
+        data?.message ||
+
+        data?.error ||
+
+        `HTTP_${response.status}`
+
+      );
 
     }
 
     return data;
 
+  }catch(error){
+
+    if(
+
+      error.name ===
+
+      "AbortError"
+
+    ){
+
+      throw new Error(
+
+        "انتهت مهلة الاتصال بالخادم"
+
+      );
+
+    }
+
+    throw error;
+
+  }finally{
+
+    clearTimeout(timeout);
+
+  }
+
 }
 
 
-/* ============================================================
-   CREATE ROOM
-============================================================ */
+/* =========================================================
+   HEALTH
+========================================================= */
 
-async function createRoom() {
+async function checkHealth(){
 
-    try {
+  try{
 
-        const data =
-            await api(
+    const data =
 
-                "/api/room/create",
+      await api("/health");
 
-                {
+    state.apiOnline =
 
-                    method:
-                        "POST"
+      Boolean(
 
-                }
+        data.success
 
-            );
+      );
 
-        roomId =
-            data.roomId;
+    state.version =
 
-        ownerToken =
-            data.ownerToken;
+      data.version ||
 
-        $("roomInput").value =
-            roomId;
+      null;
 
-        localStorage.setItem(
-            "kotcha_room",
-            roomId
-        );
+    $("#statusDot")
 
-        if (ownerToken) {
+      .classList
 
-            localStorage.setItem(
-                "kotcha_owner_token",
-                ownerToken
-            );
+      .add("online");
+
+    $("#statusText")
+
+      .textContent =
+
+      "متصل";
+
+    $("#versionValue")
+
+      .textContent =
+
+      state.version ||
+
+      "—";
+
+  }catch(error){
+
+    state.apiOnline =
+
+      false;
+
+    $("#statusDot")
+
+      .classList
+
+      .remove("online");
+
+    $("#statusText")
+
+      .textContent =
+
+      "غير متصل";
+
+  }
+
+}
+
+
+/* =========================================================
+   ROOM
+========================================================= */
+
+async function createRoom(){
+
+  try{
+
+    const data =
+
+      await api(
+
+        "/api/room/create",
+
+        {
+
+          method:"POST"
 
         }
 
-        showToast(
-            "تم إنشاء الغرفة بنجاح"
-        );
+      );
 
-        connectWebSocket();
+    state.roomId =
 
-    }
+      data.roomId;
 
-    catch (error) {
+    if(
 
-        showToast(
-            "فشل إنشاء الغرفة: "
-            +
-            error.message
-        );
+      data.ownerToken
 
-    }
+    ){
 
-}
+      state.ownerToken =
 
-
-/* ============================================================
-   JOIN ROOM
-============================================================ */
-
-function joinRoom() {
-
-    const value =
-        $("roomInput")
-            .value
-            .trim();
-
-    if (!value) {
-
-        showToast(
-            "أدخل Room ID أولًا"
-        );
-
-        return;
+        data.ownerToken;
 
     }
 
-    roomId =
-        value;
+    saveState();
 
-    localStorage.setItem(
-        "kotcha_room",
-        roomId
-    );
-
-    ownerToken =
-        localStorage.getItem(
-            "kotcha_owner_token"
-        );
+    updateRoomUI();
 
     connectWebSocket();
 
-    loadRoomData();
+    showToast(
+
+      "تم إنشاء الغرفة بنجاح",
+
+      "success"
+
+    );
+
+    openTab("home");
+
+  }catch(error){
+
+    showToast(
+
+      error.message,
+
+      "error"
+
+    );
+
+  }
 
 }
 
 
-/* ============================================================
+function updateRoomUI(){
+
+  $("#roomValue")
+
+    .textContent =
+
+    state.roomId ||
+
+    "—";
+
+}
+
+
+/* =========================================================
    WEBSOCKET
-============================================================ */
+========================================================= */
 
-function connectWebSocket() {
+function getWebSocketURL(){
 
-    if (!roomId) {
+  if(
 
-        return;
+    !state.roomId
 
-    }
+  ){
 
-    if (socket) {
+    return null;
 
-        socket.close();
+  }
 
-    }
+  return (
 
-    const wsUrl =
-        API_BASE
-            .replace(
-                "https://",
-                "wss://"
-            )
-        +
-        "/room/"
-        +
-        encodeURIComponent(roomId);
+    "wss://kotcha.ig999x.workers.dev"
 
-    socket =
-        new WebSocket(
-            wsUrl
+    +
+
+    "/room/"
+
+    +
+
+    encodeURIComponent(
+
+      state.roomId
+
+    )
+
+  );
+
+}
+
+
+function connectWebSocket(){
+
+  if(
+
+    !state.roomId
+
+    ||
+
+    state.websocketConnecting
+
+  ){
+
+    return;
+
+  }
+
+  if(
+
+    state.websocket
+
+    &&
+
+    (
+
+      state.websocket.readyState ===
+
+      WebSocket.OPEN
+
+      ||
+
+      state.websocket.readyState ===
+
+      WebSocket.CONNECTING
+
+    )
+
+  ){
+
+    return;
+
+  }
+
+  state.websocketConnecting =
+
+    true;
+
+  const url =
+
+    getWebSocketURL();
+
+  try{
+
+    const ws =
+
+      new WebSocket(url);
+
+    state.websocket =
+
+      ws;
+
+    ws.addEventListener(
+
+      "open",
+
+      () => {
+
+        state.websocketConnected =
+
+          true;
+
+        state.websocketConnecting =
+
+          false;
+
+        state.reconnectAttempts =
+
+          0;
+
+        $("#wsValue")
+
+          .textContent =
+
+          "متصل";
+
+        $("#chatConnection")
+
+          .textContent =
+
+          "Online";
+
+        sendWS({
+
+          type:"AUTH",
+
+          platform:
+
+            state.platform,
+
+          user:
+
+            getUser(),
+
+          ownerToken:
+
+            state.ownerToken
+
+        });
+
+        showToast(
+
+          "تم الاتصال بالغرفة",
+
+          "success"
+
         );
 
+      }
 
-    socket.onopen =
+    );
+
+    ws.addEventListener(
+
+      "message",
+
+      event => {
+
+        handleWSMessage(
+
+          event.data
+
+        );
+
+      }
+
+    );
+
+    ws.addEventListener(
+
+      "close",
+
+      () => {
+
+        state.websocketConnected =
+
+          false;
+
+        state.websocketConnecting =
+
+          false;
+
+        $("#wsValue")
+
+          .textContent =
+
+          "منقطع";
+
+        $("#chatConnection")
+
+          .textContent =
+
+          "Offline";
+
+        scheduleReconnect();
+
+      }
+
+    );
+
+    ws.addEventListener(
+
+      "error",
+
+      () => {
+
+        state.websocketConnected =
+
+          false;
+
+      }
+
+    );
+
+  }catch(error){
+
+    state.websocketConnecting =
+
+      false;
+
+    scheduleReconnect();
+
+  }
+
+}
+
+
+function scheduleReconnect(){
+
+  if(
+
+    !state.roomId
+
+  ){
+
+    return;
+
+  }
+
+  if(
+
+    state.reconnectTimer
+
+  ){
+
+    return;
+
+  }
+
+  state.reconnectAttempts++;
+
+  const delay =
+
+    Math.min(
+
+      30000,
+
+      1000 *
+
+      Math.pow(
+
+        2,
+
+        Math.min(
+
+          state.reconnectAttempts,
+
+          5
+
+        )
+
+      )
+
+    );
+
+  state.reconnectTimer =
+
+    setTimeout(
+
+      () => {
+
+        state.reconnectTimer =
+
+          null;
+
+        connectWebSocket();
+
+      },
+
+      delay
+
+    );
+
+}
+
+
+function sendWS(data){
+
+  if(
+
+    !state.websocket
+
+    ||
+
+    state.websocket.readyState !==
+
+    WebSocket.OPEN
+
+  ){
+
+    showToast(
+
+      "الاتصال بالغرفة غير متاح",
+
+      "error"
+
+    );
+
+    return false;
+
+  }
+
+  try{
+
+    state.websocket.send(
+
+      JSON.stringify(data)
+
+    );
+
+    return true;
+
+  }catch{
+
+    return false;
+
+  }
+
+}
+
+
+function handleWSMessage(raw){
+
+  let data;
+
+  try{
+
+    data =
+
+      JSON.parse(raw);
+
+  }catch{
+
+    return;
+
+  }
+
+  switch(
+
+    data.type
+
+  ){
+
+    case "CONNECTED":
+
+      $("#viewersValue")
+
+        .textContent =
+
+        data.viewers ||
+
+        0;
+
+      break;
+
+    case "AUTH_SUCCESS":
+
+      showToast(
+
+        "تم تسجيل الدخول للغرفة",
+
+        "success"
+
+      );
+
+      break;
+
+    case "USER_JOINED":
+
+    case "USER_LEFT":
+
+      if(
+
+        data.viewers !== undefined
+
+      ){
+
+        $("#viewersValue")
+
+          .textContent =
+
+          data.viewers;
+
+      }
+
+      break;
+
+    case "CHAT":
+
+      if(
+
+        data.data
+
+      ){
+
+        addChatMessage(
+
+          data.data
+
+        );
+
+      }
+
+      break;
+
+    case "GAME_STARTED":
+
+      loadGameState();
+
+      showToast(
+
+        "بدأت اللعبة",
+
+        "success"
+
+      );
+
+      break;
+
+    case "GAME_STOPPED":
+
+    case "GAME_RESET":
+
+      loadGameState();
+
+      break;
+
+    case "VOTE":
+
+    case "NUMBER_GUESS":
+
+      loadGameState();
+
+      break;
+
+    case "ERROR":
+
+      showToast(
+
+        data.error ||
+
+        "WebSocket error",
+
+        "error"
+
+      );
+
+      break;
+
+  }
+
+}
+
+
+/* =========================================================
+   GAME API
+========================================================= */
+
+async function loadGameState(){
+
+  if(
+
+    !state.roomId
+
+  ){
+
+    return;
+
+  }
+
+  try{
+
+    const data =
+
+      await api(
+
+        `/room/${encodeURIComponent(
+
+          state.roomId
+
+        )}/api/game/state`
+
+      );
+
+    state.game =
+
+      data.game;
+
+    renderGame();
+
+  }catch(error){
+
+    console.warn(
+
+      error
+
+    );
+
+  }
+
+}
+
+
+async function startGame(
+
+  gameType,
+
+  extraData={}
+
+){
+
+  if(
+
+    !state.roomId
+
+  ){
+
+    showToast(
+
+      "أنشئ غرفة أولًا",
+
+      "error"
+
+    );
+
+    return;
+
+  }
+
+  try{
+
+    await api(
+
+      `/room/${encodeURIComponent(
+
+        state.roomId
+
+      )}/api/room/start-game`,
+
+      {
+
+        method:"POST",
+
+        body:
+
+          JSON.stringify({
+
+            gameType,
+
+            ...extraData
+
+          })
+
+      }
+
+    );
+
+    await loadGameState();
+
+  }catch(error){
+
+    showToast(
+
+      error.message,
+
+      "error"
+
+    );
+
+  }
+
+}
+
+
+async function stopGame(){
+
+  if(
+
+    !state.roomId
+
+  ){
+
+    return;
+
+  }
+
+  try{
+
+    await api(
+
+      `/room/${encodeURIComponent(
+
+        state.roomId
+
+      )}/api/room/stop-game`,
+
+      {
+
+        method:"POST"
+
+      }
+
+    );
+
+    await loadGameState();
+
+  }catch(error){
+
+    showToast(
+
+      error.message,
+
+      "error"
+
+    );
+
+  }
+
+}
+
+
+async function resetGame(){
+
+  if(
+
+    !state.roomId
+
+  ){
+
+    return;
+
+  }
+
+  try{
+
+    await api(
+
+      `/room/${encodeURIComponent(
+
+        state.roomId
+
+      )}/api/room/reset`,
+
+      {
+
+        method:"POST"
+
+      }
+
+    );
+
+    await loadGameState();
+
+  }catch(error){
+
+    showToast(
+
+      error.message,
+
+      "error"
+
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   RENDER GAMES
+========================================================= */
+
+function renderGames(){
+
+  const grid =
+
+    $("#gamesGrid");
+
+  grid.innerHTML =
+
+    GAMES.map(
+
+      game => `
+
+        <div
+
+          class="game-option"
+
+          data-game="${game.type}">
+
+          <div class="emoji">
+
+            ${game.emoji}
+
+          </div>
+
+          <h3>
+
+            ${escapeHTML(game.title)}
+
+          </h3>
+
+          <p>
+
+            ${escapeHTML(game.description)}
+
+          </p>
+
+          <br>
+
+          <span>
+
+            ${game.premium ? "💎 Premium" : "🆓 Free"}
+
+          </span>
+
+        </div>
+
+      `
+
+    ).join("");
+
+  $all(
+
+    ".game-option"
+
+  ).forEach(
+
+    card => {
+
+      card.addEventListener(
+
+        "click",
+
         () => {
 
-            $("statusDot")
-                .classList
-                .add("online");
+          const type =
 
-            $("connectionStatus")
-                .textContent =
-                "متصل";
+            card.dataset.game;
 
-            socket.send(
+          if(
 
-                JSON.stringify({
+            type ===
 
-                    type:
-                        "AUTH",
+            "WHEEL"
 
-                    platform:
-                        $("platform")
-                            .value,
+            ||
 
-                    user:
-                        getUser(),
+            type ===
 
-                    ownerToken
+            "RUSSIAN_ROULETTE"
 
-                })
+            ||
 
-            );
+            type ===
 
-            showToast(
-                "تم الاتصال بالغرفة"
-            );
+            "ELIMINATION"
 
-        };
+            ||
 
+            type ===
 
-    socket.onmessage =
-        event => {
+            "BATTLE_ROYALE"
 
-            try {
+            ||
 
-                const data =
-                    JSON.parse(
-                        event.data
-                    );
+            type ===
 
-                handleSocketEvent(
-                    data
-                );
+            "TREASURE"
 
-            }
-
-            catch {}
-
-        };
-
-
-    socket.onclose =
-        () => {
-
-            $("statusDot")
-                .classList
-                .remove("online");
-
-            $("connectionStatus")
-                .textContent =
-                "غير متصل";
-
-        };
-
-
-    socket.onerror =
-        () => {
+          ){
 
             showToast(
-                "حدث خطأ في WebSocket"
-            );
 
-        };
+              "هذه اللعبة تحتاج إضافة Backend مخصص قبل تشغيلها",
 
-}
-
-
-function handleSocketEvent(data) {
-
-    logEvent(data);
-
-
-    switch (data.type) {
-
-
-        case "CONNECTED":
-
-            sessionId =
-                data.sessionId;
-
-            break;
-
-
-        case "AUTH_SUCCESS":
-
-            showToast(
-                "تم تسجيل الدخول"
-            );
-
-            break;
-
-
-        case "USER_JOINED":
-
-            updateStats();
-
-            break;
-
-
-        case "USER_LEFT":
-
-            updateStats();
-
-            break;
-
-
-        case "CHAT":
-
-            addChatMessage(
-                data.data
-            );
-
-            break;
-
-
-        case "GAME_STARTED":
-
-            renderGame(
-                data.game
-            );
-
-            updateStats();
-
-            break;
-
-
-        case "GAME_STOPPED":
-
-            showToast(
-                "تم إيقاف اللعبة"
-            );
-
-            updateStats();
-
-            break;
-
-
-        case "GAME_RESET":
-
-            renderGame(
-                null
-            );
-
-            updateStats();
-
-            break;
-
-
-        case "VOTE":
-
-            renderVote(
-                data
-            );
-
-            break;
-
-
-        case "NUMBER_GUESS":
-
-            showToast(
-                getGuessMessage(
-                    data.result
-                )
-            );
-
-            break;
-
-
-        case "PONG":
-
-            break;
-
-
-        case "ERROR":
-
-            showToast(
-                data.error
-            );
-
-            break;
-
-    }
-
-}
-
-
-/* ============================================================
-   ROOM DATA
-============================================================ */
-
-async function loadRoomData() {
-
-    try {
-
-        const data =
-            await api(
-
-                `/room/${encodeURIComponent(roomId)}/api/chat/history`
+              "error"
 
             );
 
-        data.messages
-            .forEach(
-                addChatMessage
-            );
+            return;
 
-        updateStats();
+          }
 
-    }
+          startGame(type);
 
-    catch {}
-
-}
-
-
-async function updateStats() {
-
-    if (!roomId) {
-
-        return;
-
-    }
-
-    try {
-
-        const data =
-            await api(
-
-                `/room/${encodeURIComponent(roomId)}/api/stats`
-
-            );
-
-        $("viewers")
-            .textContent =
-            data.viewers;
-
-        $("messages")
-            .textContent =
-            data.messages;
-
-        $("events")
-            .textContent =
-            data.events;
-
-        $("gameStatus")
-            .textContent =
-            data.active
-                ? "نشطة"
-                : "متوقفة";
-
-        $("currentGame")
-            .textContent =
-            data.gameType
-                ||
-                "لا توجد لعبة";
-
-    }
-
-    catch {}
-
-}
-
-
-/* ============================================================
-   GAME CONTROL
-============================================================ */
-
-function selectGame(type) {
-
-    selectedGame =
-        type;
-
-    $("gameSelect")
-        .value =
-        type;
-
-    renderGameControls();
-
-}
-
-
-$("gameSelect")
-    .addEventListener(
-
-        "change",
-
-        event => {
-
-            selectedGame =
-                event.target.value;
-
-            renderGameControls();
+          openTab("home");
 
         }
 
-    );
-
-
-function renderGameControls() {
-
-    const container =
-        $("extraInputContainer");
-
-    container.innerHTML =
-        "";
-
-    if (
-        selectedGame
-        ===
-        "WORD_BATTLE"
-    ) {
-
-        container.innerHTML = `
-
-            <input
-                id="wordInput"
-                placeholder="اكتب الكلمة المستهدفة"
-            >
-
-        `;
+      );
 
     }
+
+  );
 
 }
 
 
-async function startGame() {
+/* =========================================================
+   GAME RENDERER
+========================================================= */
 
-    if (!roomId) {
+function renderGame(){
 
-        showToast(
-            "أنشئ أو ادخل غرفة أولًا"
-        );
+  const stage =
 
-        return;
+    $("#gameStage");
 
-    }
+  const game =
 
-    if (!selectedGame) {
+    state.game;
 
-        showToast(
-            "اختر لعبة"
-        );
+  if(
 
-        return;
+    !game
 
-    }
+    ||
 
-    const body = {
+    !game.active
 
-        gameType:
-            selectedGame
+  ){
 
-    };
+    $("#activeGameLabel")
 
+      .textContent =
 
-    if (
-        selectedGame
-        ===
-        "WORD_BATTLE"
-    ) {
+      "لا توجد لعبة";
 
-        body.word =
-            $("wordInput")
-                ?.value
-                .trim();
+    stage.innerHTML = `
 
-    }
+      <div class="game-empty">
 
+        <div class="icon">🎮</div>
 
-    try {
+        <h2>لا توجد لعبة نشطة</h2>
 
-        const data =
-            await api(
+        <p>يمكن للمنشئ تشغيل لعبة من لوحة التحكم.</p>
 
-                `/room/${encodeURIComponent(roomId)}/api/room/start-game`,
-
-                {
-
-                    method:
-                        "POST",
-
-                    headers: {
-
-                        Authorization:
-                            `Bearer ${ownerToken}`
-
-                    },
-
-                    body:
-                        JSON.stringify(
-                            body
-                        )
-
-                }
-
-            );
-
-        renderGame(
-            data.game
-        );
-
-        showToast(
-            "بدأت اللعبة"
-        );
-
-    }
-
-    catch (error) {
-
-        showToast(
-            error.message
-        );
-
-    }
-
-}
-
-
-async function stopGame() {
-
-    if (!roomId) {
-
-        return;
-
-    }
-
-    try {
-
-        await api(
-
-            `/room/${encodeURIComponent(roomId)}/api/room/stop-game`,
-
-            {
-
-                method:
-                    "POST",
-
-                headers: {
-
-                    Authorization:
-                        `Bearer ${ownerToken}`
-
-                }
-
-            }
-
-        );
-
-    }
-
-    catch (error) {
-
-        showToast(
-            error.message
-        );
-
-    }
-
-}
-
-
-async function resetGame() {
-
-    if (!roomId) {
-
-        return;
-
-    }
-
-    try {
-
-        await api(
-
-            `/room/${encodeURIComponent(roomId)}/api/room/reset`,
-
-            {
-
-                method:
-                    "POST",
-
-                headers: {
-
-                    Authorization:
-                        `Bearer ${ownerToken}`
-
-                }
-
-            }
-
-        );
-
-    }
-
-    catch (error) {
-
-        showToast(
-            error.message
-        );
-
-    }
-
-}
-
-
-/* ============================================================
-   GAME RENDERING
-============================================================ */
-
-function renderGame(game) {
-
-    const area =
-        $("interactionArea");
-
-    if (!game || !game.active) {
-
-        area.innerHTML = `
-
-            <p style="color:var(--muted)">
-                لا توجد لعبة نشطة حاليًا.
-            </p>
-
-        `;
-
-        return;
-
-    }
-
-
-    switch (game.type) {
-
-
-        case "VOTE":
-
-            area.innerHTML = `
-
-                <h3>
-                    🗳️ اختر تصويتك
-                </h3>
-
-                <div class="controls-row">
-
-                    ${[1,2,3,4,5]
-                        .map(
-                            value =>
-                            `
-
-                            <button
-                                class="btn btn-primary"
-                                onclick="castVote(${value})"
-                            >
-                                ${value}
-                            </button>
-
-                            `
-                        )
-                        .join("")
-                    }
-
-                </div>
-
-            `;
-
-            break;
-
-
-        case "NUMBER_GUESS":
-
-            area.innerHTML = `
-
-                <h3>
-                    🔢 خمن الرقم من 1 إلى 100
-                </h3>
-
-                <div class="controls-row">
-
-                    <input
-                        id="guessInput"
-                        type="number"
-                        min="1"
-                        max="100"
-                        placeholder="رقمك"
-                    >
-
-                    <button
-                        class="btn btn-primary"
-                        onclick="sendGuess()"
-                    >
-                        تخمين
-                    </button>
-
-                </div>
-
-            `;
-
-            break;
-
-
-        case "WORD_BATTLE":
-
-            area.innerHTML = `
-
-                <h3>
-                    🧠 معركة الكلمات
-                </h3>
-
-                <p style="color:var(--muted)">
-                    أرسل محاولتك في الدردشة.
-                </p>
-
-            `;
-
-            break;
-
-
-        default:
-
-            area.innerHTML = `
-
-                <h3>
-                    🎮 ${game.type}
-                </h3>
-
-                <p style="color:var(--muted)">
-                    اللعبة نشطة.
-                </p>
-
-            `;
-
-    }
-
-}
-
-
-async function castVote(value) {
-
-    try {
-
-        await api(
-
-            `/room/${encodeURIComponent(roomId)}/api/vote/cast`,
-
-            {
-
-                method:
-                    "POST",
-
-                body:
-                    JSON.stringify({
-
-                        value,
-
-                        user:
-                            getUser()
-
-                    })
-
-            }
-
-        );
-
-        showToast(
-            "تم تسجيل التصويت"
-        );
-
-    }
-
-    catch (error) {
-
-        showToast(
-            error.message
-        );
-
-    }
-
-}
-
-
-async function sendGuess() {
-
-    const guess =
-        Number(
-            $("guessInput")
-                .value
-        );
-
-    if (!guess) {
-
-        return;
-
-    }
-
-    try {
-
-        await api(
-
-            `/room/${encodeURIComponent(roomId)}/api/number/guess`,
-
-            {
-
-                method:
-                    "POST",
-
-                body:
-                    JSON.stringify({
-
-                        guess,
-
-                        user:
-                            getUser()
-
-                    })
-
-            }
-
-        );
-
-    }
-
-    catch (error) {
-
-        showToast(
-            error.message
-        );
-
-    }
-
-}
-
-
-function getGuessMessage(result) {
-
-    const messages = {
-
-        WIN:
-            "🎉 فوز! لقد وجدت الرقم",
-
-        CLOSE:
-            "🔥 قريب جدًا",
-
-        HIGHER:
-            "⬆️ الرقم السري أكبر",
-
-        LOWER:
-            "⬇️ الرقم السري أصغر"
-
-    };
-
-    return messages[result]
-        ||
-        result;
-
-}
-
-
-function renderVote(data) {
-
-    if (!data.votes) {
-
-        return;
-
-    }
-
-    showToast(
-
-        `تم التصويت. الإجمالي: ${data.total}`
-
-    );
-
-}
-
-
-/* ============================================================
-   CHAT
-============================================================ */
-
-function sendChat(event) {
-
-    event.preventDefault();
-
-    const input =
-        $("chatInput");
-
-    const message =
-        input.value.trim();
-
-    if (!message) {
-
-        return;
-
-    }
-
-
-    if (
-        socket
-        &&
-        socket.readyState
-        ===
-        WebSocket.OPEN
-    ) {
-
-        socket.send(
-
-            JSON.stringify({
-
-                type:
-                    "CHAT_MESSAGE",
-
-                message
-
-            })
-
-        );
-
-        input.value =
-            "";
-
-        return;
-
-    }
-
-
-    showToast(
-        "اتصل بغرفة أولًا"
-    );
-
-}
-
-
-function addChatMessage(chat) {
-
-    const container =
-        $("chatMessages");
-
-    const message =
-        document.createElement(
-            "div"
-        );
-
-    message.className =
-        "message";
-
-    const username =
-        chat.user
-            ?.displayName
-        ||
-        chat.user
-            ?.username
-        ||
-        "Anonymous";
-
-    message.innerHTML = `
-
-        <div class="message-user">
-
-            <span>
-                ${escapeHTML(username)}
-            </span>
-
-            <span>
-                ${chat.platform || ""}
-            </span>
-
-        </div>
-
-        <div class="message-text">
-            ${escapeHTML(chat.message)}
-        </div>
+      </div>
 
     `;
 
-    container.appendChild(
-        message
-    );
+    return;
 
-    container.scrollTop =
-        container.scrollHeight;
+  }
 
-    $("chatCount")
-        .textContent =
-        container
-            .children
-            .length;
+  $("#activeGameLabel")
 
-}
+    .textContent =
 
+    game.type;
 
-function escapeHTML(value) {
+  if(
 
-    return String(value)
+    game.type ===
 
-        .replace(
-            /&/g,
-            "&amp;"
-        )
+    "VOTE"
 
-        .replace(
-            /</g,
-            "&lt;"
-        )
+  ){
 
-        .replace(
-            />/g,
-            "&gt;"
-        )
+    renderVoteGame(stage);
 
-        .replace(
-            /"/g,
-            "&quot;"
-        )
+    return;
 
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+  }
 
-}
+  if(
 
+    game.type ===
 
-/* ============================================================
-   PROFILE
-============================================================ */
+    "NUMBER_GUESS"
 
-function openProfile() {
+  ){
 
-    $("profileModal")
-        .classList
-        .add("show");
+    renderNumberGame(stage);
 
-}
+    return;
 
+  }
 
-function closeProfile() {
+  stage.innerHTML = `
 
-    $("profileModal")
-        .classList
-        .remove("show");
+    <div class="game-card">
 
-}
+      <h2>
 
+        ${escapeHTML(game.type)}
 
-function saveProfile() {
+      </h2>
 
-    player = {
+      <p>
 
-        id:
-            $("profileId")
-                .value
-                .trim(),
+        اللعبة نشطة الآن.
 
-        username:
-            $("profileName")
-                .value
-                .trim(),
+      </p>
 
-        displayName:
-            $("profileName")
-                .value
-                .trim(),
+      <button
 
-        avatar:
-            null
+        class="btn danger"
 
-    };
+        id="stopGameInline">
 
-    localStorage.setItem(
+        إيقاف اللعبة
 
-        "kotcha_player",
+      </button>
 
-        JSON.stringify(
-            player
-        )
+    </div>
+
+  `;
+
+  $("#stopGameInline")
+
+    ?.addEventListener(
+
+      "click",
+
+      stopGame
 
     );
 
-    $("username")
-        .value =
-        player.username;
+}
 
-    closeProfile();
+
+function renderVoteGame(stage){
+
+  const votes =
+
+    state.game.votes ||
+
+    [0,0,0,0,0];
+
+  stage.innerHTML = `
+
+    <div class="game-card">
+
+      <h2>🗳️ التصويت الجماهيري</h2>
+
+      <p>
+
+        اختر رقمًا من 1 إلى 5
+
+      </p>
+
+      <div class="game-actions">
+
+        ${[1,2,3,4,5].map(
+
+          value => `
+
+            <button
+
+              class="btn primary vote-btn"
+
+              data-value="${value}">
+
+              ${value}
+
+              <br>
+
+              <small>
+
+                ${votes[value-1] || 0} صوت
+
+              </small>
+
+            </button>
+
+          `
+
+        ).join("")}
+
+      </div>
+
+    </div>
+
+  `;
+
+  $all(
+
+    ".vote-btn"
+
+  ).forEach(
+
+    button => {
+
+      button.addEventListener(
+
+        "click",
+
+        () => castVote(
+
+          Number(
+
+            button.dataset.value
+
+          )
+
+        )
+
+      );
+
+    }
+
+  );
+
+}
+
+
+async function castVote(value){
+
+  try{
+
+    await api(
+
+      `/room/${encodeURIComponent(
+
+        state.roomId
+
+      )}/api/vote/cast`,
+
+      {
+
+        method:"POST",
+
+        body:
+
+          JSON.stringify({
+
+            value,
+
+            user:
+
+              getUser()
+
+          })
+
+      }
+
+    );
+
+  }catch(error){
 
     showToast(
-        "تم حفظ الحساب"
+
+      error.message,
+
+      "error"
+
+    );
+
+  }
+
+}
+
+
+function renderNumberGame(stage){
+
+  stage.innerHTML = `
+
+    <div class="game-card">
+
+      <h2>🔢 خمن الرقم</h2>
+
+      <p>
+
+        اختر رقمًا بين 1 و100
+
+      </p>
+
+      <input
+
+        id="guessInput"
+
+        class="game-input"
+
+        type="number"
+
+        min="1"
+
+        max="100"
+
+        placeholder="أدخل تخمينك">
+
+      <div class="game-actions">
+
+        <button
+
+          class="btn primary"
+
+          id="guessBtn">
+
+          إرسال التخمين
+
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+  $("#guessBtn")
+
+    .addEventListener(
+
+      "click",
+
+      submitGuess
+
     );
 
 }
 
 
-/* ============================================================
-   AUTO LOAD
-============================================================ */
+async function submitGuess(){
 
-(function init() {
+  const input =
 
-    const savedRoom =
-        localStorage.getItem(
-            "kotcha_room"
-        );
+    $("#guessInput");
 
-    const savedToken =
-        localStorage.getItem(
-            "kotcha_owner_token"
-        );
+  const guess =
 
-    const savedPlayer =
-        localStorage.getItem(
-            "kotcha_player"
-        );
+    Number(
 
+      input.value
 
-    if (savedRoom) {
+    );
 
-        $("roomInput")
-            .value =
-            savedRoom;
+  if(
 
-        roomId =
-            savedRoom;
+    !Number.isInteger(guess)
 
-    }
+    ||
 
+    guess < 1
 
-    if (savedToken) {
+    ||
 
-        ownerToken =
-            savedToken;
+    guess > 100
 
-    }
+  ){
 
+    showToast(
 
-    if (savedPlayer) {
+      "أدخل رقمًا بين 1 و100",
 
-        try {
+      "error"
 
-            player =
-                JSON.parse(
-                    savedPlayer
-                );
+    );
 
-            $("username")
-                .value =
-                player.username;
+    return;
+
+  }
+
+  try{
+
+    const data =
+
+      await api(
+
+        `/room/${encodeURIComponent(
+
+          state.roomId
+
+        )}/api/number/guess`,
+
+        {
+
+          method:"POST",
+
+          body:
+
+            JSON.stringify({
+
+              guess,
+
+              user:
+
+                getUser()
+
+            })
 
         }
 
-        catch {}
+      );
+
+    const result =
+
+      data.event?.result;
+
+    if(
+
+      result ===
+
+      "WIN"
+
+    ){
+
+      showToast(
+
+        "🎉 فزت!",
+
+        "success"
+
+      );
+
+    }else if(
+
+      result ===
+
+      "CLOSE"
+
+    ){
+
+      showToast(
+
+        "🔥 قريب جدًا!",
+
+        "success"
+
+      );
+
+    }else if(
+
+      result ===
+
+      "HIGHER"
+
+    ){
+
+      showToast(
+
+        "الرقم السري أعلى",
+
+        "info"
+
+      );
+
+    }else if(
+
+      result ===
+
+      "LOWER"
+
+    ){
+
+      showToast(
+
+        "الرقم السري أقل",
+
+        "info"
+
+      );
 
     }
 
-})();
+  }catch(error){
+
+    showToast(
+
+      error.message,
+
+      "error"
+
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   CHAT
+========================================================= */
+
+function addChatMessage(chat){
+
+  state.chat.push(chat);
+
+  state.chat =
+
+    state.chat.slice(-100);
+
+  const container =
+
+    $("#chatMessages");
+
+  const node =
+
+    document.createElement("div");
+
+  node.className =
+
+    "chat-message";
+
+  node.innerHTML = `
+
+    <div class="chat-user">
+
+      ${escapeHTML(
+
+        chat.user?.displayName ||
+
+        chat.user?.username ||
+
+        "Anonymous"
+
+      )}
+
+    </div>
+
+    <div class="chat-text">
+
+      ${escapeHTML(
+
+        chat.message
+
+      )}
+
+    </div>
+
+  `;
+
+  container.appendChild(node);
+
+  container.scrollTop =
+
+    container.scrollHeight;
+
+}
+
+
+async function sendChat(){
+
+  const input =
+
+    $("#chatInput");
+
+  const message =
+
+    input.value.trim();
+
+  if(
+
+    !message
+
+  ){
+
+    return;
+
+  }
+
+  if(
+
+    state.websocketConnected
+
+  ){
+
+    const sent =
+
+      sendWS({
+
+        type:
+
+          "CHAT_MESSAGE",
+
+        message
+
+      });
+
+    if(sent){
+
+      input.value = "";
+
+      return;
+
+    }
+
+  }
+
+  if(
+
+    !state.roomId
+
+  ){
+
+    showToast(
+
+      "أنشئ أو ادخل غرفة أولًا",
+
+      "error"
+
+    );
+
+    return;
+
+  }
+
+  try{
+
+    await api(
+
+      `/room/${encodeURIComponent(
+
+        state.roomId
+
+      )}/api/chat/send`,
+
+      {
+
+        method:"POST",
+
+        body:
+
+          JSON.stringify({
+
+            message,
+
+            user:
+
+              getUser(),
+
+            platform:
+
+              state.platform
+
+          })
+
+      }
+
+    );
+
+    input.value = "";
+
+  }catch(error){
+
+    showToast(
+
+      error.message,
+
+      "error"
+
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   CREATOR PANEL
+========================================================= */
+
+function renderCreator(){
+
+  const content =
+
+    $("#creatorContent");
+
+  if(
+
+    state.creatorView ===
+
+    "control"
+
+  ){
+
+    content.innerHTML = `
+
+      <div class="panel-title">
+
+        <h2>🎛️ التحكم باللعبة</h2>
+
+        <span>
+
+          ${state.roomId || "لا توجد غرفة"}
+
+        </span>
+
+      </div>
+
+      <div class="games-grid">
+
+        ${GAMES.map(
+
+          game => `
+
+            <div
+
+              class="game-option"
+
+              data-creator-game="${game.type}">
+
+              <div class="emoji">
+
+                ${game.emoji}
+
+              </div>
+
+              <h3>
+
+                ${escapeHTML(game.title)}
+
+              </h3>
+
+              <p>
+
+                ${escapeHTML(game.description)}
+
+              </p>
+
+            </div>
+
+          `
+
+        ).join("")}
+
+      </div>
+
+      <br>
+
+      <button
+
+        class="btn danger"
+
+        id="creatorStopGame">
+
+        إيقاف اللعبة
+
+      </button>
+
+      <button
+
+        class="btn"
+
+        id="creatorResetGame">
+
+        إعادة ضبط
+
+      </button>
+
+    `;
+
+    $all(
+
+      "[data-creator-game]"
+
+    ).forEach(
+
+      element => {
+
+        element.addEventListener(
+
+          "click",
+
+          () => {
+
+            startGame(
+
+              element.dataset.creatorGame
+
+            );
+
+          }
+
+        );
+
+      }
+
+    );
+
+    $("#creatorStopGame")
+
+      ?.addEventListener(
+
+        "click",
+
+        stopGame
+
+      );
+
+    $("#creatorResetGame")
+
+      ?.addEventListener(
+
+        "click",
+
+        resetGame
+
+      );
+
+    return;
+
+  }
+
+  if(
+
+    state.creatorView ===
+
+    "room"
+
+  ){
+
+    content.innerHTML = `
+
+      <div class="panel-title">
+
+        <h2>🏠 إدارة الغرفة</h2>
+
+      </div>
+
+      <div class="form-grid">
+
+        <div class="form-group">
+
+          <label>Room ID</label>
+
+          <input
+
+            value="${escapeHTML(
+
+              state.roomId || ""
+
+            )}"
+
+            readonly>
+
+        </div>
+
+        <div class="form-group">
+
+          <label>Owner Token</label>
+
+          <input
+
+            value="${escapeHTML(
+
+              state.ownerToken || ""
+
+            )}"
+
+            readonly>
+
+        </div>
+
+      </div>
+
+      <br>
+
+      <button
+
+        class="btn primary"
+
+        id="copyRoomBtn">
+
+        نسخ رابط الغرفة
+
+      </button>
+
+    `;
+
+    $("#copyRoomBtn")
+
+      ?.addEventListener(
+
+        "click",
+
+        async () => {
+
+          if(
+
+            !state.roomId
+
+          ){
+
+            return;
+
+          }
+
+          const url =
+
+            `${CONFIG.PAGE_BASE}/?room=${encodeURIComponent(
+
+              state.roomId
+
+            )}`;
+
+          await navigator.clipboard.writeText(
+
+            url
+
+          );
+
+          showToast(
+
+            "تم نسخ الرابط",
+
+            "success"
+
+          );
+
+        }
+
+      );
+
+    return;
+
+  }
+
+  if(
+
+    state.creatorView ===
+
+    "live"
+
+  ){
+
+    content.innerHTML = `
+
+      <div class="panel-title">
+
+        <h2>🔴 Live Integration</h2>
+
+      </div>
+
+      <div class="live-box">
+
+        <div>
+
+          <h2>
+
+            TikTok LIVE
+
+          </h2>
+
+          <p>
+
+            يحتاج هذا القسم إلى OAuth
+
+            وتطبيق TikTok Developer
+
+            وWebhook معتمد.
+
+          </p>
+
+          <button
+
+            class="btn primary"
+
+            id="startTikTokOAuth">
+
+            بدء ربط TikTok
+
+          </button>
+
+        </div>
+
+      </div>
+
+    `;
+
+    $("#startTikTokOAuth")
+
+      ?.addEventListener(
+
+        "click",
+
+        startTikTokOAuth
+
+      );
+
+    return;
+
+  }
+
+  if(
+
+    state.creatorView ===
+
+    "codes"
+
+  ){
+
+    content.innerHTML = `
+
+      <div class="panel-title">
+
+        <h2>🔐 توليد الأكواد</h2>
+
+      </div>
+
+      <p>
+
+        توليد كود دعوة محلي للغرفة.
+
+      </p>
+
+      <button
+
+        class="btn primary"
+
+        id="generateCodeBtn">
+
+        توليد كود
+
+      </button>
+
+      <div
+
+        id="generatedCode"
+
+        style="margin-top:20px;font-size:30px;font-weight:900">
+
+      </div>
+
+    `;
+
+    $("#generateCodeBtn")
+
+      ?.addEventListener(
+
+        "click",
+
+        () => {
+
+          const code =
+
+            Array.from(
+
+              crypto.getRandomValues(
+
+                new Uint8Array(8)
+
+              ),
+
+              byte =>
+
+                byte
+
+                  .toString(16)
+
+                  .padStart(2,"0")
+
+            )
+
+            .join("")
+
+            .toUpperCase();
+
+          $("#generatedCode")
+
+            .textContent =
+
+            code;
+
+        }
+
+      );
+
+    return;
+
+  }
+
+  if(
+
+    state.creatorView ===
+
+    "settings"
+
+  ){
+
+    content.innerHTML = `
+
+      <div class="panel-title">
+
+        <h2>⚙️ الإعدادات</h2>
+
+      </div>
+
+      <div class="form-grid">
+
+        <div class="form-group">
+
+          <label>اسم المستخدم</label>
+
+          <input
+
+            id="usernameSetting"
+
+            value="${escapeHTML(
+
+              getUser().displayName
+
+            )}">
+
+        </div>
+
+        <div class="form-group">
+
+          <label>المنصة</label>
+
+          <select id="platformSetting">
+
+            <option value="kotcha">
+
+              KOTCHA
+
+            </option>
+
+            <option value="tiktok">
+
+              TikTok
+
+            </option>
+
+            <option value="twitch">
+
+              Twitch
+
+            </option>
+
+            <option value="kick">
+
+              Kick
+
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+      <br>
+
+      <button
+
+        class="btn primary"
+
+        id="saveSettingsBtn">
+
+        حفظ
+
+      </button>
+
+    `;
+
+    $("#platformSetting")
+
+      .value =
+
+      state.platform;
+
+    $("#saveSettingsBtn")
+
+      .addEventListener(
+
+        "click",
+
+        () => {
+
+          const user =
+
+            getUser();
+
+          user.displayName =
+
+            $("#usernameSetting")
+
+              .value
+
+              .trim()
+
+              || "Player";
+
+          state.platform =
+
+            $("#platformSetting")
+
+              .value;
+
+          localStorage.setItem(
+
+            CONFIG.USER_STORAGE_KEY,
+
+            JSON.stringify(user)
+
+          );
+
+          saveState();
+
+          showToast(
+
+            "تم حفظ الإعدادات",
+
+            "success"
+
+          );
+
+        }
+
+      );
+
+  }
+
+}
+
+
+function startTikTokOAuth(){
+
+  showToast(
+
+    "يجب إضافة OAuth Client ID وRedirect URI في Backend أولًا",
+
+    "error"
+
+  );
+
+}
+
+
+/* =========================================================
+   TABS
+========================================================= */
+
+function openTab(name){
+
+  $all(
+
+    ".tab-content"
+
+  ).forEach(
+
+    content => {
+
+      content.classList.add(
+
+        "hidden"
+
+      );
+
+    }
+
+  );
+
+  $all(
+
+    ".tab"
+
+  ).forEach(
+
+    tab => {
+
+      tab.classList.remove(
+
+        "active"
+
+      );
+
+    }
+
+  );
+
+  const content =
+
+    $(`#${name}Tab`);
+
+  if(
+
+    content
+
+  ){
+
+    content.classList.remove(
+
+      "hidden"
+
+    );
+
+  }
+
+  const tab =
+
+    document.querySelector(
+
+      `[data-tab="${name}"]`
+
+    );
+
+  tab?.classList.add(
+
+    "active"
+
+  );
+
+  if(
+
+    name ===
+
+    "creator"
+
+  ){
+
+    renderCreator();
+
+  }
+
+}
+
+
+/* =========================================================
+   EVENTS
+========================================================= */
+
+function bindEvents(){
+
+  $("#createRoomBtn")
+
+    .addEventListener(
+
+      "click",
+
+      createRoom
+
+    );
+
+  $("#joinRoomBtn")
+
+    .addEventListener(
+
+      "click",
+
+      () => {
+
+        const roomId =
+
+          prompt(
+
+            "أدخل Room ID"
+
+          );
+
+        if(
+
+          roomId
+
+        ){
+
+          state.roomId =
+
+            roomId.trim();
+
+          saveState();
+
+          connectWebSocket();
+
+          loadGameState();
+
+          updateRoomUI();
+
+          showToast(
+
+            "تم الانضمام للغرفة",
+
+            "success"
+
+          );
+
+        }
+
+      }
+
+    );
+
+  $("#openCreatorBtn")
+
+    .addEventListener(
+
+      "click",
+
+      () => openTab(
+
+        "creator"
+
+      )
+
+    );
+
+  $("#browseGamesBtn")
+
+    .addEventListener(
+
+      "click",
+
+      () => openTab(
+
+        "games"
+
+      )
+
+    );
+
+  $("#chatForm")
+
+    .addEventListener(
+
+      "submit",
+
+      event => {
+
+        event.preventDefault();
+
+        sendChat();
+
+      }
+
+    );
+
+  $("#connectTikTokBtn")
+
+    .addEventListener(
+
+      "click",
+
+      startTikTokOAuth
+
+    );
+
+  $("#subscribeCreatorBtn")
+
+    .addEventListener(
+
+      "click",
+
+      () => {
+
+        showToast(
+
+          "نظام الدفع يحتاج مزود دفع Backend حقيقي",
+
+          "info"
+
+        );
+
+      }
+
+    );
+
+  $("#subscribeProBtn")
+
+    .addEventListener(
+
+      "click",
+
+      () => {
+
+        showToast(
+
+          "نظام الدفع يحتاج مزود دفع Backend حقيقي",
+
+          "info"
+
+        );
+
+      }
+
+    );
+
+  $all(
+
+    ".tab"
+
+  ).forEach(
+
+    tab => {
+
+      tab.addEventListener(
+
+        "click",
+
+        () => openTab(
+
+          tab.dataset.tab
+
+        )
+
+      );
+
+    }
+
+  );
+
+  $all(
+
+    "[data-creator-view]"
+
+  ).forEach(
+
+    button => {
+
+      button.addEventListener(
+
+        "click",
+
+        () => {
+
+          $all(
+
+            "[data-creator-view]"
+
+          ).forEach(
+
+            item => item.classList.remove(
+
+              "active"
+
+            )
+
+          );
+
+          button.classList.add(
+
+            "active"
+
+          );
+
+          state.creatorView =
+
+            button.dataset.creatorView;
+
+          renderCreator();
+
+        }
+
+      );
+
+    }
+
+  );
+
+}
+
+
+/* =========================================================
+   INITIALIZATION
+========================================================= */
+
+async function init(){
+
+  loadState();
+
+  getUser();
+
+  bindEvents();
+
+  renderGames();
+
+  updateRoomUI();
+
+  await checkHealth();
+
+  if(
+
+    state.roomId
+
+  ){
+
+    connectWebSocket();
+
+    await loadGameState();
+
+  }
+
+  const params =
+
+    new URLSearchParams(
+
+      location.search
+
+    );
+
+  const roomFromURL =
+
+    params.get("room");
+
+  if(
+
+    roomFromURL
+
+  ){
+
+    state.roomId =
+
+      roomFromURL;
+
+    saveState();
+
+    updateRoomUI();
+
+    connectWebSocket();
+
+    loadGameState();
+
+  }
+
+}
+
+init();
 
 </script>
 
