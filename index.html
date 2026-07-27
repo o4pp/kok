@@ -1528,4 +1528,249 @@
                             <div style="width:32px; height:32px; border-radius:50%; background:var(--brand-gradient); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:0.7rem;">A</div>
                             <div style="width:32px; height:32px; border-radius:50%; background:var(--brand-gradient); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:0.7rem;">B</div>
                             <div style="width:32px; height:32px; border-radius:50%; background:var(--brand-gradient); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:0.7rem;">C</div>
-                            <div style="width:32px; height:32px; border-radius:50%; background:var(--bg-glass); display:flex
+                            <div style="width:32px; height:32px; border-radius:50%; background:var(--bg-glass); display:flex; align-items:center; justify-content:center; color:var(--text-secondary); font-size:0.7rem;">+${Math.floor(Math.random() * 20) + 5}</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-lg" onclick="startGame('${game.id}')" style="width:100%; justify-content:center;">
+                        <i class="fas fa-play"></i> بدء اللعبة
+                    </button>
+                    <p style="color:var(--text-muted); font-size:0.8rem; margin-top:0.5rem;">
+                        <i class="fas fa-info-circle"></i> تفاعل مباشر مع مشاهديك عبر الشات
+                    </p>
+                </div>
+            `;
+            document.getElementById('gameModal').classList.add('active');
+            playSound('click');
+        }
+
+        function startGame(gameId) {
+            showLoading(true);
+            setTimeout(() => {
+                showLoading(false);
+                const game = GAMES.find(g => g.id === gameId);
+                showToast(`🎮 تم بدء لعبة ${game?.name || ''}!`, 'success');
+                playSound('gameStart');
+                document.getElementById('gameModal').classList.remove('active');
+            }, 1500);
+        }
+
+        // ============================================================
+        // PLANS
+        // ============================================================
+        function renderPlans() {
+            const plans = [
+                { id: 'free', name: 'مجاني', price: 0, currency: 'د.إ', features: ['ألعاب مجانية محدودة', 'دردشة أساسية', '100 مشاهد', 'دعم أساسي'], featured: false },
+                { id: 'premium', name: 'مميز', price: 29, currency: 'د.إ', features: ['جميع الألعاب', 'دردشة متقدمة', '500 مشاهد', 'علامة تجارية مخصصة', 'تحليلات متقدمة', 'دعم فني 24/7'], featured: true },
+                { id: 'pro', name: 'محترف', price: 99, currency: 'د.إ', features: ['جميع ميزات المميز', 'مشاهدين غير محدود', 'ألعاب مخصصة', 'واجهة برمجة كاملة', 'دعم VIP', 'استضافة حصرية'], featured: false }
+            ];
+
+            const grid = document.getElementById('plansGrid');
+            grid.innerHTML = plans.map(plan => `
+                <div class="plan-card ${plan.featured ? 'featured' : ''}">
+                    ${plan.featured ? '<div class="plan-badge">الأكثر اختياراً</div>' : ''}
+                    <h3>${plan.name}</h3>
+                    <div class="plan-price">${plan.price === 0 ? 'مجاني' : `${plan.price}<span>/${plan.currency}</span>`}</div>
+                    <p style="color:var(--text-secondary); font-size:0.85rem;">شهرياً</p>
+                    <ul class="plan-features">
+                        ${plan.features.map(f => `<li><i class="fas fa-check"></i> ${f}</li>`).join('')}
+                    </ul>
+                    <button class="btn ${plan.featured ? 'btn-primary' : 'btn-secondary'} btn-block" 
+                            onclick="${plan.price === 0 ? `showToast('تم اختيار الخطة المجانية', 'success')` : `upgradePlan('${plan.id}')`}">
+                        ${plan.price === 0 ? 'اختيار الخطة' : 'ابدأ الآن'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function upgradePlan(planId) {
+            if (!state.isLoggedIn) {
+                showToast('يرجى تسجيل الدخول أولاً', 'error');
+                showLogin();
+                return;
+            }
+
+            state.isSubscribed = true;
+            state.user.subscribed = true;
+            localStorage.setItem('kotcha-user', JSON.stringify(state.user));
+            showToast(`🎉 تم الترقية إلى خطة ${planId === 'premium' ? 'مميز' : 'محترف'}!`, 'success');
+            playSound('upgrade');
+            renderGames();
+        }
+
+        // ============================================================
+        // ROOM FUNCTIONS
+        // ============================================================
+        async function createRoom() {
+            if (!state.isLoggedIn) {
+                showToast('يرجى تسجيل الدخول أولاً', 'error');
+                showLogin();
+                return;
+            }
+
+            showLoading(true);
+            try {
+                const response = await fetch(`${CONFIG.API}/api/room/create`, { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    state.roomId = data.roomId;
+                    showToast(`تم إنشاء الغرفة: ${data.roomId}`, 'success');
+                    playSound('success');
+                } else {
+                    showToast('فشل إنشاء الغرفة', 'error');
+                }
+            } catch (error) {
+                showToast('خطأ في الاتصال', 'error');
+            }
+            showLoading(false);
+        }
+
+        function joinRoom() {
+            document.getElementById('joinRoomError').className = 'form-error';
+            document.getElementById('joinRoomModal').classList.add('active');
+        }
+
+        function handleJoinRoom(event) {
+            event.preventDefault();
+            const roomId = document.getElementById('joinRoomId').value.toUpperCase();
+            if (roomId) {
+                state.roomId = roomId;
+                closeModal('joinRoomModal');
+                showToast(`جاري الانضمام إلى الغرفة ${roomId}...`, 'info');
+                playSound('click');
+            }
+        }
+
+        // ============================================================
+        // UTILITY FUNCTIONS
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+            toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').classList.toggle('active', show);
+        }
+
+        function playSound(type) {
+            try {
+                const sounds = {
+                    click: new Audio('data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAABAAgA='),
+                    success: new Audio('data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAABAAgA='),
+                    connect: new Audio('data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAABAAgA='),
+                    upgrade: new Audio('data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAABAAgA='),
+                    gameStart: new Audio('data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAABAAgA=')
+                };
+                if (sounds[type]) {
+                    sounds[type].play().catch(() => {});
+                }
+            } catch (e) {}
+        }
+
+        function animateNumbers() {
+            document.querySelectorAll('.stat-number').forEach(el => {
+                const target = parseInt(el.dataset.count) || parseInt(el.textContent.replace(/,/g, ''));
+                if (target) {
+                    let current = 0;
+                    const increment = target / 50;
+                    const interval = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            current = target;
+                            clearInterval(interval);
+                        }
+                        el.textContent = Math.floor(current).toLocaleString();
+                    }, 40);
+                }
+            });
+        }
+
+        // ============================================================
+        // EVENT LISTENERS
+        // ============================================================
+        function setupEventListeners() {
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) overlay.classList.remove('active');
+                });
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.modal-overlay.active').forEach(el => el.classList.remove('active'));
+                }
+            });
+
+            window.addEventListener('scroll', () => {
+                document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+            });
+        }
+
+        // ============================================================
+        // MISC FUNCTIONS
+        // ============================================================
+        function showDemo() { showToast('🎬 جاري تشغيل العرض التوضيحي...', 'info');
+            playSound('click'); }
+
+        function showFAQ() { showToast('📖 سيتم عرض الأسئلة الشائعة قريباً', 'info'); }
+
+        function showSupport() { showToast('📧 للتواصل: support@kotcha.com', 'info'); }
+
+        function showPrivacy() { showToast('🔒 سياسة الخصوصية متاحة قريباً', 'info'); }
+
+        function showTerms() { showToast('📜 الشروط والأحكام متاحة قريباً', 'info'); }
+
+        function showDocs() { window.open('https://docs.kotcha.com', '_blank'); }
+
+        function showAPI() { window.open(`${CONFIG.API}/api`, '_blank'); }
+
+        function showGitHub() { window.open('https://github.com/kotcha', '_blank'); }
+
+        // ============================================================
+        // EXPOSE TO WINDOW
+        // ============================================================
+        window.navigateTo = navigateTo;
+        window.toggleTheme = toggleTheme;
+        window.toggleMobileMenu = toggleMobileMenu;
+        window.showLogin = showLogin;
+        window.showSignup = showSignup;
+        window.closeModal = closeModal;
+        window.handleLogin = handleLogin;
+        window.handleSignup = handleSignup;
+        window.logout = logout;
+        window.selectPlatform = selectPlatform;
+        window.disconnectPlatform = disconnectPlatform;
+        window.openGame = openGame;
+        window.startGame = startGame;
+        window.createRoom = createRoom;
+        window.joinRoom = joinRoom;
+        window.handleJoinRoom = handleJoinRoom;
+        window.upgradePlan = upgradePlan;
+        window.showToast = showToast;
+        window.showLoading = showLoading;
+        window.playSound = playSound;
+        window.showDemo = showDemo;
+        window.showFAQ = showFAQ;
+        window.showSupport = showSupport;
+        window.showPrivacy = showPrivacy;
+        window.showTerms = showTerms;
+        window.showDocs = showDocs;
+        window.showAPI = showAPI;
+        window.showGitHub = showGitHub;
+
+        console.log('🚀 KOTCHA v10.0.0 loaded successfully!');
+        console.log('📡 API:', CONFIG.API);
+        console.log('🔌 WebSocket:', CONFIG.WS);
+        console.log(`🎮 ${GAMES.length} games available`);
+    </script>
+</body>
+</html>
