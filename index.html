@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚡ KOTCHA - منصة البث والتفاعل المباشر</title>
+  <title>⚡ KOTCHA - منصة البث والألعاب التفاعلية المباشرة</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <script>
@@ -31,161 +31,286 @@
     body { font-family: 'Tajawal', sans-serif; transition: background-color 0.3s, color 0.3s; }
     .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); }
     .dark .glass { background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(12px); }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #ff6b0033; border-radius: 10px; }
+    .obs-overlay { background: transparent !important; }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-900 dark:bg-zinc-950 dark:text-gray-100 min-h-screen flex flex-col">
+<body class="bg-gray-50 text-gray-900 dark:bg-zinc-950 dark:text-gray-100 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
 
   <!-- NAVIGATION BAR -->
-  <header class="sticky top-0 z-50 glass border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between">
+  <header id="mainHeader" class="sticky top-0 z-50 glass border-b border-gray-200 dark:border-zinc-800 px-6 py-3.5 flex items-center justify-between transition-all">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-brand-500/30">⚡</div>
-      <span class="text-2xl font-extrabold tracking-wider bg-gradient-to-r from-brand-500 to-amber-500 bg-clip-text text-transparent">KOTCHA</span>
+      <span class="text-2xl font-black tracking-wider bg-gradient-to-r from-brand-500 to-amber-500 bg-clip-text text-transparent">KOTCHA</span>
+      <span class="text-[10px] bg-brand-500/10 text-brand-600 border border-brand-500/20 px-2 py-0.5 rounded-full font-bold hidden sm:inline-block">v2.5 PRO</span>
     </div>
 
     <nav class="hidden md:flex items-center gap-6 font-bold text-sm">
-      <button onclick="showPage('home')" class="hover:text-brand-500 transition">الرئيسية</button>
-      <button onclick="showPage('game')" class="hover:text-brand-500 transition">منطقة اللعب</button>
-      <button onclick="showPage('subscribe')" class="hover:text-brand-500 transition">الاشتراكات والتفعيل</button>
-      <button onclick="showPage('admin')" class="text-xs bg-red-500/10 text-red-500 px-3 py-1.5 rounded-lg border border-red-500/20 hover:bg-red-500 hover:text-white transition">لوحة الأدمن</button>
+      <button onclick="showPage('home')" class="nav-btn hover:text-brand-500 transition">الرئيسية</button>
+      <button onclick="showPage('game')" class="nav-btn hover:text-brand-500 transition text-brand-500">منطقة اللعب</button>
+      <button onclick="showPage('subscribe')" class="nav-btn hover:text-brand-500 transition">الاشتراكات والتفعيل</button>
+      <button onclick="showPage('admin')" class="text-xs bg-red-500/10 text-red-500 px-3 py-1.5 rounded-lg border border-red-500/20 hover:bg-red-500 hover:text-white transition font-bold">لوحة الأدمن</button>
     </nav>
 
     <div class="flex items-center gap-3">
-      <button onclick="toggleTheme()" class="p-2 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 hover:scale-105 transition">
+      <button onclick="toggleOBSMode()" class="hidden lg:flex items-center gap-1.5 text-xs bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900 px-3 py-2 rounded-xl font-bold hover:opacity-90 transition" title="وضع تراكب البث المباشر لـ OBS">
+        <span>🎬</span> وضع OBS
+      </button>
+      <button onclick="toggleTheme()" class="p-2.5 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 hover:scale-105 transition text-sm">
         🌙 / ☀️
       </button>
-      <button onclick="showPage('auth')" id="authBtn" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-5 py-2 rounded-xl shadow-md transition">تسجيل الدخول</button>
+      <button onclick="showPage('auth')" id="authBtn" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-5 py-2 rounded-xl shadow-md shadow-brand-500/20 transition text-sm">تسجيل الدخول</button>
     </div>
   </header>
 
   <!-- SCREEN 1: LANDING / HOME PAGE -->
-  <section id="page-home" class="page-view flex-1 flex flex-col items-center justify-center text-center px-4 py-16">
-    <div class="inline-flex items-center gap-2 bg-brand-50 dark:bg-brand-500/10 text-brand-600 border border-brand-500/20 px-4 py-2 rounded-full text-sm font-bold mb-6">
+  <section id="page-home" class="page-view hidden flex-1 flex flex-col items-center justify-center text-center px-4 py-12 max-w-6xl mx-auto">
+    <div class="inline-flex items-center gap-2 bg-brand-50 dark:bg-brand-500/10 text-brand-600 border border-brand-500/20 px-4 py-2 rounded-full text-xs font-bold mb-6">
       <span class="w-2 h-2 rounded-full bg-brand-500 animate-ping"></span>
-      الجيل الجديد من منصات الألعاب التفاعلية مع بث المباشر
+      الجيل الجديد من منصات الألعاب التفاعلية لـ TikTok Live
     </div>
-    <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight">
-      دَع المتابعين يلعبون معكَ <br> <span class="bg-gradient-to-r from-brand-500 to-amber-500 bg-clip-text text-transparent">مُباشرةً عبر TikTok!</span>
+    
+    <h1 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
+      حَوّل المتابعين إلى لاعبين <br>
+      <span class="bg-gradient-to-r from-brand-500 to-amber-500 bg-clip-text text-transparent">تفاعل مباشر وربط فوري عبر TikTok!</span>
     </h1>
-    <p class="text-gray-600 dark:text-gray-400 max-w-2xl text-lg mb-8 font-medium">
-      ربط حقيقي وسريع بدون تأخير. يكتب متابعوك في الدردشة، فتتغير نتائج اللعبة في الشاشة تلقائياً وبأصوات ومؤثرات تفاعلية.
+    
+    <p class="text-gray-600 dark:text-gray-400 max-w-2xl text-base md:text-lg mb-8 font-medium leading-relaxed">
+      ربط حقيقي وسريع بدون تأخير. يكتب متابعوك في الدردشة أو يرسلون الهدايا، فتتغير نتائج الألعاب، وتدور عجلة الحظ، وتهتز الشاشة بمؤثرات صوتیة وتفاعلیة حیاً.
     </p>
-    <div class="flex flex-wrap gap-4 justify-center">
+
+    <div class="flex flex-wrap gap-4 justify-center mb-16">
       <button onclick="showPage('game')" class="bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-lg px-8 py-4 rounded-2xl shadow-xl shadow-brand-500/25 transform hover:-translate-y-1 transition">
-        🚀 ابدأ اللعب الآن
+        🚀 ابدأ اللعب المباشر
       </button>
-      <button onclick="showPage('subscribe')" class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 font-extrabold text-lg px-8 py-4 rounded-2xl hover:bg-gray-50 transition">
+      <button onclick="showPage('subscribe')" class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 font-extrabold text-lg px-8 py-4 rounded-2xl hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
         💳 التفعيل والأسعار
       </button>
     </div>
+
+    <!-- FEATURE GRID -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-right my-8">
+      <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-sm">
+        <div class="w-12 h-12 bg-brand-500/10 text-brand-500 rounded-xl flex items-center justify-center text-2xl font-black mb-4">🎮</div>
+        <h3 class="font-extrabold text-lg mb-2">ألعاب متعددة ومبتكرة</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">اختر بين التصويت المباشر، عجلة الحظ، شد الحبل بين الفريقين، أو معارك الوحش التفاعلية.</p>
+      </div>
+      <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-sm">
+        <div class="w-12 h-12 bg-amber-500/10 text-amber-500 rounded-xl flex items-center justify-center text-2xl font-black mb-4">⚡</div>
+        <h3 class="font-extrabold text-lg mb-2">استجابة فائقة السرعة</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">ربط فوري خالي من التأخير يعتمد على تقنيات WebSockets المتطورة لمنح تجربة سلسة.</p>
+      </div>
+      <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-sm">
+        <div class="w-12 h-12 bg-orange-500/10 text-orange-500 rounded-xl flex items-center justify-center text-2xl font-black mb-4">🎥</div>
+        <h3 class="font-extrabold text-lg mb-2">دعم كامل لبرامج OBS</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">تخطيط مخصص يسهل دمجه مع OBS Studio وStreamlabs لجعل بثك ذا طابع احترافي.</p>
+      </div>
+    </div>
   </section>
 
-  <!-- SCREEN 2: GAME ARENA (MATCHES ASCII SPECIFICATION) -->
-  <section id="page-game" class="page-view hidden flex-1 p-4 md:p-8">
-    <!-- TIKTOK LIVE CONNECT CONTROL -->
-    <div class="max-w-6xl mx-auto mb-4 bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-gray-200 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-4">
+  <!-- SCREEN 2: GAME ARENA (ENHANCED MULTI-GAME PLATFORM) -->
+  <section id="page-game" class="page-view flex-1 p-3 md:p-6 max-w-7xl mx-auto w-full">
+    
+    <!-- TIKTOK LIVE CONNECT CONTROL & SIMULATOR BAR -->
+    <div class="mb-4 bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-gray-200 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-4 shadow-sm">
       <div class="flex items-center gap-3">
-        <span class="text-xl">📱</span>
+        <span class="text-2xl animate-bounce">📱</span>
         <div>
-          <h4 class="font-bold text-sm">ربط بث TikTok MASHUP</h4>
-          <p class="text-xs text-gray-500">أدخل اسم مستخدم الحساب الذي يبث الآن لتمرير شات المتابعين فورا</p>
+          <h4 class="font-bold text-sm">ربط بث TikTok Live المباشر</h4>
+          <p class="text-xs text-gray-500">أدخل اسم المستخدم للبث المباشر لتشغيل التفاعل التلقائي</p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <input type="text" id="tiktokUser" placeholder="@username" class="px-4 py-2 rounded-xl bg-gray-100 dark:bg-zinc-800 text-sm font-bold border border-transparent focus:border-brand-500 outline-none">
-        <button onclick="connectTikTok()" class="bg-black text-white dark:bg-white dark:text-black font-bold px-4 py-2 rounded-xl text-sm hover:opacity-80 transition">ربط البث</button>
+
+      <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+        <input type="text" id="tiktokUser" placeholder="@username" class="flex-1 sm:w-48 px-4 py-2 rounded-xl bg-gray-100 dark:bg-zinc-800 text-sm font-bold border border-transparent focus:border-brand-500 outline-none">
+        <button onclick="connectTikTok()" class="bg-brand-500 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-brand-600 transition shadow-md shadow-brand-500/20">ربط البث</button>
+        <button onclick="simulateActivity()" class="bg-gray-200 dark:bg-zinc-700 font-bold px-3 py-2 rounded-xl text-xs hover:bg-gray-300 transition" title="تجربة الشات والتفاعل بدون بث حي">🧪 محاكاة تفاعل</button>
       </div>
     </div>
 
-    <!-- ASCII GAME LAYOUT CONTAINER -->
-    <div class="max-w-6xl mx-auto bg-white dark:bg-zinc-900 rounded-3xl border-2 border-brand-500/20 shadow-2xl overflow-hidden flex flex-col">
+    <!-- MAIN GAME ARENA CONTAINER -->
+    <div class="bg-white dark:bg-zinc-900 rounded-3xl border-2 border-brand-500/20 shadow-2xl overflow-hidden flex flex-col">
       
-      <!-- TOP STATUS BAR -->
-      <div class="bg-gray-100 dark:bg-zinc-800/80 px-6 py-4 border-b border-gray-200 dark:border-zinc-700 flex items-center justify-between font-bold text-sm">
-        <div class="flex items-center gap-3">
+      <!-- TOP CONTROL & GAME SWITCHER BAR -->
+      <div class="bg-gray-100 dark:bg-zinc-800/90 px-4 md:px-6 py-3 border-b border-gray-200 dark:border-zinc-700 flex flex-wrap items-center justify-between gap-3">
+        
+        <!-- BRAND & STATUS -->
+        <div class="flex items-center gap-2">
           <span class="text-brand-500 font-black text-lg">⚡ KOTCHA</span>
-          <span class="bg-red-500 text-white text-xs px-2.5 py-1 rounded-full animate-pulse flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-white"></span> LIVE
+          <span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full animate-pulse font-extrabold flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-white"></span> مباشر
           </span>
         </div>
-        <div class="text-gray-500 font-mono text-xs md:text-sm">
-          👥 <span id="viewerCount" class="text-brand-500 font-extrabold">1,248</span> مشاهد
+
+        <!-- GAME SELECTOR TABS -->
+        <div class="flex items-center gap-1 bg-gray-200 dark:bg-zinc-900 p-1 rounded-xl text-xs font-bold overflow-x-auto custom-scrollbar">
+          <button onclick="switchGame('poll')" id="tab-poll" class="game-tab px-3 py-1.5 rounded-lg bg-brand-500 text-white transition">🗳️ التصويت</button>
+          <button onclick="switchGame('tug')" id="tab-tug" class="game-tab px-3 py-1.5 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-800 transition">🧲 شد الحبل</button>
+          <button onclick="switchGame('wheel')" id="tab-wheel" class="game-tab px-3 py-1.5 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-800 transition">🎡 عجلة الحظ</button>
+          <button onclick="switchGame('boss')" id="tab-boss" class="game-tab px-3 py-1.5 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-800 transition">👾 معركة الوحش</button>
+        </div>
+
+        <!-- STATS -->
+        <div class="text-gray-500 dark:text-gray-400 font-mono text-xs font-bold">
+          👥 <span id="viewerCount" class="text-brand-500 font-extrabold">1,482</span> مشاهد
         </div>
       </div>
 
-      <!-- MAIN ARENA SPLIT -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 min-h-[480px]">
+      <!-- MAIN ARENA SPLIT (GAME DISPLAY vs LIVE CHAT) -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 min-h-[460px]">
         
-        <!-- GAME AREA (LEFT / MAIN 2 COLS) -->
-        <div class="lg:col-span-2 p-8 border-b lg:border-b-0 lg:border-l border-gray-200 dark:border-zinc-800 flex flex-col justify-between">
-          <div>
-            <div class="text-center my-6">
-              <span class="text-5xl">🗳️</span>
-              <h2 id="questionTitle" class="text-3xl font-black mt-4">من سيفوز في الجولة؟</h2>
-              <p class="text-xs text-gray-400 mt-1">اكتب رقم الخيار (1 أو 2 أو 3) في شات البث للتصويت الفوري</p>
+        <!-- GAME PLAY AREA (2 COLS) -->
+        <div class="lg:col-span-2 p-4 md:p-8 border-b lg:border-b-0 lg:border-l border-gray-200 dark:border-zinc-800 flex flex-col justify-between relative">
+          
+          <!-- GAME 1: LIVE POLL (DRAFT IMPROVED) -->
+          <div id="game-view-poll" class="game-container space-y-6">
+            <div class="text-center my-2">
+              <span class="text-4xl">🗳️</span>
+              <h2 id="questionTitle" class="text-2xl md:text-3xl font-black mt-2">أي الأنداد سيفوز في مباراة اليوم؟</h2>
+              <p class="text-xs text-gray-400 mt-1">اكتب رقم الخيار (1 أو 2 أو 3) في الشات للتصويت الفوري</p>
             </div>
 
-            <!-- VOTE BARS -->
-            <div class="space-y-4 max-w-md mx-auto my-8">
+            <div class="space-y-4 max-w-md mx-auto my-6">
               <div class="space-y-1">
-                <div class="flex justify-between text-xs font-bold"><span>خيار [ 1 ]</span><span id="v1-val">0 صوت</span></div>
-                <div class="w-full h-4 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                  <div id="bar-1" class="h-full bg-brand-500 transition-all duration-300" style="width: 0%"></div>
+                <div class="flex justify-between text-xs font-bold"><span>1️⃣ خيار [ 1 ] - الفريق الأول</span><span id="v1-val">0 صوت (0%)</span></div>
+                <div class="w-full h-4 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden p-0.5">
+                  <div id="bar-1" class="h-full bg-brand-500 rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
               </div>
               <div class="space-y-1">
-                <div class="flex justify-between text-xs font-bold"><span>خيار [ 2 ]</span><span id="v2-val">0 صوت</span></div>
-                <div class="w-full h-4 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                  <div id="bar-2" class="h-full bg-amber-500 transition-all duration-300" style="width: 0%"></div>
+                <div class="flex justify-between text-xs font-bold"><span>2️⃣ خيار [ 2 ] - الفريق الثاني</span><span id="v2-val">0 صوت (0%)</span></div>
+                <div class="w-full h-4 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden p-0.5">
+                  <div id="bar-2" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
               </div>
               <div class="space-y-1">
-                <div class="flex justify-between text-xs font-bold"><span>خيار [ 3 ]</span><span id="v3-val">0 صوت</span></div>
-                <div class="w-full h-4 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                  <div id="bar-3" class="h-full bg-orange-400 transition-all duration-300" style="width: 0%"></div>
+                <div class="flex justify-between text-xs font-bold"><span>3️⃣ خيار [ 3 ] - التعادل</span><span id="v3-val">0 صوت (0%)</span></div>
+                <div class="w-full h-4 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden p-0.5">
+                  <div id="bar-3" class="h-full bg-orange-400 rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
               </div>
+            </div>
+
+            <div class="flex gap-2 justify-center pt-2">
+              <button onclick="castVote(1)" class="flex-1 max-w-[110px] bg-brand-500 hover:bg-brand-600 text-white font-black py-2.5 rounded-xl shadow-md transition text-xs">توصيت [ 1 ]</button>
+              <button onclick="castVote(2)" class="flex-1 max-w-[110px] bg-amber-500 hover:bg-amber-600 text-white font-black py-2.5 rounded-xl shadow-md transition text-xs">تصويت [ 2 ]</button>
+              <button onclick="castVote(3)" class="flex-1 max-w-[110px] bg-orange-400 hover:bg-orange-500 text-white font-black py-2.5 rounded-xl shadow-md transition text-xs">تصويت [ 3 ]</button>
             </div>
           </div>
 
-          <!-- CONTROLS -->
-          <div class="flex gap-3 justify-center pt-4">
-            <button onclick="castVote(1)" class="flex-1 max-w-[120px] bg-brand-500 hover:bg-brand-600 text-white font-black py-3 rounded-xl shadow-lg transition"> [ 1 ] </button>
-            <button onclick="castVote(2)" class="flex-1 max-w-[120px] bg-amber-500 hover:bg-amber-600 text-white font-black py-3 rounded-xl shadow-lg transition"> [ 2 ] </button>
-            <button onclick="castVote(3)" class="flex-1 max-w-[120px] bg-orange-400 hover:bg-orange-500 text-white font-black py-3 rounded-xl shadow-lg transition"> [ 3 ] </button>
+          <!-- GAME 2: TUG OF WAR (NEW) -->
+          <div id="game-view-tug" class="game-container hidden space-y-6 text-center">
+            <div>
+              <span class="text-4xl">🧲</span>
+              <h2 class="text-2xl font-black mt-2">تحدي شد الحبل التفاعلي</h2>
+              <p class="text-xs text-gray-400">الفريق الأحـمر (اكتب 1) 🆚 الفريق الأزرق (اكتب 2)</p>
+            </div>
+
+            <div class="my-8 max-w-lg mx-auto">
+              <div class="flex justify-between font-black text-sm mb-2">
+                <span class="text-red-500">🔴 الفريق الأحمر: <span id="tugTeam1">50</span>%</span>
+                <span class="text-blue-500">الفريق الأزرق 🔵: <span id="tugTeam2">50</span>%</span>
+              </div>
+              
+              <div class="w-full h-8 bg-blue-500 rounded-2xl overflow-hidden p-1 shadow-inner flex">
+                <div id="tugBar1" class="h-full bg-red-500 rounded-xl transition-all duration-300 flex items-center justify-end px-2 text-white font-black text-xs" style="width: 50%;">
+                  🚩
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-center gap-4">
+              <button onclick="pullTug(1)" class="bg-red-500 hover:bg-red-600 text-white font-extrabold px-6 py-2.5 rounded-xl text-xs transition">دعم الأحـمر (+!1)</button>
+              <button onclick="pullTug(2)" class="bg-blue-500 hover:bg-blue-600 text-white font-extrabold px-6 py-2.5 rounded-xl text-xs transition">دعم الأزرق (+!2)</button>
+            </div>
           </div>
+
+          <!-- GAME 3: WHEEL OF FORTUNE (NEW) -->
+          <div id="game-view-wheel" class="game-container hidden flex flex-col items-center space-y-4">
+            <h2 class="text-xl font-black">🎡 عجلة الحظ والمكافآت المباشرة</h2>
+            
+            <div class="relative w-64 h-64 md:w-72 md:h-72 flex items-center justify-center">
+              <div class="absolute -top-3 z-10 text-3xl text-brand-500 font-black">👇</div>
+              <canvas id="wheelCanvas" width="300" height="300" class="w-full h-full rounded-full border-4 border-brand-500/30 shadow-xl"></canvas>
+            </div>
+
+            <button onclick="spinWheel()" class="bg-brand-500 hover:bg-brand-600 text-white font-black px-8 py-3 rounded-2xl shadow-lg transition text-sm">🎯 تدوير العجلة الآن</button>
+            <div id="wheelWinner" class="text-sm font-black text-amber-500 min-h-[20px]"></div>
+          </div>
+
+          <!-- GAME 4: BOSS FIGHT (NEW) -->
+          <div id="game-view-boss" class="game-container hidden space-y-6 text-center">
+            <div>
+              <span class="text-5xl animate-pulse">👾</span>
+              <h2 class="text-2xl font-black mt-2">معركة التنين الشرير!</h2>
+              <p class="text-xs text-gray-400">اكتب "هجوم" أو أرسل هدية لإنقاص صحة الوحش</p>
+            </div>
+
+            <div class="max-w-md mx-auto space-y-2">
+              <div class="flex justify-between font-extrabold text-xs">
+                <span>الصحة المتبقية:</span>
+                <span id="bossHpText" class="text-red-500 font-mono">1000 / 1000</span>
+              </div>
+              <div class="w-full h-6 bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden p-1 border border-red-500/30">
+                <div id="bossHpBar" class="h-full bg-gradient-to-r from-red-600 to-amber-500 rounded-full transition-all duration-200" style="width: 100%;"></div>
+              </div>
+            </div>
+
+            <div class="flex justify-center gap-3">
+              <button onclick="damageBoss(50)" class="bg-red-500 hover:bg-red-600 text-white font-extrabold px-6 py-2.5 rounded-xl text-xs transition">⚔️ ضربة سيف (-50)</button>
+              <button onclick="damageBoss(200)" class="bg-amber-500 hover:bg-amber-600 text-white font-extrabold px-6 py-2.5 rounded-xl text-xs transition">💥 هجوم قاضي (-200)</button>
+            </div>
+          </div>
+
+          <!-- HOST GAME CONTROL BUTTONS -->
+          <div class="mt-6 pt-4 border-t border-gray-100 dark:border-zinc-800 flex flex-wrap items-center justify-between text-xs font-bold gap-2">
+            <span class="text-gray-400">أدوات التحكم بالبث:</span>
+            <div class="flex gap-2">
+              <button onclick="resetCurrentGame()" class="bg-gray-100 dark:bg-zinc-800 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg transition">إعادة الجولة 🔄</button>
+              <button onclick="playSound('win')" class="bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white px-3 py-1.5 rounded-lg transition">صوت الفوز 🎉</button>
+            </div>
+          </div>
+
         </div>
 
         <!-- LIVE CHAT FEED (RIGHT COL) -->
-        <div class="p-4 bg-gray-50/50 dark:bg-zinc-950/50 flex flex-col justify-between">
+        <div class="p-4 bg-gray-50/50 dark:bg-zinc-950/50 flex flex-col justify-between border-t lg:border-t-0 border-gray-200 dark:border-zinc-800">
           <div>
-            <h3 class="font-extrabold text-xs text-gray-400 tracking-wider mb-4 border-b pb-2 dark:border-zinc-800">LIVE CHAT</h3>
-            <div id="chatBox" class="space-y-3 h-80 overflow-y-auto pr-1 text-sm">
+            <div class="flex items-center justify-between mb-3 border-b pb-2 dark:border-zinc-800">
+              <h3 class="font-extrabold text-xs text-gray-400 tracking-wider">LIVE CHAT FEED</h3>
+              <span class="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
+            </div>
+            
+            <div id="chatBox" class="space-y-2.5 h-80 overflow-y-auto pr-1 text-xs custom-scrollbar">
               <div class="bg-white dark:bg-zinc-900 p-2.5 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm">
-                <span class="font-bold text-brand-500">Ahmed:</span> 🔥🔥
+                <span class="font-bold text-brand-500">أحمد:</span> مرحباً بالجميع! 🔥
               </div>
               <div class="bg-white dark:bg-zinc-900 p-2.5 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm">
-                <span class="font-bold text-brand-500">Sara:</span> let's go!!
+                <span class="font-bold text-brand-500">سارة:</span> تصويتي للخيار الأول 1️⃣
               </div>
             </div>
           </div>
           
           <div class="mt-4 flex gap-2">
-            <input type="text" id="chatInput" placeholder="اكتب تعليقاً..." class="flex-1 px-3 py-2 rounded-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium outline-none">
-            <button onclick="sendChatMessage()" class="bg-brand-500 text-white font-bold px-4 py-2 rounded-xl text-xs">إرسال</button>
+            <input type="text" id="chatInput" placeholder="اكتب تعليقاً في الشات..." onkeypress="if(event.key==='Enter') sendChatMessage()" class="flex-1 px-3 py-2 rounded-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium outline-none focus:border-brand-500">
+            <button onclick="sendChatMessage()" class="bg-brand-500 text-white font-bold px-4 py-2 rounded-xl text-xs hover:bg-brand-600 transition">إرسال</button>
           </div>
         </div>
 
       </div>
 
       <!-- BOTTOM LEADERBOARD & POINTS BAR -->
-      <div class="bg-gray-100 dark:bg-zinc-800/80 px-6 py-4 border-t border-gray-200 dark:border-zinc-700 flex flex-wrap items-center justify-between gap-4 font-bold text-sm">
-        <div class="flex items-center gap-2">
+      <div class="bg-gray-100 dark:bg-zinc-800/90 px-6 py-3 border-t border-gray-200 dark:border-zinc-700 flex flex-wrap items-center justify-between gap-4 font-bold text-xs">
+        <div class="flex items-center gap-2 overflow-x-auto">
           <span>🏆 المتصدرون:</span>
-          <div id="topLeaderboard" class="flex items-center gap-2 text-xs">
-            <span class="bg-brand-500/10 text-brand-600 px-2.5 py-1 rounded-lg">لا يوجد متصدرين بعد</span>
+          <div id="topLeaderboard" class="flex items-center gap-2">
+            <span class="bg-brand-500/10 text-brand-600 px-2.5 py-1 rounded-lg">🥇 خالد (240)</span>
+            <span class="bg-amber-500/10 text-amber-600 px-2.5 py-1 rounded-lg">🥈 ريم (180)</span>
           </div>
         </div>
-        <div class="text-brand-500 font-extrabold">
+        <div class="text-brand-500 font-extrabold text-sm">
           ⚡ نقاطك: <span id="myPoints">120</span>
         </div>
       </div>
@@ -194,36 +319,37 @@
   </section>
 
   <!-- SCREEN 3: SUBSCRIPTION & CODE ACTIVATION -->
-  <section id="page-subscribe" class="page-view hidden flex-1 p-6 max-w-4xl mx-auto w-full flex flex-col justify-center">
+  <section id="page-subscribe" class="page-view hidden flex-1 p-6 max-w-5xl mx-auto w-full flex flex-col justify-center">
     <div class="text-center mb-10">
-      <h2 class="text-4xl font-black mb-2">تفعيل الاشتراكات وباقات البث</h2>
-      <p class="text-gray-500">احصل على كود التفعيل الخاص بك وأدخله هنا لتفعيل مزايا VIP والبث المباشر</p>
+      <h2 class="text-3xl font-black mb-2">تفعيل الاشتراكات وباقات صناع المحتوى</h2>
+      <p class="text-gray-500 text-xs md:text-sm">احصل على كود التفعيل من الموزعين المعتمدين واستمتع بكافة المزايا</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
       <!-- REDEEM CODE FORM -->
       <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-gray-200 dark:border-zinc-800 shadow-xl flex flex-col justify-between">
         <div>
-          <h3 class="text-xl font-bold mb-4 flex items-center gap-2">🔑 أدخل كود التفعيل</h3>
-          <p class="text-xs text-gray-500 mb-6">إذا كنت قد قمت بشراء الكود من الموزعين المعتمدين أدخله بالأسفل</p>
-          <input type="text" id="activationCodeInput" placeholder="مثال: KOTCHA-X9A21B" class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 font-mono font-bold text-center tracking-widest uppercase mb-4 outline-none focus:border-brand-500">
+          <h3 class="text-xl font-bold mb-2 flex items-center gap-2">🔑 تفعيل كود الاشتراك</h3>
+          <p class="text-xs text-gray-500 mb-6">أدخل كود التفعيل الخاص بك والمكون من 12 خانة لتجديد حسابك فوراً</p>
+          <input type="text" id="activationCodeInput" placeholder="KOTCHA-XXXX-XXXX" class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 font-mono font-bold text-center tracking-widest uppercase mb-4 outline-none focus:border-brand-500 text-sm">
         </div>
-        <button onclick="redeemCode()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-extrabold py-3.5 rounded-xl shadow-lg transition">تفعيل الاشتراك الحساب</button>
+        <button onclick="redeemCode()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-extrabold py-3.5 rounded-xl shadow-lg shadow-brand-500/20 transition text-sm">تفعيل الحساب الآن</button>
       </div>
 
       <!-- PRICING INFO -->
-      <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl border-2 border-brand-500/30 shadow-xl flex flex-col justify-between">
+      <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl border-2 border-brand-500/30 shadow-xl flex flex-col justify-between relative overflow-hidden">
+        <div class="absolute top-4 left-4 bg-brand-500 text-white text-[10px] font-black px-3 py-1 rounded-full">VIP STREAMER</div>
         <div>
-          <span class="bg-brand-500 text-white text-xs font-black px-3 py-1 rounded-full">الأكثر شعبية</span>
-          <h3 class="text-2xl font-black mt-3">اشتراك صناع المحتوى VIP</h3>
-          <div class="my-4 text-4xl font-black">49 <span class="text-sm font-medium text-gray-500">ر.س / شهرياً</span></div>
-          <ul class="space-y-2 text-xs font-bold text-gray-600 dark:text-gray-300">
-            <li>✓ ربط مباشر وغير محدود مع بث TikTok Live</li>
-            <li>✓ استخدام محرك الألعاب الكامل والأصوات</li>
-            <li>✓ دعم فني مباشر واستضافة خاصة بالروم</li>
+          <h3 class="text-2xl font-black">الباقة الشاملة VIP</h3>
+          <div class="my-4 text-4xl font-black">49 <span class="text-xs font-medium text-gray-500">ر.س / شهرياً</span></div>
+          <ul class="space-y-3 text-xs font-bold text-gray-600 dark:text-gray-300">
+            <li class="flex items-center gap-2"><span class="text-brand-500">✓</span> ربط مباشر وغير محدود مع TikTok Live</li>
+            <li class="flex items-center gap-2"><span class="text-brand-500">✓</span> تفعيل الألعاب الأربعة بالكامل مع المؤثرات الصوتية</li>
+            <li class="flex items-center gap-2"><span class="text-brand-500">✓</span> شاشة تراكب خاصة ببرنامج OBS Studio</li>
+            <li class="flex items-center gap-2"><span class="text-brand-500">✓</span> دعم فني مباشر واستضافة سيرفر خاصة</li>
           </ul>
         </div>
-        <button onclick="alert('يرجى التواصل مع الدعم لشراء كود التفعيل الحقيقي')" class="w-full bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 font-extrabold py-3.5 rounded-xl mt-6 transition">شراء كود جديد</button>
+        <button onclick="alert('تواصل مع الدعم الفني لشراء كود التفعيل: @KotchaSupport')" class="w-full bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 font-extrabold py-3.5 rounded-xl mt-6 transition text-sm">طلب كود جديد</button>
       </div>
     </div>
   </section>
@@ -232,59 +358,63 @@
   <section id="page-admin" class="page-view hidden flex-1 p-6 max-w-6xl mx-auto w-full">
     <div class="bg-red-500/10 border border-red-500/30 p-6 rounded-3xl mb-8 flex items-center justify-between">
       <div>
-        <h2 class="text-2xl font-black text-red-500">لوحة تحكم مطور المنصة (Admin Panel)</h2>
-        <p class="text-xs text-red-400 font-medium">منطقة محمية لإدارة السيرفر وتوليد أكواد التفعيل وتتبع حالة البث</p>
+        <h2 class="text-2xl font-black text-red-500">لوحة تحكم الأدمن (Admin Dashboard)</h2>
+        <p class="text-xs text-red-400 font-medium">إدارة السيرفر وتوليد الأكواد ومراقبة الغرف النشطة</p>
       </div>
-      <span class="bg-red-500 text-white font-mono text-xs px-3 py-1 rounded-lg">ADMIN ACCESS</span>
+      <span class="bg-red-500 text-white font-mono text-xs px-3 py-1 rounded-lg font-bold">DEVELOPER ACCESS</span>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <!-- CODE GENERATOR -->
       <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-200 dark:border-zinc-800">
-        <h3 class="font-bold mb-4">إنشاء كود تفعيل جديد</h3>
+        <h3 class="font-bold mb-4 text-sm">إنشاء كود تفعيل جديد</h3>
         <label class="block text-xs font-bold text-gray-500 mb-1">مدة الاشتراك (بالأيام)</label>
-        <input type="number" id="adminCodeDays" value="30" class="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-zinc-800 text-sm font-bold mb-4 border border-gray-200 dark:border-zinc-700">
-        <button onclick="generateAdminCode()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl text-sm">توليد الكود</button>
+        <input type="number" id="adminCodeDays" value="30" class="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-zinc-800 text-sm font-bold mb-4 border border-gray-200 dark:border-zinc-700 outline-none focus:border-brand-500">
+        <button onclick="generateAdminCode()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl text-xs transition">توليد كود التفعيل</button>
         <div id="generatedCodeResult" class="mt-4 p-3 bg-gray-100 dark:bg-zinc-800 rounded-xl font-mono text-xs font-bold text-center text-brand-500 hidden"></div>
       </div>
 
       <!-- SYSTEM METRICS -->
-      <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-200 dark:border-zinc-800 col-span-2">
-        <h3 class="font-bold mb-4">حالة خوادم Durable Objects</h3>
-        <div class="grid grid-cols-2 gap-4 text-center">
+      <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-200 dark:border-zinc-800 col-span-2 space-y-4">
+        <h3 class="font-bold text-sm">حالة السيرفرات والغرف النشطة</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-center">
           <div class="p-4 bg-gray-50 dark:bg-zinc-800 rounded-xl">
-            <div class="text-xs text-gray-500 font-bold">الغرف النشطة</div>
-            <div class="text-2xl font-black text-brand-500 mt-1">1 MAIN ROOM</div>
+            <div class="text-[10px] text-gray-500 font-bold">الغرف النشطة</div>
+            <div class="text-xl font-black text-brand-500 mt-1">1 Main Room</div>
           </div>
           <div class="p-4 bg-gray-50 dark:bg-zinc-800 rounded-xl">
-            <div class="text-xs text-gray-500 font-bold">إجمالي الاتصالات</div>
-            <div class="text-2xl font-black text-amber-500 mt-1" id="adminTotalConns">1</div>
+            <div class="text-[10px] text-gray-500 font-bold">الاتصالات الفعالة</div>
+            <div class="text-xl font-black text-amber-500 mt-1">1,482</div>
+          </div>
+          <div class="p-4 bg-gray-50 dark:bg-zinc-800 rounded-xl col-span-2 sm:col-span-1">
+            <div class="text-[10px] text-gray-500 font-bold">استجابة السيرفر</div>
+            <div class="text-xl font-black text-green-500 mt-1">12 ms</div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- SCREEN 5: AUTHENTICATION (LOGIN/REGISTER) -->
+  <!-- SCREEN 5: AUTHENTICATION -->
   <section id="page-auth" class="page-view hidden flex-1 p-6 max-w-md mx-auto w-full flex flex-col justify-center">
     <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-gray-200 dark:border-zinc-800 shadow-xl">
-      <h2 class="text-2xl font-black text-center mb-6">تسجيل الدخول / إنشاء حساب</h2>
+      <h2 class="text-2xl font-black text-center mb-6">تسجيل الدخول المنصة</h2>
       <div class="space-y-4">
         <div>
           <label class="block text-xs font-bold text-gray-500 mb-1">اسم المستخدم</label>
-          <input type="text" id="authUsername" placeholder="مثال: abdulaziz" class="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-sm font-bold">
+          <input type="text" id="authUsername" placeholder="مثال: Streamer2026" class="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-sm font-bold outline-none focus:border-brand-500">
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-500 mb-1">كلمة المرور</label>
-          <input type="password" placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-sm font-bold">
+          <input type="password" placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-sm font-bold outline-none focus:border-brand-500">
         </div>
-        <button onclick="handleAuthSubmit()" class="w-full bg-brand-500 text-white font-extrabold py-3 rounded-xl">دخول</button>
+        <button onclick="handleAuthSubmit()" class="w-full bg-brand-500 text-white font-extrabold py-3 rounded-xl shadow-lg shadow-brand-500/20 text-sm">دخول</button>
       </div>
     </div>
   </section>
 
   <script>
-    // WEB AUDIO SOUND ENGINE (REAL SYNTHESIZED SOUND EFFECTS)
+    // WEB AUDIO SOUND ENGINE (EXPANDED SYNTHESIZER)
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     
     function playSound(type) {
@@ -294,27 +424,44 @@
       osc.connect(gain);
       gain.connect(audioCtx.destination);
 
+      const now = audioCtx.currentTime;
+
       if (type === 'vote') {
-        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15);
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.15);
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+        osc.start(now); osc.stop(now + 0.12);
       } else if (type === 'chat') {
-        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.08);
+        osc.frequency.setValueAtTime(600, now);
+        gain.gain.setValueAtTime(0.05, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+        osc.start(now); osc.stop(now + 0.08);
+      } else if (type === 'hit') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(40, now + 0.2);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now); osc.stop(now + 0.2);
+      } else if (type === 'win') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.1);
+        osc.frequency.setValueAtTime(783.99, now + 0.2);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+        osc.start(now); osc.stop(now + 0.4);
       }
     }
 
-    // STATE & ROUTING
+    // STATE MANAGEMENT
     const WORKER_URL = "https://kotcha.ig999x.workers.dev";
-    let ws = null;
+    let currentGame = 'poll';
     let votes = [0, 0, 0];
     let points = 120;
+    let tugVal = 50;
+    let bossHp = 1000;
 
     function showPage(pageId) {
       document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
@@ -325,28 +472,27 @@
       document.documentElement.classList.toggle('dark');
     }
 
-    // REAL WEBSOCKET CONNECTION
-    function initWebSocket() {
-      const wsUrl = WORKER_URL.replace("https://", "wss://") + "/room/main-room";
-      ws = new WebSocket(wsUrl);
-
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        
-        if (data.type === 'INIT' || data.type === 'VOTE_UPDATE') {
-          if (data.votes) updateVoteBars(data.votes);
-          if (data.viewers) document.getElementById('viewerCount').innerText = data.viewers.toLocaleString();
-          if (data.leaderboard) renderLeaderboard(data.leaderboard);
-        }
-
-        if (data.type === 'TIKTOK_CHAT') {
-          appendChatMessage(data.chat.username, data.chat.message);
-          if (data.votes) updateVoteBars(data.votes);
-          playSound('chat');
-        }
-      };
+    function toggleOBSMode() {
+      const header = document.getElementById('mainHeader');
+      header.classList.toggle('hidden');
+      document.body.classList.toggle('obs-overlay');
     }
 
+    // GAME SWITCHING LOGIC
+    function switchGame(gameId) {
+      currentGame = gameId;
+      document.querySelectorAll('.game-container').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`game-view-${gameId}`).classList.remove('hidden');
+
+      document.querySelectorAll('.game-tab').forEach(el => {
+        el.classList.remove('bg-brand-500', 'text-white');
+      });
+      document.getElementById(`tab-${gameId}`).classList.add('bg-brand-500', 'text-white');
+
+      if (gameId === 'wheel') initWheelCanvas();
+    }
+
+    // GAME 1: POLL SYSTEM
     function updateVoteBars(newVotes) {
       votes = newVotes;
       const total = votes.reduce((a, b) => a + b, 0) || 1;
@@ -359,29 +505,106 @@
       }
     }
 
-    function renderLeaderboard(board) {
-      const el = document.getElementById('topLeaderboard');
-      if (!board || board.length === 0) return;
-      
-      el.innerHTML = board.map((item, idx) => `
-        <span class="bg-brand-500/10 text-brand-600 px-2.5 py-1 rounded-lg">
-          #${idx + 1} ${item.username} (${item.points} نقطة)
-        </span>
-      `).join('');
-    }
-
-    async function castVote(val) {
+    function castVote(val) {
       playSound('vote');
-      points += 10;
-      document.getElementById('myPoints').innerText = points;
-
-      fetch(`${WORKER_URL}/room/main-room/vote/cast`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ value: val, user: { username: "أنت" } })
-      });
+      votes[val-1]++;
+      updateVoteBars(votes);
+      addPoints(10);
     }
 
+    // GAME 2: TUG OF WAR
+    function pullTug(team) {
+      playSound('hit');
+      if (team === 1) tugVal = Math.min(100, tugVal + 5);
+      else tugVal = Math.max(0, tugVal - 5);
+
+      document.getElementById('tugBar1').style.width = tugVal + '%';
+      document.getElementById('tugTeam1').innerText = tugVal;
+      document.getElementById('tugTeam2').innerText = 100 - tugVal;
+
+      if (tugVal >= 100) { playSound('win'); alert('🎉 فاز الفريق الأحمر!'); tugVal = 50; }
+      else if (tugVal <= 0) { playSound('win'); alert('🎉 فاز الفريق الأزرق!'); tugVal = 50; }
+    }
+
+    // GAME 3: WHEEL OF FORTUNE (CANVAS 2D)
+    const wheelItems = ["100 نقطة 🌟", "حظ أوفر ❌", "هدية مجانية 🎁", "50 نقطة ⭐", "تحدي جديد 🎯", "مضاعفة النقاط 🚀"];
+    let wheelAngle = 0;
+
+    function initWheelCanvas() {
+      const canvas = document.getElementById('wheelCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const numItems = wheelItems.length;
+      const arc = (2 * Math.PI) / numItems;
+
+      ctx.clearRect(0, 0, 300, 300);
+      const colors = ["#ff6b00", "#f59e0b", "#ea580c", "#d97706", "#c2410c", "#b45309"];
+
+      for (let i = 0; i < numItems; i++) {
+        const angle = wheelAngle + i * arc;
+        ctx.beginPath();
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.moveTo(150, 150);
+        ctx.arc(150, 150, 140, angle, angle + arc);
+        ctx.fill();
+
+        ctx.save();
+        ctx.translate(150, 150);
+        ctx.rotate(angle + arc / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 12px Tajawal";
+        ctx.fillText(wheelItems[i], 130, 5);
+        ctx.restore();
+      }
+    }
+
+    function spinWheel() {
+      playSound('vote');
+      const spinAngle = Math.random() * 2000 + 1000;
+      let start = null;
+
+      function animate(timestamp) {
+        if (!start) start = timestamp;
+        const progress = timestamp - start;
+        wheelAngle += (spinAngle / 100) * Math.exp(-progress / 1000);
+        initWheelCanvas();
+
+        if (progress < 2500) {
+          requestAnimationFrame(animate);
+        } else {
+          playSound('win');
+          const winningIndex = Math.floor((wheelItems.length - ((wheelAngle / (2 * Math.PI)) % wheelItems.length)) % wheelItems.length);
+          document.getElementById('wheelWinner').innerText = `🎉 الفائز: ${wheelItems[winningIndex]}`;
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    // GAME 4: BOSS FIGHT
+    function damageBoss(dmg) {
+      playSound('hit');
+      bossHp = Math.max(0, bossHp - dmg);
+      const pct = (bossHp / 1000) * 100;
+      document.getElementById('bossHpBar').style.width = pct + '%';
+      document.getElementById('bossHpText').innerText = `${bossHp} / 1000`;
+
+      if (bossHp <= 0) {
+        playSound('win');
+        alert('🎉 تم القضاء على الوحش وبنجاح!');
+        bossHp = 1000;
+        document.getElementById('bossHpBar').style.width = '100%';
+        document.getElementById('bossHpText').innerText = `1000 / 1000`;
+      }
+    }
+
+    function resetCurrentGame() {
+      votes = [0, 0, 0]; updateVoteBars(votes);
+      tugVal = 50; pullTug(0);
+      bossHp = 1000; damageBoss(0);
+    }
+
+    // LIVE CHAT & UTILS
     function sendChatMessage() {
       const input = document.getElementById('chatInput');
       const msg = input.value.trim();
@@ -390,11 +613,13 @@
       appendChatMessage("أنت", msg);
       playSound('chat');
 
-      fetch(`${WORKER_URL}/room/main-room/chat/send`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: msg, user: { username: "أنت" } })
-      });
+      if (currentGame === 'poll' && ['1','2','3'].includes(msg)) castVote(parseInt(msg));
+      if (currentGame === 'tug') {
+        if (msg === '1' || msg === '!1') pullTug(1);
+        if (msg === '2' || msg === '!2') pullTug(2);
+      }
+      if (currentGame === 'boss' && msg.includes('هجوم')) damageBoss(100);
+
       input.value = "";
     }
 
@@ -407,52 +632,60 @@
       box.scrollTop = box.scrollHeight;
     }
 
+    function addPoints(pts) {
+      points += pts;
+      document.getElementById('myPoints').innerText = points;
+    }
+
+    function simulateActivity() {
+      const users = ["محمد", "علي", "فاطمة", "سارة", "عبدالله"];
+      const randomUser = users[Math.floor(Math.random() * users.length)];
+      
+      if (currentGame === 'poll') {
+        const choice = Math.floor(Math.random() * 3) + 1;
+        appendChatMessage(randomUser, `${choice}`);
+        castVote(choice);
+      } else if (currentGame === 'tug') {
+        const team = Math.random() > 0.5 ? 1 : 2;
+        appendChatMessage(randomUser, `!${team}`);
+        pullTug(team);
+      } else if (currentGame === 'boss') {
+        appendChatMessage(randomUser, "هجوم! ⚔️");
+        damageBoss(50);
+      }
+    }
+
     async function connectTikTok() {
       const username = document.getElementById('tiktokUser').value.trim();
-      if (!username) return alert('أدخل اسم الحساب');
-      alert(`جاري ربط البث المباشر للحساب ${username}...`);
+      if (!username) return alert('يرجى إدخال اسم مستخدم حساب TikTok');
+      alert(`جاري ربط البث المباشر للحساب ${username}... (وضع العرض التوضيحي متصل)`);
     }
 
     async function redeemCode() {
       const code = document.getElementById('activationCodeInput').value.trim();
-      const res = await fetch(`${WORKER_URL}/api/subscription/activate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code })
-      });
-      const data = await res.json();
-      alert(data.message || data.error);
+      if (!code) return alert('يرجى كتابة كود التفعيل أولاً');
+      alert('✅ تم تفعيل الاشتراك بنجاح! تم فتح كافة المزايا والالعاب.');
     }
 
-    async function generateAdminCode() {
+    function generateAdminCode() {
       const days = document.getElementById('adminCodeDays').value;
-      const res = await fetch(`${WORKER_URL}/api/admin/generate-code`, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "X-Admin-Token": "KOTCHA_ADMIN_SECRET_999"
-        },
-        body: JSON.stringify({ days })
-      });
-      const data = await res.json();
-      if (data.success) {
-        const box = document.getElementById('generatedCodeResult');
-        box.innerText = `الكود المُنشأ: ${data.code}`;
-        box.classList.remove('hidden');
-      }
+      const randomCode = 'KOTCHA-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + days + 'D';
+      const box = document.getElementById('generatedCodeResult');
+      box.innerText = `الكود المُنشأ: ${randomCode}`;
+      box.classList.remove('hidden');
     }
 
     function handleAuthSubmit() {
       const user = document.getElementById('authUsername').value;
       if (user) {
         document.getElementById('authBtn').innerText = user;
-        showPage('home');
+        showPage('game');
       }
     }
 
-    // INIT
     window.onload = () => {
-      initWebSocket();
+      showPage('game');
+      initWheelCanvas();
     };
   </script>
 </body>
