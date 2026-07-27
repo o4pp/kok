@@ -3,154 +3,1140 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KOTCHA API v8.0.0 - Interactive Gaming Hub</title>
-  <link rel="stylesheet" href="style.css">
+  <title>KOTCHA Live Interactive Gaming v8.0.0</title>
+  
+  <!-- FontAwesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ============================================================
+       RESET & BASE DESIGN SYSTEM
+       ============================================================ */
+    :root {
+      --bg-dark: #0a0b10;
+      --bg-card: rgba(18, 22, 36, 0.75);
+      --bg-card-hover: rgba(28, 34, 56, 0.85);
+      --border-color: rgba(255, 255, 255, 0.08);
+      
+      --accent-primary: #ff0055;
+      --accent-secondary: #00f0ff;
+      --accent-purple: #7000ff;
+      --accent-gold: #ffb700;
+      
+      --text-main: #f0f3f9;
+      --text-muted: #8a94a6;
+      
+      --glow-primary: rgba(255, 0, 85, 0.4);
+      --glow-secondary: rgba(0, 240, 255, 0.4);
+      
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Tajawal', sans-serif;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(112, 0, 255, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(0, 240, 255, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(255, 0, 85, 0.08) 0%, transparent 60%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-secondary);
+    }
+
+    /* ============================================================
+       TOP HEADER / NAVBAR
+       ============================================================ */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      background: rgba(10, 11, 16, 0.85);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+      text-shadow: 0 0 20px var(--glow-primary);
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: var(--accent-secondary);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #00ff66;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #00ff66;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.4; }
+      50% { opacity: 1; }
+      100% { opacity: 0.4; }
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .sub-btn {
+      background: linear-gradient(135deg, var(--accent-gold), #ff6a00);
+      color: #000;
+      font-weight: 700;
+      padding: 8px 18px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 0 15px rgba(255, 183, 0, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .sub-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 25px rgba(255, 183, 0, 0.7);
+    }
+
+    /* ============================================================
+       MAIN LAYOUT
+       ============================================================ */
+    .container {
+      display: grid;
+      grid-template-columns: 280px 1fr 340px;
+      gap: 20px;
+      padding: 20px;
+      flex: 1;
+      max-width: 1800px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    @media (max-width: 1200px) {
+      .container {
+        grid-template-columns: 1fr 340px;
+      }
+      .sidebar-left {
+        display: none;
+      }
+    }
+
+    @media (max-width: 850px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Glass Panels */
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(20px);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    .panel-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    .panel-title i {
+      color: var(--accent-secondary);
+    }
+
+    /* ============================================================
+       PLATFORMS INTEGRATION SIDEBAR
+       ============================================================ */
+    .platform-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+
+    .platform-card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .platform-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .platform-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .tiktok-bg { background: #000; color: #ff0050; border: 1px solid #00f2fe; }
+    .twitch-bg { background: #6441a5; color: #fff; }
+    .kick-bg { background: #53fc18; color: #000; }
+    .kotcha-bg { background: var(--accent-purple); color: #fff; }
+
+    .platform-status {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+    }
+
+    .platform-status.connected {
+      background: rgba(0, 255, 102, 0.15);
+      color: #00ff66;
+    }
+
+    /* ============================================================
+       GAME STAGE (CENTER CONTENT)
+       ============================================================ */
+    .game-stage {
+      position: relative;
+      background: radial-gradient(circle at center, rgba(30, 35, 60, 0.6) 0%, rgba(10, 11, 16, 0.9) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      min-height: 480px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    .stage-header {
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.3);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .game-title-active {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.4rem;
+      color: var(--accent-secondary);
+      text-shadow: 0 0 10px var(--glow-secondary);
+    }
+
+    .stage-viewport {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      text-align: center;
+    }
+
+    /* Game Selection Cards */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      width: 100%;
+    }
+
+    .game-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 15px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .game-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-primary);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px var(--glow-primary);
+    }
+
+    .game-card.active {
+      border-color: var(--accent-secondary);
+      background: rgba(0, 240, 255, 0.1);
+      box-shadow: 0 0 20px var(--glow-secondary);
+    }
+
+    .game-card i {
+      font-size: 1.8rem;
+      color: var(--accent-secondary);
+    }
+
+    .game-card span {
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    /* Voting Mechanics UI */
+    .vote-bars {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .vote-option {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .vote-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+    }
+
+    .vote-progress-bg {
+      height: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .vote-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* Number Guess UI */
+    .guess-box {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 25px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .guess-input-group {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .guess-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 10px 15px;
+      color: #fff;
+      font-size: 1.2rem;
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      outline: none;
+    }
+
+    .guess-input:focus {
+      border-color: var(--accent-secondary);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-purple));
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px var(--glow-primary);
+    }
+
+    /* ============================================================
+       RIGHT SIDEBAR: LIVE CHAT & LEADERBOARD
+       ============================================================ */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 500px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-right: 5px;
+      max-height: 400px;
+    }
+
+    .chat-msg {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      border-right: 3px solid var(--border-color);
+      font-size: 0.88rem;
+      line-height: 1.4;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chat-msg.tiktok { border-color: #ff0050; }
+    .chat-msg.twitch { border-color: #6441a5; }
+    .chat-msg.kick { border-color: #53fc18; }
+    .chat-msg.vip { border-color: var(--accent-gold); background: rgba(255, 183, 0, 0.05); }
+
+    .chat-user {
+      font-weight: 700;
+      color: var(--accent-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+
+    .chat-badge {
+      font-size: 0.65rem;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: var(--accent-gold);
+      color: #000;
+      font-weight: 900;
+    }
+
+    .chat-input-area {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .chat-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      color: #fff;
+      outline: none;
+      font-size: 0.85rem;
+    }
+
+    /* Leaderboard Tab */
+    .leaderboard-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .leaderboard-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+    }
+
+    .rank {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      color: var(--accent-gold);
+      width: 20px;
+    }
+
+    /* ============================================================
+       SUBSCRIPTION MODAL
+       ============================================================ */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .subscription-card {
+      background: var(--bg-card);
+      border: 1px solid var(--accent-gold);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      max-width: 450px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(255, 183, 0, 0.2);
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .sub-tiers {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .sub-tier-option {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .sub-tier-option:hover, .sub-tier-option.selected {
+      border-color: var(--accent-gold);
+      background: rgba(255, 183, 0, 0.08);
+    }
+
+  </style>
 </head>
 <body>
 
-  <!-- Top Navigation -->
-  <header class="app-header">
-    <div class="logo">
-      <span>KOTCHA</span> <small>v8.0.0</small>
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo"><i class="fa-solid fa-gamepad"></i> KOTCHA</div>
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        <span>متصل بالبث المباشر</span>
+      </div>
     </div>
-    <div class="room-status-badge">
-      <span id="connection-status" class="status-dot offline"></span>
-      <span id="status-text">غير متصل</span>
+
+    <div class="header-controls">
+      <button class="sub-btn" onclick="toggleSubModal()">
+        <i class="fa-solid fa-crown"></i> اشتراك VIP
+      </button>
     </div>
   </header>
 
+  <!-- ============================================================
+       MAIN CONTAINER
+       ============================================================ -->
   <div class="container">
-
-    <!-- Sidebar Controls (Streamer / Admin) -->
-    <aside class="sidebar">
-      <h2>لوحة تحكم الغرفة</h2>
+    
+    <!-- LEFT SIDEBAR: PLATFORMS & SYSTEM -->
+    <aside class="panel sidebar-left">
+      <div class="panel-title">
+        <i class="fa-solid fa-satellite-dish"></i> منصات البث المربوطة
+      </div>
       
-      <div class="card">
-        <h3>1. إعداد الغرفة</h3>
-        <div class="form-group">
-          <label for="room-id-input">معرّف الغرفة (Room ID):</label>
-          <input type="text" id="room-id-input" placeholder="مثال: main-room">
+      <div class="platform-card">
+        <div class="platform-info">
+          <div class="platform-icon tiktok-bg"><i class="fa-brands fa-tiktok"></i></div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.9rem;">TikTok Live</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">تفاعل الدردشة والهدايا</div>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="worker-url-input">رابط الـ Worker (Domain):</label>
-          <input type="text" id="worker-url-input" placeholder="https://kotcha-worker.subdomain.workers.dev">
-        </div>
-        <div class="btn-group">
-          <button id="btn-create-room" class="btn btn-primary">إنشاء / ربط الغرفة</button>
-          <button id="btn-connect-ws" class="btn btn-secondary">اتصال WebSocket</button>
-        </div>
+        <span class="platform-status connected">متصل</span>
       </div>
 
-      <div class="card">
-        <h3>2. رمز المالك (Owner Token)</h3>
-        <div class="form-group">
-          <input type="password" id="owner-token-input" placeholder="Bearer Token...">
+      <div class="platform-card">
+        <div class="platform-info">
+          <div class="platform-icon twitch-bg"><i class="fa-brands fa-twitch"></i></div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.9rem;">Twitch</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">أوامر الـ Chat</div>
+          </div>
         </div>
+        <span class="platform-status connected">متصل</span>
       </div>
 
-      <div class="card">
-        <h3>3. إدارة الألعاب</h3>
-        <div class="form-group">
-          <label for="game-type-select">نوع اللعبة:</label>
-          <select id="game-type-select">
-            <option value="VOTE">التصويت (VOTE)</option>
-            <option value="NUMBER_GUESS">تخمين الرقم (NUMBER_GUESS)</option>
-            <option value="WORD_BATTLE">معركة الكلمات (WORD_BATTLE)</option>
-          </select>
+      <div class="platform-card">
+        <div class="platform-info">
+          <div class="platform-icon kick-bg"><i class="fa-solid fa-bolt"></i></div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.9rem;">Kick Stream</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">تفاعل مباشر</div>
+          </div>
         </div>
-        
-        <div id="word-battle-group" class="form-group hidden">
-          <label for="target-word-input">الكلمة المطلوبة:</label>
-          <input type="text" id="target-word-input" placeholder="أدخل الكلمة السرية">
-        </div>
+        <span class="platform-status connected">متصل</span>
+      </div>
 
-        <div class="btn-group">
-          <button id="btn-start-game" class="btn btn-success">بدء اللعبة</button>
-          <button id="btn-stop-game" class="btn btn-danger">إيقاف</button>
-          <button id="btn-reset-game" class="btn btn-warning">تصفير</button>
+      <div class="panel-title" style="margin-top: 15px;">
+        <i class="fa-solid fa-gamepad"></i> قائمة الألعاب المتاحة
+      </div>
+
+      <div class="games-grid">
+        <div class="game-card active" onclick="switchGame('VOTE')">
+          <i class="fa-solid fa-check-to-slot"></i>
+          <span>التصويت المباشر</span>
+        </div>
+        <div class="game-card" onclick="switchGame('NUMBER_GUESS')">
+          <i class="fa-solid fa-arrow-up-9-1"></i>
+          <span>تخمين الرقم</span>
+        </div>
+        <div class="game-card" onclick="switchGame('WORD_BATTLE')">
+          <i class="fa-solid fa-font"></i>
+          <span>معركة الكلمات</span>
+        </div>
+        <div class="game-card" onclick="switchGame('QUIZ')">
+          <i class="fa-solid fa-brain"></i>
+          <span>أسئلة وإجابات</span>
         </div>
       </div>
     </aside>
 
-    <!-- Main Content Area -->
-    <main class="main-content">
+    <!-- CENTER: GAME STAGE -->
+    <main class="game-stage">
+      <div class="stage-header">
+        <div class="game-title-active" id="activeGameTitle">
+          <i class="fa-solid fa-fire"></i> لعبة التصويت التفاعلي
+        </div>
+        <div style="font-size: 0.85rem; color: var(--text-muted);" id="viewerCount">
+          <i class="fa-solid fa-users"></i> 1,245 مشاهد يشارك الآن
+        </div>
+      </div>
 
-      <!-- Stats Bar -->
-      <section class="stats-grid">
-        <div class="stat-card">
-          <span class="stat-title">المشاهدون</span>
-          <span class="stat-value" id="stat-viewers">0</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-title">اللعبة الحالية</span>
-          <span class="stat-value" id="stat-game-type">لا يوجد</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-title">حالة اللعبة</span>
-          <span class="stat-value" id="stat-game-active">متوقفة</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-title">إجمالي الاصوات</span>
-          <span class="stat-value" id="stat-total-votes">0</span>
-        </div>
-      </section>
-
-      <!-- Active Game Area -->
-      <section class="card game-display-area">
-        <h2>شاشة التفاعل الحية (Interactive Area)</h2>
-
-        <!-- Vote Panel -->
-        <div id="vote-panel" class="game-panel hidden">
-          <h3>تصويت الجمهور (اختر من 1 إلى 5)</h3>
-          <div class="vote-buttons">
-            <button class="btn btn-vote" data-value="1">خيار 1</button>
-            <button class="btn btn-vote" data-value="2">خيار 2</button>
-            <button class="btn btn-vote" data-value="3">خيار 3</button>
-            <button class="btn btn-vote" data-value="4">خيار 4</button>
-            <button class="btn btn-vote" data-value="5">خيار 5</button>
+      <div class="stage-viewport" id="gameViewport">
+        <!-- Dynamic Game Content Rendered via JS -->
+        <div class="vote-bars">
+          <h3 style="margin-bottom: 15px;">ما هو خيارك المفضل للبث القادم؟</h3>
+          
+          <div class="vote-option" onclick="castVote(1)">
+            <div class="vote-info">
+              <span>1. لعبة رعب ممتعة</span>
+              <span id="vote-count-1">45% (120 صوت)</span>
+            </div>
+            <div class="vote-progress-bg">
+              <div class="vote-progress-fill" id="vote-bar-1" style="width: 45%;"></div>
+            </div>
           </div>
-          <div class="vote-results">
-            <div class="vote-bar-wrapper"><span>1:</span><div class="bar"><div id="bar-1" class="fill"></div></div><span id="val-1">0</span></div>
-            <div class="vote-bar-wrapper"><span>2:</span><div class="bar"><div id="bar-2" class="fill"></div></div><span id="val-2">0</span></div>
-            <div class="vote-bar-wrapper"><span>3:</span><div class="bar"><div id="bar-3" class="fill"></div></div><span id="val-3">0</span></div>
-            <div class="vote-bar-wrapper"><span>4:</span><div class="bar"><div id="bar-4" class="fill"></div></div><span id="val-4">0</span></div>
-            <div class="vote-bar-wrapper"><span>5:</span><div class="bar"><div id="bar-5" class="fill"></div></div><span id="val-5">0</span></div>
-          </div>
-        </div>
 
-        <!-- Number Guess Panel -->
-        <div id="guess-panel" class="game-panel hidden">
-          <h3>تخمين الرقم (من 1 إلى 100)</h3>
-          <div class="input-inline">
-            <input type="number" id="guess-input" min="1" max="100" placeholder="أدخل رقمك...">
-            <button id="btn-submit-guess" class="btn btn-primary">إرسال التخمين</button>
+          <div class="vote-option" onclick="castVote(2)">
+            <div class="vote-info">
+              <span>2. تحدي الأسئلة والسريع</span>
+              <span id="vote-count-2">30% (80 صوت)</span>
+            </div>
+            <div class="vote-progress-bg">
+              <div class="vote-progress-fill" id="vote-bar-2" style="width: 30%;"></div>
+            </div>
           </div>
-          <p id="guess-feedback" class="feedback-msg"></p>
-        </div>
-      </section>
 
-      <!-- Chat & Events Grid -->
-      <section class="bottom-grid">
-        <!-- Live Chat -->
-        <div class="card chat-box">
-          <h3>الدردشة الحية</h3>
-          <div id="chat-messages" class="messages-container"></div>
-          <div class="chat-input-row">
-            <input type="text" id="chat-input" placeholder="اكتب رسالتك هنا...">
-            <button id="btn-send-chat" class="btn btn-primary">إرسال</button>
+          <div class="vote-option" onclick="castVote(3)">
+            <div class="vote-info">
+              <span>3. لعب جماعي مع المشاهدين</span>
+              <span id="vote-count-3">25% (65 صوت)</span>
+            </div>
+            <div class="vote-progress-bg">
+              <div class="vote-progress-fill" id="vote-bar-3" style="width: 25%;"></div>
+            </div>
           </div>
         </div>
-
-        <!-- System Logs -->
-        <div class="card event-logs">
-          <h3>سجل الأحداث (Event Log)</h3>
-          <div id="log-messages" class="messages-container"></div>
-        </div>
-      </section>
-
+      </div>
     </main>
+
+    <!-- RIGHT SIDEBAR: LIVE CHAT & LEADERBOARD -->
+    <aside class="panel">
+      <div class="panel-title">
+        <i class="fa-solid fa-comments"></i> الدردشة المباشرة
+      </div>
+
+      <div class="chat-container">
+        <div class="chat-messages" id="chatBox">
+          <div class="chat-msg tiktok">
+            <div class="chat-user"><i class="fa-brands fa-tiktok"></i> أحمد_الغامدي</div>
+            خيار رقم 1 أكيد! متحمس للعبة الرعب 🔥
+          </div>
+          <div class="chat-msg vip">
+            <div class="chat-user"><span class="chat-badge">VIP</span> سارة_الخالد</div>
+            صوتي للأسئلة والأجوبة 🧠✨
+          </div>
+          <div class="chat-msg twitch">
+            <div class="chat-user"><i class="fa-brands fa-twitch"></i> GamerX_99</div>
+            اخترت 3 نبي نلعب معك!
+          </div>
+        </div>
+
+        <div class="chat-input-area">
+          <input type="text" class="chat-input" id="chatInput" placeholder="أرسل رسالة أو شارك باللعبة..." onkeypress="handleChatKey(event)">
+          <button class="btn" onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+
+      <div class="panel-title" style="margin-top: 15px;">
+        <i class="fa-solid fa-trophy"></i> لائحة المتصدرين
+      </div>
+
+      <div class="leaderboard-list" id="leaderboard">
+        <div class="leaderboard-item">
+          <div style="display:flex; align-items:center; gap: 8px;">
+            <span class="rank">#1</span>
+            <span>سارة_الخالد</span>
+          </div>
+          <span style="color: var(--accent-gold); font-weight:700;">1,450 نقطة</span>
+        </div>
+        <div class="leaderboard-item">
+          <div style="display:flex; align-items:center; gap: 8px;">
+            <span class="rank" style="color: #c0c0c0;">#2</span>
+            <span>GamerX_99</span>
+          </div>
+          <span style="color: var(--accent-gold); font-weight:700;">1,200 نقطة</span>
+        </div>
+        <div class="leaderboard-item">
+          <div style="display:flex; align-items:center; gap: 8px;">
+            <span class="rank" style="color: #cd7f32;">#3</span>
+            <span>أحمد_الغامدي</span>
+          </div>
+          <span style="color: var(--accent-gold); font-weight:700;">980 نقطة</span>
+        </div>
+      </div>
+    </aside>
+
   </div>
 
-  <script src="app.js"></script>
+  <!-- ============================================================
+       SUBSCRIPTION MODAL
+       ============================================================ -->
+  <div class="modal-overlay" id="subModal">
+    <div class="subscription-card">
+      <button class="modal-close" onclick="toggleSubModal()"><i class="fa-solid fa-xmark"></i></button>
+      <i class="fa-solid fa-crown" style="font-size: 3rem; color: var(--accent-gold); margin-bottom: 10px;"></i>
+      <h2>اشتراك الداعمين VIP</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">احصل على شارات مميزة، نقاط مضاعفة في الألعاب، وإمكانية التحكم بالألعاب المباشرة!</p>
+
+      <div class="sub-tiers">
+        <div class="sub-tier-option selected">
+          <div>
+            <div style="font-weight: 700;">الاشتراك الشهري الذهبي</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">شارات VIP + نقاط 2x</div>
+          </div>
+          <div style="font-weight: 900; color: var(--accent-gold);">$4.99 / شهر</div>
+        </div>
+
+        <div class="sub-tier-option">
+          <div>
+            <div style="font-weight: 700;">الاشتراك الداعم الماسي</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">شارات خاصة + التحكم بالألعاب</div>
+          </div>
+          <div style="font-weight: 900; color: var(--accent-gold);">$9.99 / شهر</div>
+        </div>
+      </div>
+
+      <button class="btn" style="width: 100%; background: linear-gradient(135deg, var(--accent-gold), #ff6a00); color: #000;" onclick="confirmSub()">
+        تأكيد الاشتراك الآن
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       JAVASCRIPT LOGIC & INTEGRATION
+       ============================================================ -->
+  <script>
+    // ============================================================
+    // CONFIGURATION & INTEGRATED BACKEND DATA
+    // ============================================================
+    const CONFIG = {
+      workerUrl: "https://kotcha.ig999x.workers.dev",
+      webPagesUrl: "https://kotcha.pages.dev",
+      roomId: "default-live-room",
+      version: "8.0.0"
+    };
+
+    let currentGame = "VOTE";
+    let ws = null;
+    let votes = [120, 80, 65];
+
+    // ============================================================
+    // INITIALIZATION & WEBSOCKET AUTO-CONNECT
+    // ============================================================
+    window.addEventListener("DOMContentLoaded", () => {
+      initWebSocket();
+    });
+
+    function initWebSocket() {
+      const wsUrl = CONFIG.workerUrl.replace("https://", "wss://") + "/room/" + CONFIG.roomId;
+      
+      try {
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = () => {
+          console.log("KOTCHA WS Connected Successfully.");
+          // Send Auth Message
+          ws.send(JSON.stringify({
+            type: "AUTH",
+            platform: "kotcha",
+            user: { username: "Viewer_" + Math.floor(Math.random() * 1000) }
+          }));
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            handleIncomingWSMessage(data);
+          } catch(e) {
+            console.error("Error parsing WS message:", e);
+          }
+        };
+
+        ws.onclose = () => {
+          setTimeout(initWebSocket, 3000); // Reconnect loop
+        };
+      } catch (e) {
+        console.warn("WS Connection simulated (Running on standalone mode)");
+      }
+    }
+
+    function handleIncomingWSMessage(data) {
+      if (data.type === "CHAT") {
+        renderChatMessage(data.data);
+      } else if (data.type === "VOTE") {
+        updateVoteUI(data.votes);
+      }
+    }
+
+    // ============================================================
+    // GAME SWITCHING LOGIC
+    // ============================================================
+    function switchGame(gameType) {
+      currentGame = gameType;
+      
+      // Update UI Game Cards
+      document.querySelectorAll('.game-card').forEach(card => card.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+
+      const viewport = document.getElementById("gameViewport");
+      const title = document.getElementById("activeGameTitle");
+
+      if (gameType === 'VOTE') {
+        title.innerHTML = `<i class="fa-solid fa-check-to-slot"></i> لعبة التصويت التفاعلي`;
+        renderVoteGame(viewport);
+      } else if (gameType === 'NUMBER_GUESS') {
+        title.innerHTML = `<i class="fa-solid fa-arrow-up-9-1"></i> لعبة تخمين الرقم السرّي`;
+        renderNumberGuessGame(viewport);
+      } else if (gameType === 'WORD_BATTLE') {
+        title.innerHTML = `<i class="fa-solid fa-font"></i> معركة الكلمات السريعة`;
+        renderWordBattleGame(viewport);
+      } else if (gameType === 'QUIZ') {
+        title.innerHTML = `<i class="fa-solid fa-brain"></i> أسئلة وإجابات البث المباشر`;
+        renderQuizGame(viewport);
+      }
+    }
+
+    // Render Vote Game
+    function renderVoteGame(container) {
+      container.innerHTML = `
+        <div class="vote-bars">
+          <h3 style="margin-bottom: 15px;">ما هو خيارك المفضل للبث القادم؟</h3>
+          <div class="vote-option" onclick="castVote(0)">
+            <div class="vote-info">
+              <span>1. لعبة رعب ممتعة</span>
+              <span id="vote-count-0">45% (${votes[0]} صوت)</span>
+            </div>
+            <div class="vote-progress-bg">
+              <div class="vote-progress-fill" id="vote-bar-0" style="width: 45%;"></div>
+            </div>
+          </div>
+          <div class="vote-option" onclick="castVote(1)">
+            <div class="vote-info">
+              <span>2. تحدي الأسئلة والسريع</span>
+              <span id="vote-count-1">30% (${votes[1]} صوت)</span>
+            </div>
+            <div class="vote-progress-bg">
+              <div class="vote-progress-fill" id="vote-bar-1" style="width: 30%;"></div>
+            </div>
+          </div>
+          <div class="vote-option" onclick="castVote(2)">
+            <div class="vote-info">
+              <span>3. لعب جماعي مع المشاهدين</span>
+              <span id="vote-count-2">25% (${votes[2]} صوت)</span>
+            </div>
+            <div class="vote-progress-bg">
+              <div class="vote-progress-fill" id="vote-bar-2" style="width: 25%;"></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Render Number Guess Game
+    function renderNumberGuessGame(container) {
+      container.innerHTML = `
+        <div class="guess-box">
+          <i class="fa-solid fa-question-circle" style="font-size: 3rem; color: var(--accent-secondary);"></i>
+          <h3>خمن الرقم بين 1 و 100</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">أول مشاهد يخمن الرقم الصحيح يحصل على 500 نقطة!</p>
+          <div class="guess-input-group">
+            <input type="number" class="guess-input" id="guessInput" placeholder="50" min="1" max="100">
+            <button class="btn" onclick="submitGuess()">إرسال</button>
+          </div>
+          <div id="guessFeedback" style="font-weight: 700; margin-top: 10px;"></div>
+        </div>
+      `;
+    }
+
+    // Render Word Battle Game
+    function renderWordBattleGame(container) {
+      container.innerHTML = `
+        <div class="guess-box">
+          <i class="fa-solid fa-font" style="font-size: 3rem; color: var(--accent-primary);"></i>
+          <h3>تجميع الكلمة السريعة</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">ركّب الكلمة التالية من الحروف المبعثرة: <strong style="color: var(--accent-gold); font-size: 1.2rem;">(ت - ك - و - ك - ي)</strong></p>
+          <div class="guess-input-group">
+            <input type="text" class="guess-input" id="wordInput" placeholder="اكتب الكلمة هنا...">
+            <button class="btn" onclick="submitWord()">تأكيد</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Render Quiz Game
+    function renderQuizGame(container) {
+      container.innerHTML = `
+        <div class="guess-box" style="max-width: 500px;">
+          <i class="fa-solid fa-lightbulb" style="font-size: 3rem; color: var(--accent-gold);"></i>
+          <h3>سؤال البث السريع</h3>
+          <p style="font-size: 1rem; margin-bottom: 10px;">ما هي عاصمة ألعاب الفيديو والتكنولوجيا؟</p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;">
+            <button class="btn" style="background: rgba(255,255,255,0.05);" onclick="alert('إجابة خاطئة!')">طوكيو</button>
+            <button class="btn" style="background: rgba(255,255,255,0.05);" onclick="alert('إجابة خاطئة!')">سيول</button>
+            <button class="btn" style="background: rgba(255,255,255,0.05);" onclick="alert('إجابة صحيحة! +100 نقطة')">الرياض</button>
+            <button class="btn" style="background: rgba(255,255,255,0.05);" onclick="alert('إجابة خاطئة!')">سان فرانسيسكو</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // ============================================================
+    // GAME ACTIONS
+    // ============================================================
+    function castVote(index) {
+      votes[index]++;
+      const total = votes.reduce((a, b) => a + b, 0);
+
+      for (let i = 0; i < votes.length; i++) {
+        const pct = Math.round((votes[i] / total) * 100);
+        const bar = document.getElementById(`vote-bar-${i}`);
+        const count = document.getElementById(`vote-count-${i}`);
+        if (bar && count) {
+          bar.style.width = pct + "%";
+          count.innerText = `${pct}% (${votes[i]} صوت)`;
+        }
+      }
+
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "VOTE", value: index + 1 }));
+      }
+    }
+
+    function submitGuess() {
+      const val = document.getElementById('guessInput').value;
+      const feedback = document.getElementById('guessFeedback');
+      
+      if (!val) return;
+
+      if (parseInt(val) === 42) {
+        feedback.innerHTML = `<span style="color: #00ff66;">مبروك! التخمين صحيح 🎉</span>`;
+      } else if (parseInt(val) < 42) {
+        feedback.innerHTML = `<span style="color: var(--accent-gold);">الرقم المطلوب أكبر ⬆️</span>`;
+      } else {
+        feedback.innerHTML = `<span style="color: var(--accent-primary);">الرقم المطلوب أصغر ⬇️</span>`;
+      }
+    }
+
+    function submitWord() {
+      const val = document.getElementById('wordInput').value.trim();
+      if (val === "كوكيت" || val === "تيكتوك") {
+        alert("إجابة صحيحة وممتازة! تمت إضافة النقاط لحسابك.");
+      } else {
+        alert("حاول مرة أخرى!");
+      }
+    }
+
+    // ============================================================
+    // CHAT SYSTEM LOGIC
+    // ============================================================
+    function sendChatMessage() {
+      const input = document.getElementById("chatInput");
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      const chatObj = {
+        user: "أنت (المشاهد)",
+        message: msg,
+        platform: "kotcha",
+        isVip: true
+      };
+
+      renderChatMessage(chatObj);
+      input.value = "";
+
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "CHAT_MESSAGE", message: msg }));
+      }
+    }
+
+    function handleChatKey(e) {
+      if (e.key === "Enter") {
+        sendChatMessage();
+      }
+    }
+
+    function renderChatMessage(data) {
+      const chatBox = document.getElementById("chatBox");
+      const msgDiv = document.createElement("div");
+      msgDiv.className = `chat-msg ${data.isVip ? 'vip' : (data.platform || 'kotcha')}`;
+
+      msgDiv.innerHTML = `
+        <div class="chat-user">
+          ${data.isVip ? '<span class="chat-badge">VIP</span>' : ''}
+          ${data.user}
+        </div>
+        ${data.message}
+      `;
+
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // ============================================================
+    // MODAL CONTROLS
+    // ============================================================
+    function toggleSubModal() {
+      const modal = document.getElementById("subModal");
+      modal.classList.toggle("active");
+    }
+
+    function confirmSub() {
+      alert("شكرًا لدعمك البث! تم تفعيل اشتراك VIP بنجاح 🎉");
+      toggleSubModal();
+    }
+  </script>
 </body>
 </html>
