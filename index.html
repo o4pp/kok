@@ -273,4 +273,805 @@
     
     .chat-username {
       font-weight: 600;
-      font-size: 0.
+      font-size: 0.8rem;
+      color: #FF6B35;
+    }
+    
+    .chat-content {
+      color: #B0B0C8;
+      word-break: break-word;
+    }
+    
+    .chat-input-area {
+      padding: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .chat-input-area input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: white;
+      font-size: 0.9rem;
+    }
+    
+    .chat-input-area input:focus {
+      outline: none;
+      border-color: #FF6B35;
+    }
+    
+    /* Vote Game */
+    .vote-buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+    
+    .vote-btn {
+      padding: 1rem;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .vote-btn:hover {
+      border-color: #FF6B35;
+      transform: scale(1.05);
+      background: rgba(255, 107, 53, 0.1);
+    }
+    
+    .vote-results {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .vote-result {
+      text-align: center;
+      padding: 0.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 8px;
+    }
+    
+    .vote-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 0.25rem;
+    }
+    
+    .vote-bar-fill {
+      height: 100%;
+      background: linear-gradient(135deg, #FF6B35, #F7931E);
+      transition: width 0.5s ease;
+    }
+    
+    /* Number Guess */
+    .guess-input {
+      display: flex;
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+    
+    .guess-input input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: white;
+      font-size: 1rem;
+    }
+    
+    .guess-input input:focus {
+      outline: none;
+      border-color: #FF6B35;
+    }
+    
+    .guess-feedback {
+      text-align: center;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      font-weight: 600;
+    }
+    
+    .guess-feedback.win {
+      background: rgba(46, 213, 115, 0.2);
+      color: #2ED573;
+    }
+    
+    .guess-feedback.close {
+      background: rgba(255, 165, 0, 0.2);
+      color: #FFA500;
+    }
+    
+    .guess-feedback.higher {
+      background: rgba(255, 71, 87, 0.2);
+      color: #FF4757;
+    }
+    
+    .guess-feedback.lower {
+      background: rgba(52, 152, 219, 0.2);
+      color: #3498DB;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .stats-card {
+      background: rgba(26, 26, 46, 0.8);
+      border-radius: 12px;
+      padding: 1rem;
+    }
+    
+    .stats-card h4 {
+      margin-bottom: 0.5rem;
+      color: #B0B0C8;
+      font-size: 0.9rem;
+    }
+    
+    .stats-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.25rem 0;
+      color: #B0B0C8;
+      font-size: 0.9rem;
+    }
+    
+    .stats-value {
+      color: white;
+      font-weight: 600;
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      color: #6B6B8A;
+      font-size: 0.9rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .room-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+      
+      .nav-links {
+        display: none;
+      }
+      
+      .vote-buttons {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      
+      .vote-results {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+      
+      .main {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <div class="logo-icon">K</div>
+        <span>KOTCHA</span>
+      </div>
+      <div class="nav-links">
+        <a href="#">الرئيسية</a>
+        <a href="#">الغرف</a>
+        <a href="#">الألعاب</a>
+        <a href="#">المميزات</a>
+        <button class="btn btn-secondary" onclick="toggleTheme()">🌙</button>
+        <button class="btn btn-primary" onclick="joinRoom()">انضم للغرفة</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- Hero -->
+    <section class="hero">
+      <h1>مرحباً بك في <span>KOTCHA</span></h1>
+      <p>منصة البث التفاعلي التي تحول المشاهدين إلى لاعبين. جرب تجربة البث المباشر الممتعة الآن!</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="createRoom()">إنشاء غرفة جديدة</button>
+        <button class="btn btn-secondary" onclick="joinRoom()">انضم إلى غرفة</button>
+      </div>
+    </section>
+
+    <!-- Room -->
+    <section class="room-section" id="room-section">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <h3 style="margin:0;">🎮 غرفة اللعب</h3>
+          <div id="room-id-display" style="color:#B0B0C8; font-size:0.9rem;">معرف الغرفة: -</div>
+        </div>
+        <div id="connection-status" style="color:#2ED573;">🟢 متصل</div>
+      </div>
+      
+      <div class="room-grid">
+        <div class="game-area">
+          <div class="game-header">
+            <h4 style="margin:0;">اللعبة</h4>
+            <div class="game-controls">
+              <span class="status-badge waiting" id="game-status">⏳ في انتظار اللعبة</span>
+              <button class="btn btn-primary" id="start-game-btn" onclick="startGame('VOTE')" style="display:none;">ابدأ اللعبة</button>
+              <button class="btn btn-secondary" id="stop-game-btn" onclick="stopGame()" style="display:none;">إيقاف</button>
+            </div>
+          </div>
+          <div id="game-content">
+            <div style="text-align:center; padding:2rem; color:#B0B0C8;">
+              <p style="font-size:3rem; margin-bottom:1rem;">🎯</p>
+              <p>اللعبة غير نشطة حالياً</p>
+              <p style="font-size:0.9rem;">انتظر حتى يبدأ المضيف اللعبة</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="sidebar">
+          <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+              <div style="text-align:center; color:#6B6B8A; padding:2rem;">
+                💬 ابدأ المحادثة
+              </div>
+            </div>
+            <div class="chat-input-area">
+              <input type="text" id="chat-input" placeholder="اكتب رسالة..." maxlength="500" />
+              <button class="btn btn-primary" onclick="sendChat()">إرسال</button>
+            </div>
+          </div>
+          
+          <div class="stats-card">
+            <h4>📊 الإحصائيات</h4>
+            <div class="stats-item">
+              <span>المشاهدون</span>
+              <span class="stats-value" id="viewers-count">0</span>
+            </div>
+            <div class="stats-item">
+              <span>الرسائل</span>
+              <span class="stats-value" id="messages-count">0</span>
+            </div>
+            <div class="stats-item">
+              <span>الحالة</span>
+              <span class="stats-value" id="connection-status-text">🟢 متصل</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2024 KOTCHA - منصة البث التفاعلي | الإصدار 9.0.0</p>
+  </footer>
+
+  <script>
+    // ============================================================
+    // KOTCHA - Frontend JavaScript
+    // ============================================================
+    
+    // Configuration
+    const API_URL = 'https://kotcha.ig999x.workers.dev';
+    const WS_URL = 'wss://kotcha.ig999x.workers.dev';
+    
+    // State
+    let ws = null;
+    let roomId = null;
+    let userId = null;
+    let isOwner = false;
+    let gameState = null;
+    let messages = [];
+    let viewers = 0;
+    let connected = false;
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      // Create anonymous user
+      userId = 'user_' + Math.random().toString(36).substring(2, 10);
+      
+      // Check URL for room
+      const params = new URLSearchParams(window.location.search);
+      roomId = params.get('room') || generateRoomId();
+      
+      document.getElementById('room-id-display').textContent = `معرف الغرفة: ${roomId}`;
+      
+      // Connect WebSocket
+      connectWebSocket();
+      
+      // Setup chat input
+      document.getElementById('chat-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendChat();
+      });
+      
+      // Update stats periodically
+      setInterval(updateStats, 5000);
+    });
+    
+    // Generate room ID
+    function generateRoomId() {
+      return Math.random().toString(36).substring(2, 8).toUpperCase();
+    }
+    
+    // Toggle theme
+    function toggleTheme() {
+      document.body.style.background = 
+        document.body.style.background === '#0A0A1A' ? '#FFFFFF' : '#0A0A1A';
+      document.body.style.color = 
+        document.body.style.color === '#FFFFFF' ? '#0A0A1A' : '#FFFFFF';
+    }
+    
+    // ============================================================
+    // WEBSOCKET
+    // ============================================================
+    
+    function connectWebSocket() {
+      const wsUrl = `${WS_URL}/room/${roomId}`;
+      
+      try {
+        ws = new WebSocket(wsUrl);
+        
+        ws.onopen = () => {
+          connected = true;
+          console.log('WebSocket connected');
+          updateConnectionStatus(true);
+          authenticate();
+        };
+        
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            handleWebSocketMessage(data);
+          } catch (e) {
+            console.error('Failed to parse message:', e);
+          }
+        };
+        
+        ws.onclose = () => {
+          connected = false;
+          console.log('WebSocket disconnected');
+          updateConnectionStatus(false);
+          setTimeout(connectWebSocket, 3000);
+        };
+        
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+        };
+      } catch (error) {
+        console.error('Failed to connect:', error);
+      }
+    }
+    
+    function sendWebSocketMessage(data) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(data));
+      }
+    }
+    
+    function authenticate() {
+      sendWebSocketMessage({
+        type: 'AUTH',
+        user: {
+          id: userId,
+          username: 'Guest_' + Math.floor(Math.random() * 10000),
+          displayName: 'Guest_' + Math.floor(Math.random() * 10000)
+        }
+      });
+    }
+    
+    // ============================================================
+    // WEBSOCKET MESSAGE HANDLER
+    // ============================================================
+    
+    function handleWebSocketMessage(data) {
+      console.log('WebSocket message:', data);
+      
+      switch (data.type) {
+        case 'CONNECTED':
+          viewers = data.viewers || 0;
+          updateStats();
+          break;
+          
+        case 'AUTH_SUCCESS':
+          isOwner = data.isOwner || false;
+          if (isOwner) {
+            document.getElementById('start-game-btn').style.display = 'inline-block';
+          }
+          break;
+          
+        case 'CHAT':
+          if (data.data) {
+            messages.push(data.data);
+            renderChat();
+          }
+          break;
+          
+        case 'USER_JOINED':
+          viewers = data.viewers || viewers;
+          updateStats();
+          break;
+          
+        case 'USER_LEFT':
+          viewers = data.viewers || viewers;
+          updateStats();
+          break;
+          
+        case 'GAME_STARTED':
+        case 'GAME_STOPPED':
+        case 'GAME_RESET':
+          updateGameState();
+          break;
+          
+        case 'VOTE':
+          updateGameState();
+          break;
+          
+        case 'NUMBER_GUESS':
+          updateGameState();
+          break;
+          
+        case 'ERROR':
+          console.error('Server error:', data.error);
+          break;
+          
+        default:
+          console.log('Unhandled message type:', data.type);
+      }
+    }
+    
+    // ============================================================
+    // API METHODS
+    // ============================================================
+    
+    async function apiRequest(endpoint, options = {}) {
+      const url = `${API_URL}/room/${roomId}${endpoint}`;
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(options.headers || {})
+      };
+      
+      try {
+        const response = await fetch(url, {
+          ...options,
+          headers,
+          body: options.body ? JSON.stringify(options.body) : undefined
+        });
+        return await response.json();
+      } catch (error) {
+        console.error('API request failed:', error);
+        throw error;
+      }
+    }
+    
+    // ============================================================
+    // GAME FUNCTIONS
+    // ============================================================
+    
+    async function updateGameState() {
+      try {
+        const response = await apiRequest('/api/game/state');
+        if (response.success) {
+          gameState = response.game;
+          renderGame();
+        }
+      } catch (error) {
+        console.error('Failed to update game state:', error);
+      }
+    }
+    
+    async function startGame(gameType = 'VOTE') {
+      try {
+        const response = await apiRequest('/api/room/start-game', {
+          method: 'POST',
+          body: { gameType }
+        });
+        if (response.success) {
+          gameState = response.game;
+          renderGame();
+        }
+      } catch (error) {
+        console.error('Failed to start game:', error);
+        alert('Failed to start game. Please try again.');
+      }
+    }
+    
+    async function stopGame() {
+      try {
+        const response = await apiRequest('/api/room/stop-game', {
+          method: 'POST'
+        });
+        if (response.success) {
+          gameState = null;
+          renderGame();
+        }
+      } catch (error) {
+        console.error('Failed to stop game:', error);
+      }
+    }
+    
+    async function castVote(value) {
+      try {
+        const response = await apiRequest('/api/vote/cast', {
+          method: 'POST',
+          body: {
+            value,
+            user: {
+              id: userId,
+              username: 'Guest_' + userId.substring(0, 6)
+            }
+          }
+        });
+        if (response.success) {
+          gameState = response.game;
+          renderGame();
+        }
+      } catch (error) {
+        console.error('Failed to cast vote:', error);
+      }
+    }
+    
+    async function guessNumber() {
+      const input = document.getElementById('guess-input');
+      const guess = parseInt(input?.value);
+      if (!guess || guess < 1 || guess > 100) {
+        alert('Please enter a number between 1 and 100');
+        return;
+      }
+      
+      try {
+        const response = await apiRequest('/api/number/guess', {
+          method: 'POST',
+          body: {
+            guess,
+            user: {
+              id: userId,
+              username: 'Guest_' + userId.substring(0, 6)
+            }
+          }
+        });
+        if (response.success) {
+          gameState = response.game;
+          renderGame();
+          if (input) input.value = '';
+        }
+      } catch (error) {
+        console.error('Failed to guess:', error);
+      }
+    }
+    
+    // ============================================================
+    // CHAT FUNCTIONS
+    // ============================================================
+    
+    function sendChat() {
+      const input = document.getElementById('chat-input');
+      const message = input?.value?.trim();
+      if (!message) return;
+      
+      sendWebSocketMessage({
+        type: 'CHAT_MESSAGE',
+        message: message
+      });
+      
+      if (input) input.value = '';
+    }
+    
+    // ============================================================
+    // RENDER FUNCTIONS
+    // ============================================================
+    
+    function renderGame() {
+      const container = document.getElementById('game-content');
+      const statusBadge = document.getElementById('game-status');
+      
+      if (!gameState || !gameState.active) {
+        statusBadge.className = 'status-badge waiting';
+        statusBadge.textContent = '⏳ في انتظار اللعبة';
+        container.innerHTML = `
+          <div style="text-align:center; padding:2rem; color:#B0B0C8;">
+            <p style="font-size:3rem; margin-bottom:1rem;">🎯</p>
+            <p>اللعبة غير نشطة حالياً</p>
+            <p style="font-size:0.9rem;">انتظر حتى يبدأ المضيف اللعبة</p>
+          </div>
+        `;
+        return;
+      }
+      
+      statusBadge.className = 'status-badge live';
+      statusBadge.textContent = '🟢 نشطة';
+      
+      switch (gameState.type) {
+        case 'VOTE':
+          renderVoteGame(container);
+          break;
+        case 'NUMBER_GUESS':
+          renderNumberGuess(container);
+          break;
+        default:
+          container.innerHTML = `
+            <div style="text-align:center; padding:2rem; color:#B0B0C8;">
+              <p style="font-size:2rem; margin-bottom:1rem;">🎮</p>
+              <p>اللعبة: ${gameState.type}</p>
+              <p style="font-size:0.9rem;">اللعبة نشطة حالياً</p>
+            </div>
+          `;
+      }
+    }
+    
+    function renderVoteGame(container) {
+      const votes = gameState.votes || [0, 0, 0, 0, 0];
+      const total = votes.reduce((a, b) => a + b, 0) || 1;
+      
+      container.innerHTML = `
+        <div>
+          <h4 style="margin-bottom:1rem;">📊 التصويت</h4>
+          <div class="vote-buttons">
+            ${[1, 2, 3, 4, 5].map(i => `
+              <button class="vote-btn" onclick="castVote(${i})">
+                ${i}
+              </button>
+            `).join('')}
+          </div>
+          <div class="vote-results">
+            ${votes.map((count, i) => `
+              <div class="vote-result">
+                <div style="font-weight:700;">${i + 1}</div>
+                <div class="vote-bar">
+                  <div class="vote-bar-fill" style="width: ${(count / total * 100)}%;"></div>
+                </div>
+                <div style="font-size:0.8rem; color:#B0B0C8;">${count}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+    
+    function renderNumberGuess(container) {
+      container.innerHTML = `
+        <div>
+          <h4 style="margin-bottom:1rem;">🔢 تخمين الرقم</h4>
+          <p style="color:#B0B0C8; margin-bottom:1rem;">خمن رقم بين 1 و 100</p>
+          <div class="guess-input">
+            <input type="number" id="guess-input" min="1" max="100" placeholder="أدخل رقم..." />
+            <button class="btn btn-primary" onclick="guessNumber()">خمن</button>
+          </div>
+          <div id="guess-feedback"></div>
+        </div>
+      `;
+    }
+    
+    function renderChat() {
+      const container = document.getElementById('chat-messages');
+      
+      if (messages.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; color:#6B6B8A; padding:2rem;">
+            💬 ابدأ المحادثة
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = messages.slice(-50).map(msg => `
+        <div class="chat-message">
+          <div class="chat-avatar">${(msg.user?.displayName || 'U')[0]}</div>
+          <div>
+            <div class="chat-username">${msg.user?.displayName || 'Anonymous'}</div>
+            <div class="chat-content">${escapeHtml(msg.message)}</div>
+          </div>
+        </div>
+      `).join('');
+      
+      container.scrollTop = container.scrollHeight;
+    }
+    
+    // ============================================================
+    // UTILITY FUNCTIONS
+    // ============================================================
+    
+    function updateStats() {
+      document.getElementById('viewers-count').textContent = viewers;
+      document.getElementById('messages-count').textContent = messages.length;
+    }
+    
+    function updateConnectionStatus(connected) {
+      const status = document.getElementById('connection-status');
+      const statusText = document.getElementById('connection-status-text');
+      
+      if (connected) {
+        status.textContent = '🟢 متصل';
+        status.style.color = '#2ED573';
+        statusText.textContent = '🟢 متصل';
+      } else {
+        status.textContent = '🔴 غير متصل';
+        status.style.color = '#FF4757';
+        statusText.textContent = '🔴 غير متصل';
+      }
+    }
+    
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // ============================================================
+    // ROOM FUNCTIONS
+    // ============================================================
+    
+    async function createRoom() {
+      try {
+        const response = await fetch(`${API_URL}/api/room/create`, {
+          method: 'POST'
+        });
+        const data = await response.json();
+        if (data.success) {
+          roomId = data.roomId;
+          window.location.href = `/?room=${roomId}`;
+        }
+      } catch (error) {
+        console.error('Failed to create room:', error);
+        alert('فشل إنشاء الغرفة. حاول مرة أخرى.');
+      }
+    }
+    
+    function joinRoom() {
+      const room = prompt('أدخل معرف الغرفة:');
+      if (room) {
+        window.location.href = `/?room=${room.toUpperCase()}`;
+      }
+    }
+    
+    // Export functions to window
+    window.createRoom = createRoom;
+    window.joinRoom = joinRoom;
+    window.startGame = startGame;
+    window.stopGame = stopGame;
+    window.castVote = castVote;
+    window.guessNumber = guessNumber;
+    window.sendChat = sendChat;
+    window.toggleTheme = toggleTheme;
+    
+    console.log('KOTCHA v9.0.0 loaded successfully!');
+    console.log('Room ID:', roomId);
+    console.log('User ID:', userId);
+  </script>
+</body>
+</html>
