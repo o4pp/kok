@@ -1,509 +1,1932 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KOTCHA Live v8.0 | البث المباشر التفاعلي والألعاب</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Tajawal & Press Start 2P -->
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <!-- Canvas Confetti for Game Wins -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            dark: '#0B0E14',
-                            card: '#151921',
-                            accent: '#6366F1',
-                            pink: '#EC4899',
-                            cyan: '#06B6D4',
-                            green: '#10B981',
-                            gold: '#F59E0B'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Tajawal', 'sans-serif'],
-                        pixel: ['"Press Start 2P"', 'cursive']
-                    }
-                }
-            }
-        }
-    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KOTCHA - منصة ألعاب البث المباشر التفاعلية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
+        /* ============================================================
+           KOTCHA - FULL STYLES v10.0.0
+           ============================================================ */
+        :root {
+            --brand-primary: #FF6B35;
+            --brand-secondary: #F7931E;
+            --brand-gradient: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            --brand-glow: rgba(255, 107, 53, 0.3);
+            --brand-dark: #0A0A1A;
+            --brand-dark-secondary: #12122A;
+            
+            --bg-primary: #0A0A1A;
+            --bg-secondary: #12122A;
+            --bg-card: rgba(18, 18, 42, 0.95);
+            --bg-glass: rgba(255, 255, 255, 0.05);
+            --bg-hover: rgba(255, 255, 255, 0.08);
+            
+            --text-primary: #FFFFFF;
+            --text-secondary: #B0B0C8;
+            --text-muted: #6B6B8A;
+            
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(255, 107, 53, 0.3);
+            
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+            --shadow-md: 0 8px 32px rgba(0,0,0,0.3);
+            --shadow-lg: 0 16px 64px rgba(0,0,0,0.4);
+            --shadow-glow: 0 0 40px rgba(255,107,53,0.15);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --radius-full: 9999px;
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #F0F2F5;
+            --bg-secondary: #FFFFFF;
+            --bg-card: rgba(255,255,255,0.95);
+            --bg-glass: rgba(0,0,0,0.03);
+            --bg-hover: rgba(0,0,0,0.05);
+            --text-primary: #1A1A2E;
+            --text-secondary: #4A4A6A;
+            --text-muted: #8A8AAA;
+            --border-color: rgba(0,0,0,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body {
-            background-color: #0B0E14;
-            color: #F3F4F6;
-            font-family: 'Tajawal', sans-serif;
+            font-family: 'Cairo', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
             overflow-x: hidden;
+            transition: var(--transition);
+            min-height: 100vh;
         }
-        .glow-accent { box-shadow: 0 0 25px -5px rgba(99, 102, 241, 0.4); }
-        .glow-pink { box-shadow: 0 0 25px -5px rgba(236, 72, 153, 0.4); }
-        .glass-panel {
-            background: rgba(21, 25, 33, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+
+        ::selection { background: var(--brand-primary); color: white; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--brand-gradient); border-radius: 4px; }
+
+        .gradient-text {
+            background: var(--brand-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #0B0E14; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #2D3748; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6366F1; }
-        @keyframes pulse-fast {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; width: 100%; }
+
+        /* ============================================================
+           BUTTONS
+           ============================================================ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
         }
-        .animate-pulse-fast { animation: pulse-fast 0.8s infinite; }
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .btn:hover::after { opacity: 1; }
+        .btn-primary {
+            background: var(--brand-gradient);
+            color: white;
+            box-shadow: 0 4px 20px rgba(255,107,53,0.3);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(255,107,53,0.4); }
+        .btn-secondary {
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        .btn-secondary:hover { background: var(--bg-hover); border-color: var(--brand-primary); }
+        .btn-outline {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--brand-primary);
+        }
+        .btn-outline:hover { background: var(--brand-primary); color: white; }
+        .btn-glass {
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        .btn-glass:hover { background: var(--bg-hover); transform: translateY(-2px); }
+        .btn-success { background: #2ED573; color: white; }
+        .btn-danger { background: #FF4757; color: white; }
+        .btn-gold { background: linear-gradient(135deg, #F9CA24, #F0932B); color: white; }
+        .btn-lg { padding: 0.8rem 2.2rem; font-size: 1rem; }
+        .btn-sm { padding: 0.3rem 0.8rem; font-size: 0.8rem; }
+        .btn-block { width: 100%; justify-content: center; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+        /* ============================================================
+           NAVBAR
+           ============================================================ */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10,10,26,0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 0;
+            transition: var(--transition);
+        }
+        [data-theme="light"] .navbar { background: rgba(255,255,255,0.92); }
+        .navbar.scrolled { box-shadow: var(--shadow-md); }
+        .navbar .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--brand-gradient);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: white;
+            box-shadow: 0 4px 20px rgba(255,107,53,0.3);
+            animation: pulseIcon 2s ease-in-out infinite;
+        }
+        @keyframes pulseIcon {
+            0%, 100% { box-shadow: 0 4px 20px rgba(255,107,53,0.3); }
+            50% { box-shadow: 0 4px 40px rgba(255,107,53,0.6); }
+        }
+        .brand-name { font-size: 1.2rem; font-weight: 800; color: var(--text-primary); }
+        .brand-status {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: rgba(46,213,115,0.15);
+            padding: 0.15rem 0.6rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6rem;
+            color: #2ED573;
+            font-weight: 700;
+        }
+        .brand-status .dot { width: 6px; height: 6px; background: #2ED573; border-radius: 50%; animation: blink 1s ease-in-out infinite; }
+        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 600;
+            font-size: 0.85rem;
+            position: relative;
+            padding: 0.2rem 0;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--brand-primary); }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--brand-gradient);
+            transition: var(--transition);
+        }
+        .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+        .theme-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        .theme-toggle:hover { background: var(--brand-primary); color: white; border-color: var(--brand-primary); }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            position: relative;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--brand-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: white;
+            background: var(--brand-gradient);
+        }
+        .user-name { font-weight: 600; font-size: 0.85rem; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.5rem;
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: var(--transition);
+            box-shadow: var(--shadow-lg);
+        }
+        .user-menu:hover .user-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+        .user-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            font-size: 0.85rem;
+        }
+        .user-dropdown a:hover { background: var(--bg-hover); color: var(--brand-primary); }
+        .user-dropdown hr { border: none; border-top: 1px solid var(--border-color); margin: 0.3rem 0; }
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        /* ============================================================
+           HERO
+           ============================================================ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 80px 0 0;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(255,107,53,0.08), transparent 60%),
+                        radial-gradient(circle at 80% 50%, rgba(247,147,30,0.05), transparent 60%);
+            z-index: 0;
+        }
+        .hero .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-content { position: relative; }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-color);
+            padding: 0.3rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            color: var(--brand-primary);
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+        }
+        .hero-title .highlight {
+            position: relative;
+            display: inline-block;
+        }
+        .hero-title .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: var(--brand-gradient);
+            opacity: 0.3;
+            border-radius: 4px;
+        }
+        .hero-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+        .hero-stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease-out 0.3s both;
+        }
+        .stat-item { display: flex; flex-direction: column; }
+        .stat-number { font-size: 1.8rem; font-weight: 800; color: var(--brand-primary); }
+        .stat-label { font-size: 0.8rem; color: var(--text-secondary); }
+        .hero-actions {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.6s ease-out 0.4s both;
+        }
+
+        .hero-visual {
+            position: relative;
+            height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hero-orb {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,107,53,0.15), transparent 70%);
+            border-radius: 50%;
+            animation: orbFloat 8s ease-in-out infinite;
+        }
+        .hero-orb.orb-2 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(247,147,30,0.1), transparent 70%);
+            animation-delay: -4s;
+        }
+        @keyframes orbFloat { 0%,100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ============================================================
+           PLATFORM SELECTOR
+           ============================================================ */
+        .platform-selector {
+            background: var(--bg-secondary);
+            padding: 2rem 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .platform-selector .container { text-align: center; }
+        .platform-selector h3 { margin-bottom: 0.5rem; }
+        .platform-selector p { color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem; }
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .platform-btn {
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--border-color);
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .platform-btn:hover { border-color: var(--brand-primary); transform: translateY(-2px); }
+        .platform-btn.active {
+            border-color: var(--brand-primary);
+            background: rgba(255,107,53,0.1);
+            box-shadow: 0 0 30px rgba(255,107,53,0.1);
+        }
+        .platform-btn .icon { font-size: 2.5rem; }
+        .platform-btn .badge {
+            font-size: 0.6rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: var(--radius-full);
+            background: var(--brand-primary);
+            color: white;
+        }
+        .platform-status {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            border-radius: var(--radius-md);
+            background: var(--bg-glass);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .platform-status .connected { color: #2ED573; }
+        .platform-status .disconnected { color: #FF4757; }
+
+        /* ============================================================
+           GAMES GRID
+           ============================================================ */
+        .games-section { padding: 3rem 0; }
+        .games-section .section-header { text-align: center; margin-bottom: 2rem; }
+        .games-section .section-tag {
+            display: inline-block;
+            background: var(--bg-glass);
+            padding: 0.2rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            color: var(--brand-primary);
+            margin-bottom: 0.5rem;
+        }
+        .games-section .section-header h2 { font-size: 2rem; margin-bottom: 0.3rem; }
+        .games-section .section-header p { color: var(--text-secondary); font-size: 0.95rem; }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+        .game-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 1.2rem;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            text-align: center;
+        }
+        .game-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-glow);
+            box-shadow: var(--shadow-glow);
+        }
+        .game-card .icon { font-size: 2.5rem; display: block; margin-bottom: 0.3rem; }
+        .game-card h4 { font-size: 0.95rem; margin-bottom: 0.2rem; }
+        .game-card p { color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 0.5rem; }
+        .game-card .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+        .game-card .tag {
+            padding: 0.1rem 0.5rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6rem;
+            font-weight: 600;
+            background: var(--bg-glass);
+            color: var(--brand-primary);
+        }
+        .game-card .tag.new { background: rgba(46,213,115,0.2); color: #2ED573; }
+        .game-card .tag.premium { background: rgba(255,215,0,0.2); color: #F9CA24; }
+        .game-card .lock {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        .game-card .play-btn {
+            margin-top: 0.5rem;
+            width: 100%;
+            justify-content: center;
+        }
+        .game-card.locked { opacity: 0.7; }
+        .game-card.locked:hover { transform: none; }
+
+        /* ============================================================
+           SUBSCRIPTION
+           ============================================================ */
+        .subscription-section {
+            padding: 3rem 0;
+            background: var(--bg-secondary);
+        }
+        .subscription-section .section-header { text-align: center; margin-bottom: 2rem; }
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        .plan-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+        }
+        .plan-card:hover { transform: translateY(-4px); }
+        .plan-card.featured {
+            border-color: var(--brand-primary);
+            transform: scale(1.05);
+            box-shadow: 0 8px 40px rgba(255,107,53,0.15);
+        }
+        .plan-card.featured:hover { transform: scale(1.05) translateY(-4px); }
+        .plan-badge {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--brand-gradient);
+            color: white;
+            padding: 0.2rem 1.2rem;
+            border-radius: var(--radius-full);
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .plan-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--brand-primary);
+            margin: 0.5rem 0;
+        }
+        .plan-price span { font-size: 0.9rem; font-weight: 400; color: var(--text-secondary); }
+        .plan-features {
+            list-style: none;
+            text-align: left;
+            margin: 1rem 0;
+        }
+        .plan-features li {
+            padding: 0.3rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+        .plan-features li .fa-check { color: #2ED573; }
+        .plan-features li .fa-times { color: #FF4757; }
+
+        /* ============================================================
+           MODALS
+           ============================================================ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            animation: modalIn 0.3s ease-out;
+        }
+        .modal-wide { max-width: 700px; }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .modal-header h3 { font-size: 1.3rem; }
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.2rem;
+        }
+        .modal-close:hover { color: var(--brand-primary); transform: rotate(90deg); }
+
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--brand-primary);
+        }
+        .form-group input::placeholder { color: var(--text-muted); }
+        .form-error { color: #FF4757; font-size: 0.8rem; margin-top: 0.3rem; display: none; }
+        .form-error.show { display: block; }
+        .form-success { color: #2ED573; font-size: 0.8rem; margin-top: 0.3rem; display: none; }
+        .form-success.show { display: block; }
+
+        /* ============================================================
+           TOAST
+           ============================================================ */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-width: 400px;
+        }
+        .toast {
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slideInRight 0.3s ease-out;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        }
+        .toast-success { border-right: 4px solid #2ED573; }
+        .toast-error { border-right: 4px solid #FF4757; }
+        .toast-info { border-right: 4px solid #3498DB; }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ============================================================
+           LOADING
+           ============================================================ */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .loading-overlay.active { display: flex; }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--brand-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-content { text-align: center; }
+        .loading-content p { margin-top: 0.8rem; color: var(--text-secondary); }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        .footer {
+            padding: 3rem 0 1.5rem;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        .footer-brand p {
+            color: var(--text-secondary);
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+            max-width: 300px;
+        }
+        .social-links {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .social-links a {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        .social-links a:hover { background: var(--brand-primary); color: white; border-color: var(--brand-primary); }
+        .footer-links h4 { font-size: 0.95rem; margin-bottom: 0.8rem; }
+        .footer-links a {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.2rem 0;
+            transition: var(--transition);
+            font-size: 0.85rem;
+        }
+        .footer-links a:hover { color: var(--brand-primary); }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 1024px) {
+            .hero .container { grid-template-columns: 1fr; text-align: center; }
+            .hero-description { margin: 0 auto 1.5rem; }
+            .hero-stats { justify-content: center; }
+            .hero-actions { justify-content: center; }
+            .hero-visual { display: none; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--bg-card);
+                padding: 1rem 2rem;
+                border-bottom: 1px solid var(--border-color);
+                gap: 0.5rem;
+            }
+            .nav-links.open { display: flex; }
+            .mobile-menu-btn { display: block; }
+            .hero-title { font-size: 2.5rem; }
+            .platform-grid { grid-template-columns: 1fr; max-width: 300px; }
+            .games-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .plans-grid { grid-template-columns: 1fr; }
+            .plan-card.featured { transform: none; }
+            .plan-card.featured:hover { transform: none; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .modal { padding: 1.5rem; margin: 1rem; }
+        }
+        @media (max-width: 480px) {
+            .container { padding: 0 1rem; }
+            .hero-title { font-size: 2rem; }
+            .hero-stats { flex-direction: column; gap: 0.5rem; align-items: center; }
+            .games-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+            .btn { padding: 0.4rem 1rem; font-size: 0.8rem; }
+            .btn-lg { padding: 0.6rem 1.5rem; font-size: 0.9rem; }
+        }
     </style>
 </head>
-<body class="custom-scrollbar min-h-screen flex flex-col justify-between">
+<body>
 
-    <!-- Sound & FX Elements -->
-    <audio id="sfx-click" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" preload="auto"></audio>
-    <audio id="sfx-win" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" preload="auto"></audio>
-    <audio id="sfx-fail" src="https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3" preload="auto"></audio>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>جاري التحميل...</p>
+        </div>
+    </div>
 
-    <!-- Top Navigation Header -->
-    <header class="sticky top-0 z-50 glass-panel border-b border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            
-            <!-- Brand Logo -->
-            <div class="flex items-center space-x-3 space-x-reverse">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-pink-500 to-cyan-400 flex items-center justify-center text-white font-pixel font-bold text-xl shadow-lg glow-accent">
-                    K
-                </div>
-                <div>
-                    <div class="flex items-center space-x-2 space-x-reverse">
-                        <span class="font-black text-xl tracking-wider text-white">KOTCHA</span>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 font-semibold">v8.0 STREAM INTEGRATED</span>
-                    </div>
-                    <p class="text-[10px] text-gray-400">منصة ألعاب البث المباشر المدمجة</p>
-                </div>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ============================================================
+    NAVBAR
+    ============================================================ -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-brand" onclick="navigateTo('home')">
+                <div class="brand-icon">K</div>
+                <span class="brand-name">KOTCHA</span>
+                <span class="brand-status"><span class="dot"></span> LIVE</span>
             </div>
-
-            <!-- Header Quick Stats & Controls -->
-            <div class="flex items-center space-x-3 space-x-reverse">
-                <div class="flex items-center space-x-1.5 space-x-reverse px-3 py-1.5 rounded-xl bg-gray-900 border border-gray-800 text-xs font-bold text-gray-300">
-                    <i class="fas fa-eye text-cyan-400 animate-pulse"></i>
-                    <span>المشاهدين: </span>
-                    <span id="live-viewer-count" class="text-white font-mono text-sm">1,240</span>
+            <div class="nav-links" id="navLinks">
+                <a href="#" class="active" data-page="home"><i class="fas fa-home"></i> الرئيسية</a>
+                <a href="#" data-page="games"><i class="fas fa-gamepad"></i> الألعاب</a>
+                <a href="#" data-page="platforms"><i class="fas fa-broadcast"></i> المنصات</a>
+                <a href="#" data-page="subscription"><i class="fas fa-crown"></i> الاشتراك</a>
+            </div>
+            <div class="nav-actions">
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <div id="authButtons">
+                    <button class="btn btn-outline btn-sm" onclick="showLogin()">
+                        <i class="fas fa-sign-in-alt"></i> دخول
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="showSignup()">
+                        <i class="fas fa-user-plus"></i> حساب
+                    </button>
                 </div>
-
-                <div id="connection-status-badge" class="flex items-center space-x-2 space-x-reverse px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                    <span id="connection-status-text">البث مباشر LIVE</span>
+                <div class="user-menu" id="userMenu" style="display:none;">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <span class="user-name" id="userNameDisplay">User</span>
+                    <div class="user-dropdown">
+                        <a href="#" onclick="navigateTo('profile')"><i class="fas fa-user"></i> الملف الشخصي</a>
+                        <a href="#" onclick="navigateTo('subscription')"><i class="fas fa-crown"></i> الاشتراك</a>
+                        <a href="#" onclick="navigateTo('settings')"><i class="fas fa-cog"></i> الإعدادات</a>
+                        <hr />
+                        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
+                    </div>
                 </div>
-
-                <button onclick="toggleAudio()" id="audio-btn" class="w-10 h-10 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-800 flex items-center justify-center text-gray-300 transition">
-                    <i class="fas fa-volume-up text-indigo-400"></i>
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
                 </button>
             </div>
-
         </div>
-    </header>
+    </nav>
 
-    <!-- Main Integrated Layout -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- ============================================================
+    MAIN CONTENT
+    ============================================================ -->
+    <main id="mainContent">
 
-        <!-- Center/Left: Live Stream & Game Overlay Stage (8 Cols) -->
-        <section class="lg:col-span-8 space-y-6">
-
-            <!-- Integrated Live Stream Screen + Game Overlay -->
-            <div class="relative w-full rounded-2xl overflow-hidden glass-panel border border-indigo-500/30 shadow-2xl group">
-                
-                <!-- Video Stream Container -->
-                <div class="relative w-full aspect-video bg-black flex items-center justify-center overflow-hidden">
-                    
-                    <!-- Demo Video Stream Background -->
-                    <video id="main-stream-video" autoplay loop muted playsinline class="w-full h-full object-cover opacity-80">
-                        <source src="https://assets.mixkit.co/videos/preview/mixkit-game-animation-of-a-robot-character-42963-large.mp4" type="video/mp4">
-                    </video>
-
-                    <!-- Stream Live Tag & Overlay Controls -->
-                    <div class="absolute top-4 right-4 flex items-center gap-2 z-20">
-                        <span class="px-3 py-1 rounded-md bg-red-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg">
-                            <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span> مباشر LIVE
-                        </span>
-                        <span id="stream-game-tag" class="px-3 py-1 rounded-md bg-gray-900/80 backdrop-blur-md text-indigo-300 border border-indigo-500/30 text-xs font-bold">
-                            🎮 وضع البث المدمج
-                        </span>
+        <!-- ============================================================
+        HERO SECTION
+        ============================================================ -->
+        <section class="hero" id="homeSection">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-bolt"></i> ألعاب البث المباشر التفاعلية
                     </div>
-
-                    <!-- Interactive Dynamic Game Canvas Overlay -->
-                    <div id="stream-game-overlay" class="absolute inset-x-4 bottom-14 z-20 p-4 rounded-xl bg-gray-950/85 backdrop-blur-md border border-indigo-500/40 shadow-2xl transition-all duration-300 transform scale-100">
-                        <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-3">
-                            <div class="flex items-center gap-2">
-                                <span id="stage-pulse" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                                <h3 id="stage-game-title" class="font-bold text-sm text-white">تحدي البث المباشر</h3>
-                            </div>
-                            <span id="stage-timer" class="font-pixel text-yellow-400 text-xs bg-gray-900 px-2.5 py-1 rounded-md border border-yellow-500/30">00:60</span>
+                    <h1 class="hero-title">
+                        <span class="gradient-text">KOTCHA</span><br />
+                        حيث المشاهد <span class="highlight">يلعب</span>
+                    </h1>
+                    <p class="hero-description">
+                        منصة تفاعلية للبث المباشر تجمع بين الترفيه والتفاعل.
+                        المشاهد لا يشاهد فقط، بل يشارك ويلعب مع المضيف في آن واحد.
+                        العب وتفاعل تلقائياً مع مشاهديك عبر شات البث بمختلف المنصات.
+                    </p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="statUsers">12,458</span>
+                            <span class="stat-label">مستخدم نشط</span>
                         </div>
-
-                        <!-- Render Stage for Current Game Graphics -->
-                        <div id="stage-canvas" class="my-auto flex flex-col items-center justify-center relative min-h-[110px]">
-                            <div class="text-center space-y-2">
-                                <p class="text-xs text-indigo-300 font-bold">اختر إحدى الألعاب بالأسفل للبدء بتلقي إجابات المشاهدين داخل هذا البث!</p>
-                            </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="statRooms">3,289</span>
+                            <span class="stat-label">غرفة تفاعلية</span>
                         </div>
-
-                        <!-- Action Ticker Bar -->
-                        <div id="stage-action-ticker" class="mt-2 text-[11px] bg-indigo-950/80 text-indigo-200 py-1.5 px-3 rounded-lg border border-indigo-500/30 truncate text-center">
-                            في انتظار تفاعل الجمهور عبر الشات...
+                        <div class="stat-item">
+                            <span class="stat-number" id="statGames">22</span>
+                            <span class="stat-label">لعبة متاحة</span>
                         </div>
                     </div>
-
-                    <!-- Stream Bottom Action Bar -->
-                    <div class="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-black/90 to-transparent flex items-center justify-between px-4 z-10 text-xs">
-                        <div class="flex items-center gap-3">
-                            <button onclick="likeStream()" class="text-pink-500 hover:text-pink-400 font-bold flex items-center gap-1 transition">
-                                <i class="fas fa-heart text-sm"></i> <span id="stream-likes">4.8k</span>
-                            </button>
-                            <span class="text-gray-400">|</span>
-                            <span class="text-gray-300"><i class="fas fa-share text-cyan-400 ml-1"></i> 142 مشاركة</span>
-                        </div>
-                        <div class="text-gray-400 text-[11px]">
-                            معرّف القناة: <span class="text-indigo-400 font-bold">@KOTCHA_Live</span>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- TikTok Live Connection Panel -->
-            <div class="glass-panel p-4 rounded-2xl border border-indigo-500/30 shadow-xl space-y-4">
-                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                    <div>
-                        <h2 class="text-base font-black text-white flex items-center gap-2">
-                            <i class="fab fa-tiktok text-pink-500"></i> ربط حساب TikTok Live
-                        </h2>
-                        <p class="text-xs text-gray-400 mt-0.5">ادخل اسم المستخدِم لجلب شات وتفاعلات البث المباشر فوراً.</p>
-                    </div>
-                    <div class="flex items-center space-x-2 space-x-reverse w-full md:w-auto">
-                        <div class="relative w-full md:w-52">
-                            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500 text-xs">@</span>
-                            <input type="text" id="tiktok-username" placeholder="Username..." value="KOTCHA_Live" class="w-full bg-gray-900 border border-gray-700 text-xs rounded-xl pr-7 pl-3 py-2 text-white focus:outline-none focus:border-indigo-500">
-                        </div>
-                        <button onclick="connectTikTokLive()" id="btn-connect" class="px-4 py-2 bg-gradient-to-r from-pink-500 to-indigo-600 hover:opacity-90 text-white font-bold text-xs rounded-xl transition shrink-0 shadow-lg glow-pink">
-                            توصيل
+                    <div class="hero-actions">
+                        <button class="btn btn-primary btn-lg" onclick="createRoom()">
+                            <i class="fas fa-plus-circle"></i> إنشاء غرفة
+                        </button>
+                        <button class="btn btn-secondary btn-lg" onclick="joinRoom()">
+                            <i class="fas fa-sign-in-alt"></i> انضم لغرفة
+                        </button>
+                        <button class="btn btn-glass btn-lg" onclick="navigateTo('games')">
+                            <i class="fas fa-gamepad"></i> استكشف الألعاب
                         </button>
                     </div>
                 </div>
-            </div>
-
-            <!-- Game Launch Grid -->
-            <div class="space-y-3">
-                <h3 class="text-sm font-bold text-gray-300 flex items-center gap-2">
-                    <i class="fas fa-gamepad text-indigo-400"></i> الألعاب المتاحة للدمج مع البث
-                </h3>
-                <div id="games-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    <!-- Dynamically Populated via JavaScript -->
+                <div class="hero-visual">
+                    <div class="hero-orb"></div>
+                    <div class="hero-orb orb-2"></div>
+                    <div style="position:relative; z-index:2; text-align:center;">
+                        <div style="font-size:6rem; margin-bottom:0.5rem;">🎮</div>
+                        <div style="background:var(--bg-card); padding:1rem 2rem; border-radius:var(--radius-lg); border:1px solid var(--border-color);">
+                            <div style="font-size:1.2rem; font-weight:700;">🔥 بث مباشر</div>
+                            <div style="color:var(--text-secondary); font-size:0.9rem;">1,248 مشاهد</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
         </section>
 
-        <!-- Right Side: Live Chat Box & Console Controls (4 Cols) -->
-        <aside class="lg:col-span-4 space-y-6">
-
-            <div class="glass-panel rounded-2xl p-4 border border-gray-800 space-y-4 sticky top-20">
-                
-                <!-- Live Stream Chat Header -->
-                <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-                    <div class="flex items-center space-x-2 space-x-reverse">
-                        <i class="fas fa-comments text-indigo-400"></i>
-                        <h2 class="font-bold text-sm text-white">دردشة البث المباشر</h2>
-                    </div>
-                    <span id="chat-count-label" class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/30">نشط</span>
-                </div>
-
-                <!-- Chat Box Output -->
-                <div id="live-chat-box" class="h-80 bg-black/60 rounded-xl p-3 border border-gray-800 overflow-y-auto space-y-2 text-xs font-mono custom-scrollbar">
-                    <div class="text-gray-500 text-center text-[11px] py-4">البث متصل الآن. أرسل إجاباتك بالتفاعلات بالأسفل...</div>
-                </div>
-
-                <!-- Live Test Chat Simulator Input -->
-                <div class="space-y-2 pt-2 border-t border-gray-800">
-                    <span class="text-[11px] text-gray-400 font-bold">محاكاة إجابة متابع:</span>
-                    <div class="flex items-center gap-1.5">
-                        <input type="text" id="sim-user" placeholder="اسم المتابع" value="أحمد" class="w-1/3 bg-gray-900 border border-gray-800 rounded-lg px-2 py-1.5 text-xs text-white">
-                        <input type="text" id="sim-cmd" placeholder="الإجابة / الأمر" class="w-2/3 bg-gray-900 border border-gray-800 rounded-lg px-2 py-1.5 text-xs text-white">
-                        <button onclick="sendSimulatedChat()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg shrink-0">
-                            إرسال
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Control Buttons -->
-                <div class="grid grid-cols-2 gap-2 pt-2">
-                    <button onclick="stopCurrentGame()" class="px-3 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
-                        <i class="fas fa-stop"></i> إيقاف اللعبة
+        <!-- ============================================================
+        PLATFORM SELECTOR
+        ============================================================ -->
+        <section class="platform-selector" id="platformsSection">
+            <div class="container">
+                <h3><i class="fas fa-broadcast"></i> اختر منصة البث المباشر الخاصة بك</h3>
+                <p>اضغط على المنصة التي تبث عليها لتنشيط الربط التفاعلي وألعاب الشات</p>
+                <div class="platform-grid">
+                    <button class="platform-btn" data-platform="tiktok" onclick="selectPlatform('tiktok')">
+                        <span class="icon"><i class="fab fa-tiktok"></i></span>
+                        TikTok Live
+                        <span class="badge">شائع</span>
                     </button>
-                    <button onclick="resetGameScores()" class="px-3 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
-                        <i class="fas fa-rotate-right"></i> إعادة ضبط
+                    <button class="platform-btn" data-platform="twitch" onclick="selectPlatform('twitch')">
+                        <span class="icon"><i class="fab fa-twitch"></i></span>
+                        Twitch Live
+                        <span class="badge">مميز</span>
+                    </button>
+                    <button class="platform-btn" data-platform="kick" onclick="selectPlatform('kick')">
+                        <span class="icon"><i class="fas fa-bolt"></i></span>
+                        Kick Live
+                        <span class="badge">جديد</span>
                     </button>
                 </div>
-
+                <div class="platform-status" id="platformStatus">
+                    <span>🔴</span>
+                    <span>لا يوجد اشتراك بث نشط</span>
+                    <button class="btn btn-primary btn-sm" onclick="navigateTo('subscription')">
+                        اشترك الآن
+                    </button>
+                </div>
             </div>
+        </section>
 
-        </aside>
+        <!-- ============================================================
+        GAMES SECTION
+        ============================================================ -->
+        <section class="games-section" id="gamesSection">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag"><i class="fas fa-gamepad"></i> الألعاب المتاحة</span>
+                    <h2>اختر اللعبة وابدأ <span class="gradient-text">التفاعل</span></h2>
+                    <p>اختر اللعبة التي تريد تشغيلها وابدأ التفاعل المباشر مع متابعيك</p>
+                </div>
+                <div class="games-grid" id="gamesGrid">
+                    <!-- سيتم توليدها بواسطة JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        SUBSCRIPTION SECTION
+        ============================================================ -->
+        <section class="subscription-section" id="subscriptionSection">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag"><i class="fas fa-crown"></i> الاشتراك</span>
+                    <h2>اختر خطتك <span class="gradient-text">المثالية</span></h2>
+                    <p>خطط تناسب جميع الاحتياجات مع ميزات حصرية</p>
+                </div>
+                <div class="plans-grid" id="plansGrid">
+                    <!-- سيتم توليدها بواسطة JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        CTA SECTION
+        ============================================================ -->
+        <section class="hero" style="min-height:auto; padding:3rem 0; background:var(--bg-secondary);">
+            <div class="container" style="text-align:center;">
+                <h2 style="font-size:2.5rem;">جاهز لبدء <span class="gradient-text">رحلة التفاعل</span>؟</h2>
+                <p style="color:var(--text-secondary); font-size:1.1rem; max-width:500px; margin:0 auto 1.5rem;">
+                    انضم إلى آلاف المستخدمين الذين يختبرون مستقبل البث التفاعلي
+                </p>
+                <div class="hero-actions" style="justify-content:center;">
+                    <button class="btn btn-primary btn-lg" onclick="createRoom()">
+                        <i class="fas fa-rocket"></i> ابدأ الآن
+                    </button>
+                    <button class="btn btn-glass btn-lg" onclick="showDemo()">
+                        <i class="fas fa-play-circle"></i> شاهد العرض
+                    </button>
+                </div>
+            </div>
+        </section>
 
     </main>
 
-    <!-- JavaScript Game Engine & Integration -->
+    <!-- ============================================================
+    FOOTER
+    ============================================================ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+                        <div class="brand-icon">K</div>
+                        <span class="brand-name">KOTCHA</span>
+                    </div>
+                    <p>منصة ألعاب البث المباشر التفاعلية التي تحول المشاهدين إلى لاعبين</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>المنصة</h4>
+                    <a href="#" onclick="navigateTo('home')">الرئيسية</a>
+                    <a href="#" onclick="navigateTo('games')">الألعاب</a>
+                    <a href="#" onclick="navigateTo('platforms')">المنصات</a>
+                    <a href="#" onclick="navigateTo('subscription')">الاشتراك</a>
+                </div>
+                <div class="footer-links">
+                    <h4>الدعم</h4>
+                    <a href="#" onclick="showFAQ()">الأسئلة الشائعة</a>
+                    <a href="#" onclick="showSupport()">الدعم الفني</a>
+                    <a href="#" onclick="showPrivacy()">سياسة الخصوصية</a>
+                    <a href="#" onclick="showTerms()">الشروط والأحكام</a>
+                </div>
+                <div class="footer-links">
+                    <h4>المطورين</h4>
+                    <a href="#" onclick="showDocs()">التوثيق</a>
+                    <a href="#" onclick="showAPI()">واجهة البرمجة</a>
+                    <a href="#" onclick="showGitHub()">المساهمة</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 KOTCHA. جميع الحقوق محفوظة. الإصدار 10.0.0</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ============================================================
+    MODALS
+    ============================================================ -->
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</h3>
+                <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+            </div>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="loginEmail" placeholder="example@email.com" required />
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required />
+                </div>
+                <div class="form-error" id="loginError"></div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                </button>
+                <p style="text-align:center; margin-top:1rem; color:var(--text-secondary); font-size:0.9rem;">
+                    ليس لديك حساب؟ <a href="#" onclick="closeModal('loginModal'); showSignup();" style="color:var(--brand-primary);">إنشاء حساب</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div class="modal-overlay" id="signupModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> إنشاء حساب</h3>
+                <button class="modal-close" onclick="closeModal('signupModal')">&times;</button>
+            </div>
+            <form onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label>اسم المستخدم</label>
+                    <input type="text" id="signupUsername" placeholder="أدخل اسم المستخدم" required />
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="signupEmail" placeholder="example@email.com" required />
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="signupPassword" placeholder="••••••••" required minlength="6" />
+                </div>
+                <div class="form-error" id="signupError"></div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-user-plus"></i> إنشاء حساب
+                </button>
+                <p style="text-align:center; margin-top:1rem; color:var(--text-secondary); font-size:0.9rem;">
+                    لديك حساب؟ <a href="#" onclick="closeModal('signupModal'); showLogin();" style="color:var(--brand-primary);">تسجيل الدخول</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Join Room Modal -->
+    <div class="modal-overlay" id="joinRoomModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-sign-in-alt"></i> انضم إلى غرفة</h3>
+                <button class="modal-close" onclick="closeModal('joinRoomModal')">&times;</button>
+            </div>
+            <form onsubmit="handleJoinRoom(event)">
+                <div class="form-group">
+                    <label>معرف الغرفة</label>
+                    <input type="text" id="joinRoomId" placeholder="أدخل معرف الغرفة (مثال: ABC123)" required />
+                </div>
+                <div class="form-error" id="joinRoomError"></div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-sign-in-alt"></i> انضم
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Game Modal -->
+    <div class="modal-overlay" id="gameModal">
+        <div class="modal modal-wide">
+            <div class="modal-header">
+                <h3 id="gameModalTitle"><i class="fas fa-gamepad"></i> اللعبة</h3>
+                <button class="modal-close" onclick="closeModal('gameModal')">&times;</button>
+            </div>
+            <div id="gameModalContent">
+                <div style="text-align:center; padding:2rem;">
+                    <div class="spinner" style="margin:0 auto;"></div>
+                    <p style="margin-top:1rem; color:var(--text-secondary);">جاري تحميل اللعبة...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        const STATE = {
-            isConnected: true,
-            activeGameId: null,
-            audioEnabled: true,
-            streamerUser: "KOTCHA_Live",
-            viewerCount: 1240,
-            likes: 4800,
-            stats: { chat: 0 },
-            activeQuestion: null,
-            tugScore: 50
+        // ============================================================
+        // KOTCHA - FULL APPLICATION v10.0.0
+        // ============================================================
+
+        const CONFIG = {
+            API: 'https://kotcha.ig999x.workers.dev',
+            WS: 'wss://kotcha.ig999x.workers.dev',
+            VERSION: '10.0.0'
         };
 
-        const GAMES_DATABASE = [
-            {
-                id: "code_breaker",
-                title: "كاسر الشفرة",
-                desc: "تخمين الرقم السري المكون من 4 أرقام",
-                icon: "fa-key",
-                color: "from-amber-600 to-orange-900",
-                command: "اكتب 4 أرقام"
-            },
-            {
-                id: "mentals",
-                title: "الحساب الذهني",
-                desc: "حل المعادل الرياضية بأسرع وقت",
-                icon: "fa-calculator",
-                color: "from-cyan-600 to-blue-900",
-                command: "اكتب الناتج"
-            },
-            {
-                id: "tug_of_war",
-                title: "شد الحبل",
-                desc: "تحدي الفرق (الشباب 1 ضد البنات 2)",
-                icon: "fa-people-arrows",
-                color: "from-indigo-600 to-purple-900",
-                command: "1 أو 2"
-            },
-            {
-                id: "derby",
-                title: "ضربات الجزاء",
-                desc: "اختر زاوية التسديد ضد الحارس",
-                icon: "fa-futbol",
-                color: "from-emerald-600 to-teal-900",
-                command: "يمين أو يسار"
-            },
-            {
-                id: "cups",
-                title: "أكواب الحظ",
-                desc: "خمن الكوب المخبأ تحته الكرة",
-                icon: "fa-glass-water",
-                color: "from-pink-600 to-rose-900",
-                command: "1 أو 2 أو 3"
-            }
-        ];
+        // ============================================================
+        // GAME DATA
+        // ============================================================
+        const GAMES = [{
+            id: 'abyss',
+            name: 'الهاوية',
+            icon: '🌊',
+            description: 'تحدي الجسر الزجاجي؛ اختر لوح النجاة قبل أن تبتلعك الهاوية!',
+            tags: ['جديد', 'ممتع'],
+            premium: true,
+            category: 'تحدي'
+        }, {
+            id: 'derby',
+            name: 'ديربي',
+            icon: '⚽',
+            description: 'سباق أهداف مباشر بين فريقين؛ اختر زاوية التسديد واكسر توقع الحارس الذكي!',
+            tags: ['جديد', 'رياضة'],
+            premium: true,
+            category: 'رياضة'
+        }, {
+            id: 'match',
+            name: 'تطابق',
+            icon: '🧩',
+            description: 'تحدي الذاكرة البصرية التفاعلي الفردي لإيجاد الصور المتطابقة للشات!',
+            tags: ['جديد', 'ذاكرة'],
+            premium: true,
+            category: 'ذاكرة'
+        }, {
+            id: 'cups',
+            name: 'أكواب',
+            icon: '🥤',
+            description: 'تتبع الكوب الذهبي الذي يخبئ الكرة بعد خلط الأكواب بسرعة فائقة!',
+            tags: ['تركيز'],
+            premium: true,
+            category: 'تركيز'
+        }, {
+            id: 'topten',
+            name: 'توب تن',
+            icon: '🏆',
+            description: 'تحدي تخمين أفضل 10 إجابات للسؤال المطروح بالشات!',
+            tags: ['تحدي'],
+            premium: true,
+            category: 'تحدي'
+        }, {
+            id: 'ambush',
+            name: 'الكمين',
+            icon: '🎯',
+            description: 'فك شيفرة الإحداثيات للنجاة من عدوى المصاب!',
+            tags: ['إثارة'],
+            premium: true,
+            category: 'إثارة'
+        }, {
+            id: 'chairs',
+            name: 'الكراسي الموسيقية',
+            icon: '🪑',
+            description: 'تحدي السرعة والجلوس على الكراسي المتبقية بالشات',
+            tags: ['سرعة'],
+            premium: true,
+            category: 'سرعة'
+        }, {
+            id: 'hidden_roulette',
+            name: 'الروليت المخفي',
+            icon: '🎰',
+            description: 'روليت الإقصاء مع إخفاء الهويات خلف أعلام الدول',
+            tags: ['إثارة'],
+            premium: true,
+            category: 'إثارة'
+        }, {
+            id: 'story',
+            name: 'سرد',
+            icon: '📖',
+            description: 'تحدي البحث عن الكلمات المترابطة',
+            tags: ['إبداع'],
+            premium: true,
+            category: 'إبداع'
+        }, {
+            id: 'roulette_elim',
+            name: 'الروليت والإقصاء',
+            icon: '🎲',
+            description: 'عجلة الروليت وإقصاء اللاعبين من الشات',
+            tags: ['إثارة'],
+            premium: true,
+            category: 'إثارة'
+        }, {
+            id: 'russian_roulette',
+            name: 'الروليت الروسي',
+            icon: '💀',
+            description: 'تحدي الموت أو النجاة بالروليت الروسي',
+            tags: ['إثارة'],
+            premium: true,
+            category: 'إثارة'
+        }, {
+            id: 'connect',
+            name: 'شبك',
+            icon: '🔗',
+            description: 'تحدي ربط الدول والحدود الجغرافية',
+            tags: ['معرفة'],
+            premium: true,
+            category: 'معرفة'
+        }, {
+            id: 'bomb',
+            name: 'القنبلة الموقوتة',
+            icon: '💣',
+            description: 'فريق الشباب ضد فريق البنات',
+            tags: ['جماعي'],
+            premium: true,
+            category: 'جماعي'
+        }, {
+            id: 'letter_net',
+            name: 'شبكة الحروف',
+            icon: '🔤',
+            description: 'مسار الشباب ضد مسار البنات',
+            tags: ['جماعي'],
+            premium: true,
+            category: 'جماعي'
+        }, {
+            id: 'code_breaker',
+            name: 'كاسر الشفرة',
+            icon: '🔐',
+            description: 'تخمين الرقم السري',
+            tags: ['تحدي'],
+            premium: true,
+            category: 'تحدي'
+        }, {
+            id: 'sketch',
+            name: 'خربشة',
+            icon: '🎨',
+            description: 'ارسم الكلمة والجمهور يخمن الإجابة بالشات',
+            tags: ['إبداع'],
+            premium: true,
+            category: 'إبداع'
+        }, {
+            id: 'sniper',
+            name: 'القناص',
+            icon: '🎯',
+            description: 'تحدي القناص والاختباء الجماعي للمشاهدين بالشات',
+            tags: ['إثارة'],
+            premium: true,
+            category: 'إثارة'
+        }, {
+            id: 'salad',
+            name: 'سلطة',
+            icon: '🥗',
+            description: 'مجموعة ألعاب سريعة وتفاعلية داخل مكان واحد',
+            tags: ['متنوع'],
+            premium: true,
+            category: 'متنوع'
+        }, {
+            id: 'elimination',
+            name: 'شطب',
+            icon: '✖️',
+            description: 'تحدي الأسئلة المتعددة والنجاة من الشطب والإقصاء',
+            tags: ['تحدي'],
+            premium: true,
+            category: 'تحدي'
+        }, {
+            id: 'mind',
+            name: 'ذهنيات',
+            icon: '🧠',
+            description: 'ألعاب الذكاء، الحساب الذهني، وتحدي الذاكرة',
+            tags: ['ذكاء'],
+            premium: true,
+            category: 'ذكاء'
+        }, {
+            id: 'rocket_war',
+            name: 'حرب الصواريخ',
+            icon: '🚀',
+            description: 'تحدي إطلاق الصواريخ وحماية القلعة بين فريقين',
+            tags: ['جماعي'],
+            premium: true,
+            category: 'جماعي'
+        }];
 
-        // Render Games Cards
-        function renderGamesGrid() {
-            const container = document.getElementById("games-grid");
-            container.innerHTML = GAMES_DATABASE.map(game => `
-                <div class="glass-panel p-3.5 rounded-xl border border-gray-800 hover:border-indigo-500/50 transition flex flex-col justify-between space-y-3">
-                    <div class="flex items-center space-x-3 space-x-reverse">
-                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br ${game.color} flex items-center justify-center text-white shrink-0 shadow">
-                            <i class="fas ${game.icon}"></i>
-                        </div>
-                        <div class="overflow-hidden">
-                            <h4 class="font-bold text-xs text-white truncate">${game.title}</h4>
-                            <p class="text-[10px] text-gray-400 truncate">${game.desc}</p>
-                        </div>
+        // ============================================================
+        // STATE
+        // ============================================================
+        let state = {
+            user: null,
+            isLoggedIn: false,
+            isSubscribed: false,
+            selectedPlatform: null,
+            theme: localStorage.getItem('kotcha-theme') || 'dark',
+            currentPage: 'home'
+        };
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme(state.theme);
+            renderGames();
+            renderPlans();
+            checkAuth();
+            setupEventListeners();
+            animateNumbers();
+        });
+
+        // ============================================================
+        // THEME
+        // ============================================================
+        function toggleTheme() {
+            state.theme = state.theme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('kotcha-theme', state.theme);
+            applyTheme(state.theme);
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const icon = document.getElementById('themeIcon');
+            if (icon) {
+                icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+            }
+        }
+
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
+        function navigateTo(page) {
+            state.currentPage = page;
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.nav-links a[data-page="${page}"]`);
+            if (link) link.classList.add('active');
+
+            const sections = {
+                home: document.getElementById('homeSection'),
+                games: document.getElementById('gamesSection'),
+                platforms: document.getElementById('platformsSection'),
+                subscription: document.getElementById('subscriptionSection')
+            };
+
+            if (sections[page]) {
+                sections[page].scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            if (page === 'games') {
+                renderGames();
+            }
+
+            closeMobileMenu();
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('navLinks').classList.toggle('open');
+        }
+
+        function closeMobileMenu() {
+            document.getElementById('navLinks').classList.remove('open');
+        }
+
+        // ============================================================
+        // AUTH
+        // ============================================================
+        function checkAuth() {
+            const userData = localStorage.getItem('kotcha-user');
+            if (userData) {
+                try {
+                    state.user = JSON.parse(userData);
+                    state.isLoggedIn = true;
+                    updateUIForAuth();
+                } catch {
+                    localStorage.removeItem('kotcha-user');
+                }
+            }
+        }
+
+        function updateUIForAuth() {
+            document.getElementById('authButtons').style.display = 'none';
+            document.getElementById('userMenu').style.display = 'flex';
+            document.getElementById('userNameDisplay').textContent = state.user?.displayName || state.user?.username || 'User';
+            document.getElementById('userAvatar').textContent = (state.user?.displayName || 'U')[0].toUpperCase();
+        }
+
+        function showLogin() {
+            document.getElementById('loginError').className = 'form-error';
+            document.getElementById('loginModal').classList.add('active');
+        }
+
+        function showSignup() {
+            document.getElementById('signupError').className = 'form-error';
+            document.getElementById('signupModal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            state.user = {
+                id: 'user_' + Math.random().toString(36).substring(2, 10),
+                username: email.split('@')[0],
+                displayName: email.split('@')[0],
+                email: email,
+                avatar: null,
+                subscribed: false
+            };
+
+            localStorage.setItem('kotcha-user', JSON.stringify(state.user));
+            state.isLoggedIn = true;
+            updateUIForAuth();
+            closeModal('loginModal');
+            showToast('تم تسجيل الدخول بنجاح!', 'success');
+            playSound('success');
+        }
+
+        function handleSignup(event) {
+            event.preventDefault();
+            const username = document.getElementById('signupUsername').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+
+            state.user = {
+                id: 'user_' + Math.random().toString(36).substring(2, 10),
+                username: username,
+                displayName: username,
+                email: email,
+                avatar: null,
+                subscribed: false
+            };
+
+            localStorage.setItem('kotcha-user', JSON.stringify(state.user));
+            state.isLoggedIn = true;
+            updateUIForAuth();
+            closeModal('signupModal');
+            showToast('تم إنشاء الحساب بنجاح!', 'success');
+            playSound('success');
+        }
+
+        function logout() {
+            localStorage.removeItem('kotcha-user');
+            state.user = null;
+            state.isLoggedIn = false;
+            document.getElementById('authButtons').style.display = 'flex';
+            document.getElementById('userMenu').style.display = 'none';
+            showToast('تم تسجيل الخروج', 'info');
+        }
+
+        // ============================================================
+        // PLATFORM SELECTION
+        // ============================================================
+        function selectPlatform(platform) {
+            state.selectedPlatform = platform;
+            document.querySelectorAll('.platform-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.platform === platform);
+            });
+
+            const status = document.getElementById('platformStatus');
+            const names = { tiktok: 'TikTok Live', twitch: 'Twitch Live', kick: 'Kick Live' };
+
+            if (state.isLoggedIn) {
+                status.innerHTML = `
+                    <span>✅</span>
+                    <span style="color:#2ED573;">متصل بـ ${names[platform]}</span>
+                    <button class="btn btn-secondary btn-sm" onclick="disconnectPlatform()">
+                        <i class="fas fa-plug"></i> قطع الاتصال
+                    </button>
+                `;
+                showToast(`تم الاتصال بـ ${names[platform]}`, 'success');
+                playSound('connect');
+            } else {
+                status.innerHTML = `
+                    <span>🔴</span>
+                    <span>يرجى تسجيل الدخول أولاً</span>
+                    <button class="btn btn-primary btn-sm" onclick="showLogin()">
+                        <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                    </button>
+                `;
+                showToast('يرجى تسجيل الدخول أولاً', 'error');
+            }
+        }
+
+        function disconnectPlatform() {
+            state.selectedPlatform = null;
+            document.querySelectorAll('.platform-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('platformStatus').innerHTML = `
+                <span>🔴</span>
+                <span>لا يوجد اشتراك بث نشط</span>
+                <button class="btn btn-primary btn-sm" onclick="navigateTo('subscription')">
+                    اشترك الآن
+                </button>
+            `;
+            showToast('تم قطع الاتصال', 'info');
+        }
+
+        // ============================================================
+        // GAMES
+        // ============================================================
+        function renderGames() {
+            const grid = document.getElementById('gamesGrid');
+            grid.innerHTML = GAMES.map(game => `
+                <div class="game-card ${game.premium && !state.isSubscribed ? 'locked' : ''}" 
+                     onclick="${game.premium && !state.isSubscribed ? `showToast('هذه اللعبة تتطلب اشتراكاً مميزاً', 'error')` : `openGame('${game.id}')`}">
+                    ${game.premium && !state.isSubscribed ? `<div class="lock"><i class="fas fa-lock"></i></div>` : ''}
+                    <span class="icon">${game.icon}</span>
+                    <h4>${game.name}</h4>
+                    <p>${game.description}</p>
+                    <div class="tags">
+                        ${game.tags.map(tag => `<span class="tag ${tag === 'جديد' ? 'new' : ''}">${tag}</span>`).join('')}
+                        ${game.premium ? `<span class="tag premium">⭐ مميز</span>` : `<span class="tag">🎯 مجاني</span>`}
                     </div>
-                    <button onclick="launchGame('${game.id}')" class="w-full py-1.5 bg-indigo-600/80 hover:bg-indigo-600 text-white font-bold text-xs rounded-lg transition shadow">
-                        تشغيل في البث
+                    <button class="btn ${game.premium && !state.isSubscribed ? 'btn-gold' : 'btn-primary'} btn-sm play-btn" 
+                            onclick="event.stopPropagation(); ${game.premium && !state.isSubscribed ? `showToast('هذه اللعبة تتطلب اشتراكاً مميزاً', 'error')` : `openGame('${game.id}')`}">
+                        ${game.premium && !state.isSubscribed ? '⭐ اشترك الآن' : '▶️ العب الآن'}
                     </button>
                 </div>
             `).join('');
         }
 
-        function launchGame(gameId) {
-            playSound('sfx-click');
-            STATE.activeGameId = gameId;
-            const game = GAMES_DATABASE.find(g => g.id === gameId);
+        function openGame(gameId) {
+            const game = GAMES.find(g => g.id === gameId);
+            if (!game) return;
 
-            document.getElementById("stage-game-title").innerText = `🎮 ${game.title}`;
-            initGameCanvas(gameId);
-            addLogMessage("النظام", `بدأت الآن لعبة: ${game.title}`, "text-yellow-400 font-bold");
-        }
-
-        function initGameCanvas(gameId) {
-            const canvas = document.getElementById("stage-canvas");
-            
-            if (gameId === 'code_breaker') {
-                const secret = Math.floor(1000 + Math.random() * 9000);
-                STATE.activeQuestion = secret;
-                canvas.innerHTML = `
-                    <div class="text-center space-y-1">
-                        <div class="text-2xl font-pixel text-yellow-400 tracking-widest bg-gray-900 px-4 py-2 rounded-lg border border-yellow-500/30">????</div>
-                        <p class="text-[11px] text-gray-300">خمّن الرقم السري (4 أرقام) بالدردشة!</p>
-                    </div>
-                `;
-            } else if (gameId === 'mentals') {
-                const n1 = Math.floor(Math.random() * 25) + 5;
-                const n2 = Math.floor(Math.random() * 20) + 2;
-                STATE.activeQuestion = n1 + n2;
-                canvas.innerHTML = `
-                    <div class="text-center space-y-1">
-                        <div class="text-2xl font-black text-cyan-400 bg-gray-900 px-5 py-2 rounded-lg border border-cyan-500/30">${n1} + ${n2} = ?</div>
-                        <p class="text-[11px] text-gray-300">اكتب النتيجة الصحيحة في الشات!</p>
-                    </div>
-                `;
-            } else if (gameId === 'tug_of_war') {
-                STATE.tugScore = 50;
-                renderTugBar();
-            } else if (gameId === 'derby') {
-                STATE.activeQuestion = Math.random() > 0.5 ? 'يمين' : 'يسار';
-                canvas.innerHTML = `
-                    <div class="text-center space-y-1">
-                        <div class="text-3xl">🥅 ⚽</div>
-                        <p class="text-[11px] text-gray-200">سدد بـ: <span class="text-emerald-400 font-bold">يمين</span> أو <span class="text-cyan-400 font-bold">يسار</span></p>
-                    </div>
-                `;
-            } else if (gameId === 'cups') {
-                STATE.activeQuestion = (Math.floor(Math.random() * 3) + 1).toString();
-                canvas.innerHTML = `
-                    <div class="flex justify-center gap-3 text-xl">
-                        <div class="px-3 py-1.5 bg-gray-900 rounded-lg border border-amber-500/30 text-amber-400 font-bold">1 🥤</div>
-                        <div class="px-3 py-1.5 bg-gray-900 rounded-lg border border-amber-500/30 text-amber-400 font-bold">2 🥤</div>
-                        <div class="px-3 py-1.5 bg-gray-900 rounded-lg border border-amber-500/30 text-amber-400 font-bold">3 🥤</div>
-                    </div>
-                    <p class="text-[11px] text-gray-300 mt-2">أين الكرة؟ خمن (1، 2، أو 3)</p>
-                `;
+            if (game.premium && !state.isSubscribed) {
+                showToast('هذه اللعبة تتطلب اشتراكاً مميزاً', 'error');
+                return;
             }
-        }
 
-        function renderTugBar() {
-            const canvas = document.getElementById("stage-canvas");
-            canvas.innerHTML = `
-                <div class="w-full space-y-1.5 px-2">
-                    <div class="flex justify-between text-[11px] font-bold">
-                        <span class="text-indigo-400">الشباب (1)</span>
-                        <span class="text-pink-400">البنات (2)</span>
+            document.getElementById('gameModalTitle').innerHTML = `<i class="fas fa-gamepad"></i> ${game.icon} ${game.name}`;
+            document.getElementById('gameModalContent').innerHTML = `
+                <div style="text-align:center; padding:1rem;">
+                    <div style="font-size:4rem; margin-bottom:1rem;">${game.icon}</div>
+                    <h3 style="margin-bottom:0.5rem;">${game.name}</h3>
+                    <p style="color:var(--text-secondary); margin-bottom:1rem;">${game.description}</p>
+                    <div style="display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; margin-bottom:1rem;">
+                        ${game.tags.map(tag => `<span class="tag" style="background:var(--bg-glass); padding:0.2rem 0.8rem; border-radius:var(--radius-full);">${tag}</span>`).join('')}
                     </div>
-                    <div class="w-full h-5 bg-gray-900 rounded-full overflow-hidden p-0.5 border border-gray-800 flex">
-                        <div style="width: ${STATE.tugScore}%" class="h-full bg-indigo-500 rounded-r-full transition-all"></div>
-                        <div style="width: ${100 - STATE.tugScore}%" class="h-full bg-pink-500 rounded-l-full transition-all"></div>
+                    <div style="background:var(--bg-glass); border-radius:var(--radius-md); padding:1rem; margin-bottom:1rem;">
+                        <p style="color:var(--text-secondary); font-size:0.9rem;">
+                            <i class="fas fa-users"></i> ${Math.floor(Math.random() * 100) + 50} لاعب متصل
+                        </p>
+                        <div style="display:flex; gap:0.5rem; justify-content:center; margin-top:0.5rem;">
+                            <div style="width:32px; height:32px; border-radius:50%; background:var(--brand-gradient); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:0.7rem;">A</div>
+                            <div style="width:32px; height:32px; border-radius:50%; background:var(--brand-gradient); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:0.7rem;">B</div>
+                            <div style="width:32px; height:32px; border-radius:50%; background:var(--brand-gradient); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:0.7rem;">C</div>
+                            <div style="width:32px; height:32px; border-radius:50%; background:var(--bg-glass); display:flex; align-items:center; justify-content:center; color:var(--text-secondary); font-size:0.7rem;">+${Math.floor(Math.random() * 20) + 5}</div>
+                        </div>
                     </div>
+                    <button class="btn btn-primary btn-lg" onclick="startGame('${game.id}')" style="width:100%; justify-content:center;">
+                        <i class="fas fa-play"></i> بدء اللعبة
+                    </button>
+                    <p style="color:var(--text-muted); font-size:0.8rem; margin-top:0.5rem;">
+                        <i class="fas fa-info-circle"></i> تفاعل مباشر مع مشاهديك عبر الشات
+                    </p>
                 </div>
             `;
+            document.getElementById('gameModal').classList.add('active');
+            playSound('click');
         }
 
-        function processGameLogic(user, text) {
-            if (!STATE.activeGameId) return;
-            const cleanText = text.trim();
-            const ticker = document.getElementById("stage-action-ticker");
+        function startGame(gameId) {
+            showLoading(true);
+            setTimeout(() => {
+                showLoading(false);
+                showToast(`🎮 تم بدء لعبة ${GAMES.find(g => g.id === gameId)?.name || ''}!`, 'success');
+                playSound('gameStart');
+                document.getElementById('gameModal').classList.remove('active');
+            }, 1500);
+        }
 
-            if (STATE.activeGameId === 'code_breaker' || STATE.activeGameId === 'mentals') {
-                if (cleanText == STATE.activeQuestion) {
-                    triggerWin(user, `أجاب إجابة صحيحة (${cleanText}) 🎉`);
+        // ============================================================
+        // PLANS
+        // ============================================================
+        function renderPlans() {
+            const plans = [{
+                id: 'free',
+                name: 'مجاني',
+                price: 0,
+                currency: 'د.إ',
+                features: ['ألعاب مجانية محدودة', 'دردشة أساسية', '100 مشاهد', 'دعم أساسي'],
+                featured: false
+            }, {
+                id: 'premium',
+                name: 'مميز',
+                price: 29,
+                currency: 'د.إ',
+                features: ['جميع الألعاب', 'دردشة متقدمة', '500 مشاهد', 'علامة تجارية مخصصة', 'تحليلات متقدمة', 'دعم فني 24/7'],
+                featured: true
+            }, {
+                id: 'pro',
+                name: 'محترف',
+                price: 99,
+                currency: 'د.إ',
+                features: ['جميع ميزات المميز', 'مشاهدين غير محدود', 'ألعاب مخصصة', 'واجهة برمجة كاملة', 'دعم VIP', 'استضافة حصرية'],
+                featured: false
+            }];
+
+            const grid = document.getElementById('plansGrid');
+            grid.innerHTML = plans.map(plan => `
+                <div class="plan-card ${plan.featured ? 'featured' : ''}">
+                    ${plan.featured ? '<div class="plan-badge">الأكثر اختياراً</div>' : ''}
+                    <h3>${plan.name}</h3>
+                    <div class="plan-price">${plan.price === 0 ? 'مجاني' : `${plan.price}<span>/${plan.currency}</span>`}</div>
+                    <p style="color:var(--text-secondary); font-size:0.85rem;">شهرياً</p>
+                    <ul class="plan-features">
+                        ${plan.features.map(f => `<li><i class="fas fa-check"></i> ${f}</li>`).join('')}
+                    </ul>
+                    <button class="btn ${plan.featured ? 'btn-primary' : 'btn-secondary'} btn-block" 
+                            onclick="${plan.price === 0 ? `showToast('تم اختيار الخطة المجانية', 'success')` : `upgradePlan('${plan.id}')`}">
+                        ${plan.price === 0 ? 'اختيار الخطة' : 'ابدأ الآن'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function upgradePlan(planId) {
+            if (!state.isLoggedIn) {
+                showToast('يرجى تسجيل الدخول أولاً', 'error');
+                showLogin();
+                return;
+            }
+
+            state.isSubscribed = true;
+            state.user.subscribed = true;
+            localStorage.setItem('kotcha-user', JSON.stringify(state.user));
+            showToast(`🎉 تم الترقية إلى خطة ${planId === 'premium' ? 'مميز' : 'محترف'}!`, 'success');
+            playSound('upgrade');
+            renderGames();
+        }
+
+        // ============================================================
+        // ROOM FUNCTIONS
+        // ============================================================
+        async function createRoom() {
+            if (!state.isLoggedIn) {
+                showToast('يرجى تسجيل الدخول أولاً', 'error');
+                showLogin();
+                return;
+            }
+
+            showLoading(true);
+            try {
+                const response = await fetch(`${CONFIG.API}/api/room/create`, { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    showToast(`تم إنشاء الغرفة: ${data.roomId}`, 'success');
+                    playSound('success');
                 } else {
-                    ticker.innerText = `محاولة من ${user}: ${cleanText}`;
+                    showToast('فشل إنشاء الغرفة', 'error');
                 }
-            } else if (STATE.activeGameId === 'tug_of_war') {
-                if (cleanText === '1') {
-                    STATE.tugScore = Math.min(100, STATE.tugScore + 5);
-                    renderTugBar();
-                    if (STATE.tugScore >= 95) triggerWin("فريق الشباب", "انتصروا في تحدي شد الحبل! 🏆");
-                } else if (cleanText === '2') {
-                    STATE.tugScore = Math.max(0, STATE.tugScore - 5);
-                    renderTugBar();
-                    if (STATE.tugScore <= 5) triggerWin("فريق البنات", "انتصرن في تحدي شد الحبل! 🏆");
-                }
-            } else if (STATE.activeGameId === 'derby' || STATE.activeGameId === 'cups') {
-                if (cleanText === STATE.activeQuestion) {
-                    triggerWin(user, "تخمين صحيح وسجل الخيار الفائز! 🎯");
-                } else {
-                    ticker.innerText = `محاولة من ${user}: ${cleanText}`;
-                }
+            } catch (error) {
+                showToast('خطأ في الاتصال', 'error');
+            }
+            showLoading(false);
+        }
+
+        function joinRoom() {
+            document.getElementById('joinRoomError').className = 'form-error';
+            document.getElementById('joinRoomModal').classList.add('active');
+        }
+
+        function handleJoinRoom(event) {
+            event.preventDefault();
+            const roomId = document.getElementById('joinRoomId').value.toUpperCase();
+            if (roomId) {
+                closeModal('joinRoomModal');
+                showToast(`جاري الانضمام إلى الغرفة ${roomId}...`, 'info');
+                playSound('click');
             }
         }
 
-        function triggerWin(winner, msg) {
-            playSound('sfx-win');
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-            
-            const ticker = document.getElementById("stage-action-ticker");
-            ticker.innerText = `🏆 الفائز: ${winner} - ${msg}`;
-            addLogMessage("فوز!", `${winner} ${msg}`, "text-emerald-400 font-bold");
-
+        // ============================================================
+        // UTILITY FUNCTIONS
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+            toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${message}</span>`;
+            container.appendChild(toast);
             setTimeout(() => {
-                if(STATE.activeGameId) initGameCanvas(STATE.activeGameId);
-            }, 3500);
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
 
-        function sendSimulatedChat() {
-            const user = document.getElementById("sim-user").value.trim() || "متابع";
-            const cmd = document.getElementById("sim-cmd").value.trim();
-            if (!cmd) return;
-
-            addLogMessage(user, cmd, "text-indigo-300");
-            processGameLogic(user, cmd);
-            document.getElementById("sim-cmd").value = "";
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').classList.toggle('active', show);
         }
 
-        function addLogMessage(sender, msg, color = 'text-gray-200') {
-            const box = document.getElementById("live-chat-box");
-            const entry = document.createElement("div");
-            entry.className = "flex items-start gap-1.5 text-[11px]";
-            entry.innerHTML = `<span class="font-bold text-gray-400 shrink-0">${sender}:</span> <span class="${color}">${msg}</span>`;
-            box.appendChild(entry);
-            box.scrollTop = box.scrollHeight;
+        function playSound(type) {
+            try {
+                const sounds = {
+                    click: new Audio('data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAABAAgA='),
+                    success: new Audio('data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAABAAgA='),
+                    connect: new Audio('data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAABAAgA='),
+                    upgrade: new Audio('data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAABAAgA='),
+                    gameStart: new Audio('data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAABAAgA=')
+                };
+                if (sounds[type]) {
+                    sounds[type].play().catch(() => {});
+                }
+            } catch (e) {}
         }
 
-        function stopCurrentGame() {
-            STATE.activeGameId = null;
-            document.getElementById("stage-game-title").innerText = "تحدي البث المباشر";
-            document.getElementById("stage-canvas").innerHTML = `<p class="text-xs text-gray-400">تم إيقاف اللعبة. اختر لعبة جديدة للبدء.</p>`;
-            document.getElementById("stage-action-ticker").innerText = "في انتظار تشغيل لعبة جديدة...";
+        function animateNumbers() {
+            document.querySelectorAll('.stat-number').forEach(el => {
+                const target = parseInt(el.dataset.count) || parseInt(el.textContent.replace(/,/g, ''));
+                if (target) {
+                    let current = 0;
+                    const increment = target / 50;
+                    const interval = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            current = target;
+                            clearInterval(interval);
+                        }
+                        el.textContent = Math.floor(current).toLocaleString();
+                    }, 40);
+                }
+            });
         }
 
-        function resetGameScores() {
-            if(STATE.activeGameId) initGameCanvas(STATE.activeGameId);
+        // ============================================================
+        // EVENT LISTENERS
+        // ============================================================
+        function setupEventListeners() {
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) overlay.classList.remove('active');
+                });
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.modal-overlay.active').forEach(el => el.classList.remove('active'));
+                }
+            });
+
+            window.addEventListener('scroll', () => {
+                document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+            });
         }
 
-        function likeStream() {
-            STATE.likes += 1;
-            document.getElementById("stream-likes").innerText = (STATE.likes / 1000).toFixed(1) + "k";
-            playSound('sfx-click');
+        // ============================================================
+        // MISC FUNCTIONS
+        // ============================================================
+        function showDemo() {
+            showToast('🎬 جاري تشغيل العرض التوضيحي...', 'info');
+            playSound('click');
         }
 
-        function connectTikTokLive() {
-            const user = document.getElementById("tiktok-username").value.trim();
-            if(user) addLogMessage("النظام", `تم التوصيل ببث @${user} بنجاح!`, "text-emerald-400");
-        }
+        function showFAQ() { showToast('📖 سيتم عرض الأسئلة الشائعة قريباً', 'info'); }
 
-        function playSound(id) {
-            if (!STATE.audioEnabled) return;
-            const audio = document.getElementById(id);
-            if (audio) { audio.currentTime = 0; audio.play().catch(()=>{}); }
-        }
+        function showSupport() { showToast('📧 للتواصل: support@kotcha.com', 'info'); }
 
-        function toggleAudio() {
-            STATE.audioEnabled = !STATE.audioEnabled;
-            const btn = document.getElementById("audio-btn");
-            btn.innerHTML = STATE.audioEnabled ? `<i class="fas fa-volume-up text-indigo-400"></i>` : `<i class="fas fa-volume-mute text-gray-500"></i>`;
-        }
+        function showPrivacy() { showToast('🔒 سياسة الخصوصية متاحة قريباً', 'info'); }
 
-        // Initialize App
-        window.onload = () => {
-            renderGamesGrid();
-        };
+        function showTerms() { showToast('📜 الشروط والأحكام متاحة قريباً', 'info'); }
+
+        function showDocs() { window.open('https://docs.kotcha.com', '_blank'); }
+
+        function showAPI() { window.open(`${CONFIG.API}/api`, '_blank'); }
+
+        function showGitHub() { window.open('https://github.com/kotcha', '_blank'); }
+
+        // ============================================================
+        // EXPOSE TO WINDOW
+        // ============================================================
+        window.navigateTo = navigateTo;
+        window.toggleTheme = toggleTheme;
+        window.toggleMobileMenu = toggleMobileMenu;
+        window.showLogin = showLogin;
+        window.showSignup = showSignup;
+        window.closeModal = closeModal;
+        window.handleLogin = handleLogin;
+        window.handleSignup = handleSignup;
+        window.logout = logout;
+        window.selectPlatform = selectPlatform;
+        window.disconnectPlatform = disconnectPlatform;
+        window.openGame = openGame;
+        window.startGame = startGame;
+        window.createRoom = createRoom;
+        window.joinRoom = joinRoom;
+        window.handleJoinRoom = handleJoinRoom;
+        window.upgradePlan = upgradePlan;
+        window.showToast = showToast;
+        window.showLoading = showLoading;
+        window.playSound = playSound;
+        window.showDemo = showDemo;
+        window.showFAQ = showFAQ;
+        window.showSupport = showSupport;
+        window.showPrivacy = showPrivacy;
+        window.showTerms = showTerms;
+        window.showDocs = showDocs;
+        window.showAPI = showAPI;
+        window.showGitHub = showGitHub;
+
+        console.log('🚀 KOTCHA v10.0.0 loaded successfully!');
+        console.log('📡 API:', CONFIG.API);
+        console.log('🔌 WebSocket:', CONFIG.WS);
+        console.log(`🎮 ${GAMES.length} games available`);
     </script>
 </body>
 </html>
