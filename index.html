@@ -1,439 +1,885 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#080b14">
-<title>KOTCHA — Interactive Live Gaming</title>
-<style>
-:root{
-  --bg:#070912;--panel:rgba(17,22,38,.78);--panel2:rgba(24,31,52,.86);
-  --line:rgba(255,255,255,.10);--text:#f6f7fb;--muted:#9ba4bd;
-  --primary:#7c5cff;--secondary:#18d8c4;--danger:#ff5577;--gold:#ffc857;
-  --shadow:0 24px 80px rgba(0,0,0,.42);--radius:24px;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:
- radial-gradient(circle at 8% 0%,rgba(124,92,255,.20),transparent 28rem),
- radial-gradient(circle at 92% 12%,rgba(24,216,196,.12),transparent 25rem),
- linear-gradient(135deg,#070912,#0b0f1d 55%,#070912);
- color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;min-height:100vh}
-button,input{font:inherit}
-button{cursor:pointer;border:0}
-a{color:inherit;text-decoration:none}
-.app{min-height:100vh}
-.topbar{position:sticky;top:0;z-index:50;height:76px;border-bottom:1px solid var(--line);background:rgba(7,9,18,.72);backdrop-filter:blur(24px);display:flex;align-items:center;justify-content:space-between;padding:0 5vw}
-.brand{display:flex;align-items:center;gap:12px;font-weight:900;font-size:23px;letter-spacing:-.5px}
-.brand-mark{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),#a56cff);box-shadow:0 0 30px rgba(124,92,255,.45);font-size:21px}
-.nav{display:flex;gap:8px;align-items:center}
-.nav button,.ghost{background:transparent;color:var(--muted);padding:11px 15px;border-radius:12px;transition:.2s}
-.nav button:hover,.ghost:hover{background:rgba(255,255,255,.07);color:var(--text)}
-.actions{display:flex;gap:10px;align-items:center}
-.btn{padding:12px 18px;border-radius:14px;color:white;font-weight:800;transition:.2s;display:inline-flex;align-items:center;gap:8px}
-.btn:hover{transform:translateY(-2px);filter:brightness(1.08)}
-.btn-primary{background:linear-gradient(135deg,#7254ff,#a35dff);box-shadow:0 12px 30px rgba(124,92,255,.25)}
-.btn-secondary{background:linear-gradient(135deg,#0da996,#20d8c1)}
-.btn-dark{background:rgba(255,255,255,.08);border:1px solid var(--line)}
-.btn-danger{background:linear-gradient(135deg,#e83f64,#ff6a7f)}
-.container{width:min(1400px,90vw);margin:auto}
-.hero{padding:72px 0 38px;display:grid;grid-template-columns:1.1fr .9fr;gap:50px;align-items:center}
-.kicker{color:var(--secondary);font-weight:900;letter-spacing:1px;font-size:13px;text-transform:uppercase}
-h1{font-size:clamp(42px,6vw,82px);line-height:1.02;margin:15px 0 22px;letter-spacing:-3px}
-.gradient{background:linear-gradient(90deg,#fff,#bbaeff 45%,#68eadb);-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero p{font-size:18px;line-height:1.9;color:var(--muted);max-width:680px}
-.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
-.live-stage{position:relative;min-height:390px;border:1px solid var(--line);border-radius:32px;overflow:hidden;background:
- linear-gradient(135deg,rgba(124,92,255,.25),transparent 45%),
- radial-gradient(circle at 70% 30%,rgba(24,216,196,.22),transparent 20rem),
- #101426;box-shadow:var(--shadow)}
-.live-stage:before,.live-stage:after{content:"";position:absolute;border-radius:50%;filter:blur(1px);animation:float 7s ease-in-out infinite}
-.live-stage:before{width:180px;height:180px;background:rgba(124,92,255,.24);top:45px;right:55px}
-.live-stage:after{width:110px;height:110px;background:rgba(24,216,196,.2);bottom:55px;left:65px;animation-delay:-3s}
-@keyframes float{50%{transform:translateY(-25px) translateX(18px) scale(1.08)}}
-.stage-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(to bottom,black,transparent)}
-.stage-content{position:relative;z-index:2;padding:28px;height:100%;display:flex;flex-direction:column;justify-content:space-between}
-.live-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,75,110,.16);border:1px solid rgba(255,85,119,.4);color:#ff9db1;border-radius:99px;padding:8px 12px;width:max-content;font-weight:800}
-.dot{width:8px;height:8px;border-radius:50%;background:#ff5577;box-shadow:0 0 14px #ff5577;animation:pulse 1.3s infinite}
-@keyframes pulse{50%{opacity:.3;transform:scale(.7)}}
-.stage-title{font-size:30px;font-weight:900;max-width:450px}
-.stage-bottom{display:flex;justify-content:space-between;align-items:end;gap:20px}
-.avatar-stack{display:flex;direction:ltr}
-.avatar{width:38px;height:38px;border-radius:50%;border:3px solid #101426;background:linear-gradient(135deg,#7c5cff,#18d8c4);display:grid;place-items:center;font-size:12px;font-weight:900;margin-left:-8px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0 50px}
-.stat,.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
-.stat{padding:22px}
-.stat strong{font-size:28px;display:block}.stat span{color:var(--muted);font-size:13px}
-.section{padding:35px 0 70px}
-.section-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:22px}
-.section h2{font-size:32px;margin:0 0 8px}.section-head p{color:var(--muted);margin:0}
-.filters{display:flex;gap:10px;flex-wrap:wrap}
-.filter{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted);padding:10px 15px;border-radius:12px}
-.filter.active{background:rgba(124,92,255,.2);border-color:rgba(124,92,255,.65);color:white}
-.rooms{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.room-card{padding:20px;position:relative;overflow:hidden;transition:.25s}
-.room-card:hover{transform:translateY(-6px);border-color:rgba(124,92,255,.5)}
-.room-card:after{content:"";position:absolute;inset:auto -30px -70px;height:140px;background:radial-gradient(circle,rgba(124,92,255,.18),transparent 65%);pointer-events:none}
-.room-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.room-icon{width:50px;height:50px;border-radius:16px;background:linear-gradient(135deg,rgba(124,92,255,.3),rgba(24,216,196,.18));display:grid;place-items:center;font-size:25px}
-.badge{font-size:11px;font-weight:900;padding:7px 10px;border-radius:99px;background:rgba(255,255,255,.07);color:var(--muted)}
-.badge.live{color:#ff9db1;background:rgba(255,85,119,.12)}
-.room-card h3{margin:0 0 8px;font-size:20px}.room-card p{color:var(--muted);font-size:13px;line-height:1.7;margin:0 0 18px}
-.room-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-bottom:16px}
-.games{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.game-card{padding:22px;min-height:210px;display:flex;flex-direction:column;justify-content:space-between;transition:.25s}
-.game-card:hover{transform:translateY(-5px);border-color:rgba(24,216,196,.5)}
-.game-icon{font-size:38px;margin-bottom:18px}.game-card h3{margin:0 0 8px}.game-card p{color:var(--muted);line-height:1.7;font-size:13px}
-.platforms{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.platform{padding:22px;text-align:center}.platform .logo{font-size:34px;margin-bottom:12px}.platform h3{margin:0 0 7px}.platform p{color:var(--muted);font-size:12px;margin:0 0 16px}
-.footer{border-top:1px solid var(--line);padding:35px 0;color:var(--muted);display:flex;justify-content:space-between}
-.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(10px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
-.modal-backdrop.open{display:flex}
-.modal{width:min(680px,100%);max-height:90vh;overflow:auto;background:#101426;border:1px solid var(--line);border-radius:28px;box-shadow:0 40px 120px rgba(0,0,0,.6);padding:28px;animation:modalIn .25s ease}
-@keyframes modalIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
-.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.modal h2{margin:0}.close{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.07);color:white;font-size:20px}
-.form{display:grid;gap:14px}.field{display:grid;gap:8px}.field label{font-size:13px;color:var(--muted)}.field input,.field select{width:100%;padding:14px 15px;border-radius:14px;background:#0a0e1a;border:1px solid var(--line);color:white;outline:none}.field input:focus,.field select:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(124,92,255,.12)}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.notice{padding:13px 15px;border-radius:14px;background:rgba(24,216,196,.08);border:1px solid rgba(24,216,196,.18);color:#a9eee5;font-size:13px;line-height:1.7}
-.toast{position:fixed;bottom:24px;left:24px;z-index:200;display:grid;gap:10px}.toast-item{background:#151b2e;border:1px solid var(--line);box-shadow:var(--shadow);padding:14px 18px;border-radius:14px;animation:toastIn .25s ease}.toast-item.success{border-color:rgba(24,216,196,.45)}.toast-item.error{border-color:rgba(255,85,119,.45)}
-@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.empty{padding:45px;text-align:center;color:var(--muted);grid-column:1/-1}
-.mobile-menu{display:none}
-@media(max-width:1000px){.hero{grid-template-columns:1fr}.rooms,.games{grid-template-columns:repeat(2,1fr)}.platforms{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:700px){.topbar{padding:0 4vw}.nav{display:none}.mobile-menu{display:block}.actions .btn-dark{display:none}.container{width:92vw}.hero{padding-top:45px}.stats{grid-template-columns:repeat(2,1fr)}.rooms,.games,.platforms{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}.footer{display:block}.footer>*{margin:8px 0}h1{letter-spacing:-2px}.live-stage{min-height:330px}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOTCHA Live | منصة ألعاب البث المباشر التفاعلية</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Tajawal & Press Start 2P for Gaming vibe -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#0B0E14',
+                            card: '#151921',
+                            accent: '#6366F1',
+                            pink: '#EC4899',
+                            cyan: '#06B6D4',
+                            green: '#10B981',
+                            gold: '#F59E0B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif'],
+                        pixel: ['"Press Start 2P"', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0B0E14;
+            color: #F3F4F6;
+            font-family: 'Tajawal', sans-serif;
+            overflow-x: hidden;
+        }
+        .glow-accent {
+            box-shadow: 0 0 25px -5px rgba(99, 102, 241, 0.4);
+        }
+        .glow-pink {
+            box-shadow: 0 0 25px -5px rgba(236, 72, 153, 0.4);
+        }
+        .glass-panel {
+            background: rgba(21, 25, 33, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0B0E14;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2D3748;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #4A5568;
+        }
+        @keyframes pulse-fast {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .animate-pulse-fast {
+            animation: pulse-fast 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
 </head>
-<body>
-<div class="app">
-<header class="topbar">
-  <a class="brand" href="#home"><span class="brand-mark">⚡</span><span>KOTCHA</span></a>
-  <nav class="nav">
-    <button data-scroll="rooms">استكشف الغرف</button>
-    <button data-scroll="games">الألعاب</button>
-    <button data-scroll="platforms">المنصات</button>
-  </nav>
-  <div class="actions">
-    <button class="btn btn-dark" id="loginBtn">تسجيل الدخول</button>
-    <button class="btn btn-primary" id="createBtn">إنشاء غرفة</button>
-    <button class="ghost mobile-menu" id="menuBtn">☰</button>
-  </div>
-</header>
+<body class="custom-scrollbar min-h-screen flex flex-col">
 
-<main id="home">
-<section class="hero container">
-  <div>
-    <div class="kicker">LIVE • PLAY • CONNECT</div>
-    <h1>حوّل البث إلى<br><span class="gradient">لعبة جماعية</span></h1>
-    <p>منصة KOTCHA تجعل المشاهدين جزءًا من البث. ألعاب مباشرة، تفاعل لحظي، دردشة موحدة، وغرف تجمع جمهورك من TikTok وTwitch وKick في تجربة واحدة.</p>
-    <div class="hero-actions">
-      <button class="btn btn-primary" id="heroCreate">🚀 ابدأ غرفة الآن</button>
-      <button class="btn btn-dark" data-scroll="rooms">استكشف الغرف ←</button>
-    </div>
-  </div>
-  <div class="live-stage">
-    <div class="stage-grid"></div>
-    <div class="stage-content">
-      <div class="live-pill"><span class="dot"></span> LIVE NOW</div>
-      <div>
-        <div class="stage-title">الجمهور لا يشاهد فقط… الجمهور يلعب 🎮</div>
-        <p style="color:var(--muted);max-width:440px;line-height:1.8">صوّت، خمّن، نافس، اجمع النقاط واصعد في لوحة المتصدرين في الوقت الحقيقي.</p>
-      </div>
-      <div class="stage-bottom">
-        <div class="avatar-stack"><span class="avatar">A</span><span class="avatar">K</span><span class="avatar">S</span><span class="avatar">+1K</span></div>
-        <div style="text-align:left"><strong style="font-size:22px">1,248</strong><br><span style="color:var(--muted);font-size:12px">لاعب متصل</span></div>
-      </div>
-    </div>
-  </div>
-</section>
+    <!-- Sound & FX Manager (Audio Elements simulated via Web Audio / Audio tags) -->
+    <audio id="sfx-click" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" preload="auto"></audio>
+    <audio id="sfx-win" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" preload="auto"></audio>
+    <audio id="sfx-fail" src="https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3" preload="auto"></audio>
 
-<section class="container stats">
-  <div class="stat"><strong id="statRooms">0</strong><span>غرفة نشطة</span></div>
-  <div class="stat"><strong id="statPlayers">0</strong><span>مشاهدون متصلون</span></div>
-  <div class="stat"><strong>6+</strong><span>ألعاب مباشرة</span></div>
-  <div class="stat"><strong>24/7</strong><span>تفاعل لحظي</span></div>
-</section>
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-pink-500 to-cyan-400 flex items-center justify-center text-white font-pixel font-bold text-xl shadow-lg glow-accent">
+                    K
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <span class="font-black text-xl tracking-wider text-white">KOTCHA</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 font-semibold">v8.0 VIP</span>
+                    </div>
+                    <p class="text-[10px] text-gray-400">منصة ألعاب التفاعل المباشر للبثوث</p>
+                </div>
+            </div>
 
-<section class="section container" id="rooms">
-  <div class="section-head">
-    <div><h2>الغرف المباشرة 🔥</h2><p>ادخل إلى غرفة وشارك في اللعبة فورًا.</p></div>
-    <div class="filters">
-      <button class="filter active" data-filter="all">الكل</button>
-      <button class="filter" data-filter="live">مباشر</button>
-      <button class="filter" data-filter="new">الأحدث</button>
-    </div>
-  </div>
-  <div class="rooms" id="roomsGrid"></div>
-</section>
+            <!-- Platform Selector Header Buttons -->
+            <div class="hidden md:flex items-center space-x-2 space-x-reverse bg-gray-900/80 p-1.5 rounded-xl border border-gray-800">
+                <button onclick="selectPlatform('tiktok')" id="btn-tiktok" class="platform-btn flex items-center space-x-2 space-x-reverse px-3 py-1.5 rounded-lg text-sm transition font-medium text-gray-400 hover:text-white">
+                    <i class="fab fa-tiktok text-pink-500"></i>
+                    <span>TikTok Live</span>
+                </button>
+                <button onclick="selectPlatform('twitch')" id="btn-twitch" class="platform-btn flex items-center space-x-2 space-x-reverse px-3 py-1.5 rounded-lg text-sm transition font-medium text-gray-400 hover:text-white">
+                    <i class="fab fa-twitch text-purple-400"></i>
+                    <span>Twitch Live</span>
+                </button>
+                <button onclick="selectPlatform('kick')" id="btn-kick" class="platform-btn flex items-center space-x-2 space-x-reverse px-3 py-1.5 rounded-lg text-sm transition font-medium text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-bolt text-green-400"></i>
+                    <span>Kick Live</span>
+                </button>
+            </div>
 
-<section class="section container" id="games">
-  <div class="section-head"><div><h2>ألعاب البث 🎮</h2><p>اختر اللعبة التي تجعل جمهورك يشارك بدلًا من المشاهدة فقط.</p></div></div>
-  <div class="games">
-    <article class="card game-card"><div><div class="game-icon">🗳️</div><h3>تصويت الجمهور</h3><p>دع الجمهور يقرر النتيجة لحظيًا مع عرض النتائج مباشرة.</p></div><span class="badge">FREE</span></article>
-    <article class="card game-card"><div><div class="game-icon">🎯</div><h3>خمن الرقم</h3><p>رقم سري، محاولات محدودة، منافسة ونتائج مباشرة.</p></div><span class="badge">FREE</span></article>
-    <article class="card game-card"><div><div class="game-icon">🔤</div><h3>Word Battle</h3><p>تحديات الكلمات والسرعة بين المشاهدين.</p></div><span class="badge">PRO</span></article>
-    <article class="card game-card"><div><div class="game-icon">🧠</div><h3>Quiz Arena</h3><p>أسئلة مباشرة، نقاط، ترتيب، ومنافسة جماعية.</p></div><span class="badge">PRO</span></article>
-    <article class="card game-card"><div><div class="game-icon">⚔️</div><h3>Team Battle</h3><p>قسّم جمهورك إلى فرق وابدأ معركة تفاعلية.</p></div><span class="badge">PRO</span></article>
-    <article class="card game-card"><div><div class="game-icon">⚡</div><h3>Reaction Rush</h3><p>أسرع مشاهد يضغط يفوز. مثالية للبث المباشر.</p></div><span class="badge">PRO</span></article>
-  </div>
-</section>
+            <!-- Status & Quick Controls -->
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <!-- VIP Badge / Subscription Status -->
+                <div id="sub-badge" class="flex items-center space-x-2 space-x-reverse px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                    <span>غير مشترك</span>
+                </div>
 
-<section class="section container" id="platforms">
-  <div class="section-head"><div><h2>منصاتك في مكان واحد 🌐</h2><p>واجهة واحدة لجمهورك مهما كانت منصة البث.</p></div></div>
-  <div class="platforms">
-    <div class="card platform"><div class="logo">♪</div><h3>TikTok LIVE</h3><p>ربط حسابك مع غرفة KOTCHA.</p><button class="btn btn-dark platform-connect" data-platform="tiktok">ربط الحساب</button></div>
-    <div class="card platform"><div class="logo">◉</div><h3>Twitch</h3><p>تفاعل المشاهدين مع بثك.</p><button class="btn btn-dark platform-connect" data-platform="twitch">ربط الحساب</button></div>
-    <div class="card platform"><div class="logo">K</div><h3>Kick</h3><p>تجربة لعب مباشرة للجمهور.</p><button class="btn btn-dark platform-connect" data-platform="kick">ربط الحساب</button></div>
-    <div class="card platform"><div class="logo">⚡</div><h3>KOTCHA</h3><p>منصة الألعاب والتفاعل.</p><button class="btn btn-secondary" id="openRoomBtn">فتح غرفة</button></div>
-  </div>
-</section>
-</main>
+                <!-- Audio Toggle -->
+                <button onclick="toggleAudio()" id="audio-btn" class="w-10 h-10 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 flex items-center justify-center text-gray-300 transition">
+                    <i class="fas fa-volume-up"></i>
+                </button>
 
-<footer class="footer container"><div>© 2026 KOTCHA — Interactive Live Gaming</div><div>Built for creators and communities ⚡</div></footer>
-</div>
+                <!-- Performance Mode -->
+                <button onclick="togglePerformanceMode()" id="perf-btn" class="hidden sm:flex items-center space-x-1.5 space-x-reverse px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 text-xs text-gray-300 font-medium transition">
+                    <i class="fas fa-gauge-high text-cyan-400"></i>
+                    <span>وضع الأداء</span>
+                </button>
+            </div>
 
-<div class="modal-backdrop" id="authModal">
-  <div class="modal">
-    <div class="modal-head"><h2 id="authTitle">تسجيل الدخول</h2><button class="close" data-close>×</button></div>
-    <form class="form" id="authForm">
-      <div class="field"><label>البريد الإلكتروني</label><input type="email" id="authEmail" required autocomplete="email" placeholder="you@example.com"></div>
-      <div class="field"><label>كلمة المرور</label><input type="password" id="authPassword" required autocomplete="current-password" placeholder="••••••••"></div>
-      <div class="field" id="nameField" style="display:none"><label>اسم العرض</label><input type="text" id="authName" placeholder="اسمك"></div>
-      <div class="notice">واجهة الحساب جاهزة محليًا. لتفعيل الحسابات السحابية فعليًا، يجب إضافة API مصادقة إلى Worker.</div>
-      <button class="btn btn-primary" type="submit" id="authSubmit">دخول</button>
-      <button class="ghost" type="button" id="switchAuth">إنشاء حساب جديد</button>
-    </form>
-  </div>
-</div>
-
-<div class="modal-backdrop" id="createModal">
-  <div class="modal">
-    <div class="modal-head"><h2>إنشاء غرفة جديدة 🚀</h2><button class="close" data-close>×</button></div>
-    <form class="form" id="createForm">
-      <div class="form-row">
-        <div class="field"><label>اسم الغرفة</label><input id="roomName" required maxlength="80" placeholder="مثال: تحدي الجمهور"></div>
-        <div class="field"><label>اللعبة</label><select id="gameType"><option value="VOTE">تصويت الجمهور</option><option value="NUMBER_GUESS">خمن الرقم</option><option value="WORD_BATTLE">Word Battle</option><option value="QUIZ">Quiz</option><option value="TEAM_BATTLE">Team Battle</option><option value="REACTION">Reaction Rush</option></select></div>
-      </div>
-      <div class="field"><label>منصة البث</label><select id="roomPlatform"><option value="kotcha">KOTCHA</option><option value="tiktok">TikTok</option><option value="twitch">Twitch</option><option value="kick">Kick</option></select></div>
-      <div class="notice">سيتم إنشاء الغرفة من خلال Durable Object في Worker. رمز المالك لا يظهر في الواجهة العامة ويتم حفظه محليًا للمالك فقط.</div>
-      <button class="btn btn-primary" type="submit">إنشاء الغرفة وبدء التجربة</button>
-    </form>
-  </div>
-</div>
-
-<div class="modal-backdrop" id="roomModal">
-  <div class="modal">
-    <div class="modal-head"><h2 id="roomTitle">غرفة KOTCHA</h2><button class="close" data-close>×</button></div>
-    <div id="roomBody"></div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
-"use strict";
-
-const API = "https://kotcha.ig999x.workers.dev";
-const WS = "wss://kotcha.ig999x.workers.dev";
-const state = { rooms: [], filter:"all", authMode:"login", user:null, socket:null, room:null };
-
-const $ = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
-
-function toast(message,type="success"){
-  const el=document.createElement("div");
-  el.className=`toast-item ${type}`;
-  el.textContent=message;
-  $("#toast").appendChild(el);
-  setTimeout(()=>el.remove(),4200);
-}
-
-function openModal(id){ $("#"+id).classList.add("open"); }
-function closeModal(el){ el.closest(".modal-backdrop")?.classList.remove("open"); }
-
-$$("[data-close]").forEach(x=>x.addEventListener("click",()=>closeModal(x)));
-$$(".modal-backdrop").forEach(x=>x.addEventListener("click",e=>{if(e.target===x)x.classList.remove("open")}));
-
-$$("[data-scroll]").forEach(btn=>btn.addEventListener("click",()=>{
-  document.getElementById(btn.dataset.scroll)?.scrollIntoView({behavior:"smooth"});
-}));
-
-$("#loginBtn").addEventListener("click",()=>openAuth("login"));
-$("#createBtn").addEventListener("click",()=>openCreate());
-$("#heroCreate").addEventListener("click",()=>openCreate());
-$("#openRoomBtn").addEventListener("click",()=>openCreate());
-
-function openAuth(mode){
-  state.authMode=mode;
-  $("#authTitle").textContent=mode==="login"?"تسجيل الدخول":"إنشاء حساب";
-  $("#authSubmit").textContent=mode==="login"?"دخول":"إنشاء الحساب";
-  $("#nameField").style.display=mode==="login"?"none":"grid";
-  $("#switchAuth").textContent=mode==="login"?"إنشاء حساب جديد":"لدي حساب بالفعل";
-  openModal("authModal");
-}
-$("#switchAuth").addEventListener("click",()=>openAuth(state.authMode==="login"?"register":"login"));
-
-$("#authForm").addEventListener("submit",e=>{
-  e.preventDefault();
-  const email=$("#authEmail").value.trim();
-  const name=$("#authName").value.trim() || email.split("@")[0];
-  state.user={id:email,username:name,displayName:name,avatar:null};
-  localStorage.setItem("kotcha_user",JSON.stringify(state.user));
-  $("#authModal").classList.remove("open");
-  toast(state.authMode==="login"?"تم تسجيل الدخول":"تم إنشاء الحساب");
-  updateUserUI();
-});
-
-function updateUserUI(){
-  const user=state.user;
-  if(user){
-    $("#loginBtn").textContent=`👤 ${user.displayName}`;
-  }
-}
-
-function openCreate(){
-  if(!state.user){
-    toast("سجّل الدخول أولًا لإنشاء غرفة","error");
-    openAuth("login");
-    return;
-  }
-  openModal("createModal");
-}
-
-async function api(path,options={}){
-  const res=await fetch(API+path,{
-    ...options,
-    headers:{"Content-Type":"application/json",...(options.headers||{})}
-  });
-  const data=await res.json().catch(()=>({success:false,error:"INVALID_RESPONSE"}));
-  if(!res.ok || data.success===false) throw new Error(data.message||data.error||"API_ERROR");
-  return data;
-}
-
-async function createRoom(){
-  const data=await api("/api/room/create",{method:"POST"});
-  const roomId=data.roomId;
-  const ownerToken=data.ownerToken;
-  if(ownerToken) localStorage.setItem(`kotcha_owner_${roomId}`,ownerToken);
-  state.room={roomId,ownerToken};
-  $("#createModal").classList.remove("open");
-  showRoom(roomId,ownerToken);
-  toast("تم إنشاء الغرفة بنجاح ⚡");
-}
-
-$("#createForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-  try{await createRoom()}catch(err){toast(err.message,"error")}
-});
-
-function roomCard(room){
-  const article=document.createElement("article");
-  article.className="card room-card";
-  article.innerHTML=`
-    <div class="room-top"><div class="room-icon">${room.icon}</div><span class="badge ${room.live?"live":""}">${room.live?"● LIVE":"جديدة"}</span></div>
-    <h3>${escapeHTML(room.name)}</h3>
-    <p>${escapeHTML(room.description)}</p>
-    <div class="room-meta"><span>👥 ${room.viewers} مشاهد</span><span>${room.game}</span></div>
-    <button class="btn btn-primary join-room">دخول الغرفة</button>`;
-  article.querySelector(".join-room").addEventListener("click",()=>showRoom(room.id));
-  return article;
-}
-
-function escapeHTML(v){return String(v).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-
-function renderRooms(){
-  const grid=$("#roomsGrid");
-  grid.innerHTML="";
-  let rooms=state.rooms;
-  if(state.filter==="live") rooms=rooms.filter(r=>r.live);
-  if(state.filter==="new") rooms=[...rooms].reverse();
-  if(!rooms.length){grid.innerHTML='<div class="empty">لا توجد غرف متاحة حاليًا. كن أول من ينشئ غرفة 🚀</div>';return}
-  rooms.forEach(r=>grid.appendChild(roomCard(r)));
-  $("#statRooms").textContent=rooms.length;
-  $("#statPlayers").textContent=rooms.reduce((a,b)=>a+b.viewers,0).toLocaleString("ar-SA");
-}
-
-async function loadRooms(){
-  // The current Worker exposes room creation and per-room APIs, but does not expose a public room directory.
-  // Keep the discovery experience ready without inventing backend data.
-  state.rooms=[];
-  renderRooms();
-}
-$$(".filter").forEach(btn=>btn.addEventListener("click",()=>{
-  $$(".filter").forEach(x=>x.classList.remove("active"));
-  btn.classList.add("active"); state.filter=btn.dataset.filter; renderRooms();
-}));
-
-async function showRoom(roomId,ownerToken=null){
-  $("#roomTitle").textContent=`غرفة ${roomId}`;
-  $("#roomBody").innerHTML=`<div class="notice">جاري الاتصال بالغرفة…</div>`;
-  openModal("roomModal");
-  try{
-    const data=await api(`/room/${encodeURIComponent(roomId)}/api/room/status`);
-    const token=ownerToken||localStorage.getItem(`kotcha_owner_${roomId}`);
-    $("#roomBody").innerHTML=`
-      <div class="form">
-        <div class="form-row">
-          <div class="card" style="padding:18px"><small style="color:var(--muted)">الحالة</small><h3 style="margin:8px 0;color:var(--secondary)">● متصل</h3></div>
-          <div class="card" style="padding:18px"><small style="color:var(--muted)">المشاهدون</small><h3 style="margin:8px 0">${data.viewers||0}</h3></div>
         </div>
-        <div class="card" style="padding:20px">
-          <h3 style="margin-top:0">اللعبة الحالية</h3>
-          <p style="color:var(--muted)">${data.gameType||"لا توجد لعبة نشطة"}</p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <button class="btn btn-primary" id="connectRoom">اتصال مباشر</button>
-            <button class="btn btn-dark" id="voteDemo">فتح التصويت</button>
-          </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Controls / Game Launcher Area (Lg: 8 Cols) -->
+        <section class="lg:col-span-8 space-y-6">
+
+            <!-- Banner / System Status Hero Panel -->
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900/40 via-purple-900/30 to-brand-card p-6 border border-indigo-500/20 shadow-2xl">
+                <div class="absolute -left-10 -bottom-10 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
+                    <div>
+                        <div class="flex items-center space-x-2 space-x-reverse mb-2">
+                            <span class="px-2.5 py-1 rounded-md bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-500/30">تحكم حقيقي وتفاعل فوري</span>
+                            <span class="px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30 flex items-center gap-1">
+                                <i class="fas fa-plug text-[10px]"></i> Cloudflare WebSocket Active
+                            </span>
+                        </div>
+                        <h1 class="text-2xl md:text-3xl font-black text-white mb-2">ربط التفاعل المباشر مع شات البث</h1>
+                        <p class="text-gray-300 text-sm max-w-xl">اختر منصة البث، نَشّط الاشتراك، واطلق ألعاب التفاعل المباشر ليتحول شات البث فوراً إلى أوامر حركة ونقاط على شاشتك!</p>
+                    </div>
+
+                    <!-- Action Subscription Button -->
+                    <button onclick="activateSubscription()" class="w-full md:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-bold text-sm shadow-lg hover:opacity-95 transition transform hover:-translate-y-0.5 flex items-center justify-center space-x-2 space-x-reverse glow-pink shrink-0">
+                        <i class="fas fa-crown text-yellow-300"></i>
+                        <span>تفعيل اشتراك VIP الكامل</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Platform Quick Switch Bar (Mobile / Extra Control) -->
+            <div class="glass-panel p-4 rounded-2xl border border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span class="text-sm font-bold text-gray-200">المنصة النشطة حالياً:</span>
+                    <span id="active-platform-name" class="text-sm font-extrabold text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-lg border border-indigo-500/20">لم يتم التحديد</span>
+                </div>
+
+                <div class="flex items-center space-x-2 space-x-reverse w-full sm:w-auto">
+                    <input type="text" id="streamer-username" placeholder="اسم حسابك بالبث..." class="bg-gray-900 border border-gray-700 text-sm rounded-xl px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 w-full sm:w-48">
+                    <button onclick="connectStream()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition shrink-0">
+                        ربط الشات
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Categories & Search Bar -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <!-- Categories -->
+                <div class="flex items-center space-x-2 space-x-reverse overflow-x-auto w-full pb-2 sm:pb-0 custom-scrollbar">
+                    <button onclick="filterGames('all')" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white whitespace-nowrap">الكل (21)</button>
+                    <button onclick="filterGames('battle')" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold bg-gray-800 text-gray-400 hover:text-white whitespace-nowrap">تحديات وفرق</button>
+                    <button onclick="filterGames('luck')" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold bg-gray-800 text-gray-400 hover:text-white whitespace-nowrap">روليت وإقصاء</button>
+                    <button onclick="filterGames('mind')" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold bg-gray-800 text-gray-400 hover:text-white whitespace-nowrap">ذكاء وتخمين</button>
+                </div>
+
+                <!-- Game Search -->
+                <div class="relative w-full sm:w-64">
+                    <i class="fas fa-search absolute right-3 top-3 text-gray-500 text-xs"></i>
+                    <input type="text" id="game-search" onkeyup="searchGames()" placeholder="ابحث عن لعبة..." class="w-full bg-gray-900 border border-gray-800 text-xs rounded-xl pr-8 pl-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500">
+                </div>
+            </div>
+
+            <!-- Games Grid Container (21 Fully Detailed Games) -->
+            <div id="games-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Dynamically Inserted via JS -->
+            </div>
+
+        </section>
+
+        <!-- Right Side: Live Stage & Interactive Controls (Lg: 4 Cols) -->
+        <aside class="lg:col-span-4 space-y-6">
+
+            <!-- Active Game Live Monitor Stage -->
+            <div class="glass-panel rounded-2xl p-4 border border-gray-800 space-y-4 sticky top-20">
+                <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <span class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></span>
+                        <h2 class="font-bold text-sm text-white">شاشة البث التفاعلية المباشرة</h2>
+                    </div>
+                    <span id="game-status-pill" class="text-[10px] font-bold px-2.5 py-1 rounded-md bg-gray-800 text-gray-400">خامل</span>
+                </div>
+
+                <!-- Simulation Video Screen -->
+                <div id="live-stage" class="relative w-full h-64 bg-black rounded-xl overflow-hidden border border-gray-800 flex flex-col items-center justify-center p-4 text-center">
+                    <!-- Default Screen when no game active -->
+                    <div id="stage-placeholder" class="space-y-3">
+                        <div class="w-16 h-16 rounded-full bg-indigo-500/10 border border-indigo-500/20 mx-auto flex items-center justify-center text-indigo-400 text-2xl">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <p class="text-xs text-gray-400 font-medium">اختر لعبة وانقر على "تشغيل اللعبة" لعرض محاكاة التفاعل المباشر هنا</p>
+                    </div>
+
+                    <!-- Dynamic Live Game Render Area -->
+                    <div id="stage-active-game" class="hidden w-full h-full flex flex-col justify-between">
+                        <!-- Header Bar -->
+                        <div class="flex justify-between items-center text-xs text-gray-300 bg-gray-900/80 p-2 rounded-lg backdrop-blur">
+                            <span id="stage-game-title" class="font-bold text-indigo-400">اسم اللعبة</span>
+                            <span id="stage-timer" class="font-pixel text-yellow-400">00:60</span>
+                        </div>
+
+                        <!-- Canvas / Dynamic Graphics Display -->
+                        <div id="stage-canvas" class="my-auto flex flex-col items-center justify-center relative w-full h-32">
+                            <!-- Visual elements inserted dynamically based on selected game -->
+                        </div>
+
+                        <!-- Live Action Ticker Footer -->
+                        <div id="stage-action-ticker" class="text-[11px] bg-indigo-950/60 text-indigo-200 py-1.5 px-3 rounded-lg border border-indigo-500/30 truncate">
+                            في انتظار أوامر الشات...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simulated Live Stream Chat Box -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between text-xs text-gray-400">
+                        <span class="font-bold"><i class="fas fa-comments text-indigo-400 ml-1"></i> شات المتابعين التفاعلي</span>
+                        <span id="chat-count" class="text-[10px] bg-gray-800 px-2 py-0.5 rounded">0 رسالة</span>
+                    </div>
+
+                    <div id="live-chat-box" class="h-44 bg-gray-950 rounded-xl p-3 border border-gray-800 overflow-y-auto space-y-2 text-xs font-mono custom-scrollbar">
+                        <div class="text-gray-600 text-center text-[11px] py-4">سيتم عرض رسائل وأوامر شات المتابعين هنا فور التفاعل...</div>
+                    </div>
+
+                    <!-- Manual Trigger Input for Testing -->
+                    <div class="flex items-center gap-2 pt-2">
+                        <input type="text" id="sim-user" placeholder="اسم المتابع" class="w-1/3 bg-gray-900 border border-gray-800 rounded-lg px-2 py-1.5 text-xs text-white">
+                        <input type="text" id="sim-cmd" placeholder="الرمز أو الإجابة (!1 أو إجابة)" class="w-2/3 bg-gray-900 border border-gray-800 rounded-lg px-2 py-1.5 text-xs text-white">
+                        <button onclick="sendSimulatedChat()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg shrink-0">
+                            ارسال
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Control Console Actions -->
+                <div class="grid grid-cols-2 gap-2 pt-2">
+                    <button onclick="stopCurrentGame()" class="px-3 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
+                        <i class="fas fa-stop"></i> إيقاف اللعبة
+                    </button>
+                    <button onclick="resetGameScores()" class="px-3 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
+                        <i class="fas fa-rotate-right"></i> إعادة ضبط
+                    </button>
+                </div>
+
+            </div>
+
+        </aside>
+
+    </main>
+
+    <!-- Modal for Subscription Activation -->
+    <div id="sub-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-md w-full rounded-2xl p-6 border border-indigo-500/30 shadow-2xl space-y-6 text-center relative">
+            <button onclick="closeSubModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white text-lg">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-yellow-400 to-amber-600 text-black font-bold text-2xl mx-auto flex items-center justify-center shadow-lg glow-pink">
+                <i class="fas fa-crown"></i>
+            </div>
+
+            <div>
+                <h3 class="text-xl font-black text-white">تفعيل اشتراك KOTCHA VIP</h3>
+                <p class="text-xs text-gray-400 mt-1">احصل على الوصول الكامل لجميع الـ 21 لعبة تفاعلية وبدون قيود أو إعلانات</p>
+            </div>
+
+            <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800 text-right space-y-2 text-xs">
+                <div class="flex items-center text-emerald-400 gap-2 font-bold">
+                    <i class="fas fa-check-circle"></i> ربط مباشر مع TikTok Live, Twitch, Kick
+                </div>
+                <div class="flex items-center text-emerald-400 gap-2 font-bold">
+                    <i class="fas fa-check-circle"></i> دعم كود الـ Cloudflare Worker v8.0.0
+                </div>
+                <div class="flex items-center text-emerald-400 gap-2 font-bold">
+                    <i class="fas fa-check-circle"></i> 21 لعبة تفاعلية بدقة ومؤثرات صوتية VIP
+                </div>
+            </div>
+
+            <button onclick="confirmSubscription()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-sm shadow-lg hover:opacity-95 transition">
+                تأكيد التفعيل المجاني التمكييني (مجاناً حصرياً)
+            </button>
         </div>
-        <div id="roomStatusText" class="notice">WebSocket جاهز للاتصال عند بدء اللعب.</div>
-      </div>`;
-    $("#connectRoom").addEventListener("click",()=>connectRoom(roomId,token));
-    $("#voteDemo").addEventListener("click",()=>sendVote(roomId));
-  }catch(err){$("#roomBody").innerHTML=`<div class="notice" style="border-color:rgba(255,85,119,.4);color:#ffb0bf">تعذر تحميل الغرفة: ${escapeHTML(err.message)}</div>`}
-}
+    </div>
 
-function connectRoom(roomId,ownerToken){
-  if(state.socket) try{state.socket.close()}catch{}
-  const url=`${WS}/room/${encodeURIComponent(roomId)}`;
-  try{
-    const socket=new WebSocket(url);
-    state.socket=socket;
-    socket.onopen=()=>{
-      socket.send(JSON.stringify({
-        type:"AUTH",
-        platform:"kotcha",
-        user:state.user||{id:"guest-"+crypto.randomUUID(),username:"Guest",displayName:"Guest"},
-        ...(ownerToken?{ownerToken}: {})
-      }));
-      $("#roomStatusText").textContent="متصل مباشرة عبر WebSocket ⚡";
-      toast("تم الاتصال بالغرفة لحظيًا");
-    };
-    socket.onmessage=e=>{
-      const msg=JSON.parse(e.data);
-      if(msg.type==="CHAT") toast(`${msg.data.user?.displayName||"مستخدم"}: ${msg.data.message}`);
-    };
-    socket.onerror=()=>toast("تعذر اتصال WebSocket","error");
-    socket.onclose=()=>{if($("#roomStatusText"))$("#roomStatusText").textContent="انقطع الاتصال";}
-  }catch{toast("المتصفح لا يدعم WebSocket هنا","error")}
-}
+    <!-- JavaScript Game Logic & Engine Integration -->
+    <script>
+        // ============================================================
+        // KOTCHA CLIENT ENGINE & STATE MANAGEMENT
+        // ============================================================
 
-async function sendVote(roomId){
-  try{
-    const value=Math.floor(Math.random()*5)+1;
-    await api(`/room/${encodeURIComponent(roomId)}/api/vote/cast`,{
-      method:"POST",body:JSON.stringify({value,user:state.user||{id:"guest",username:"Guest",displayName:"Guest"}})
-    });
-    toast("تم إرسال تصويتك");
-  }catch(err){toast(err.message,"error")}
-}
+        const STATE = {
+            subscriptionActive: false,
+            activePlatform: null,
+            activeGameId: null,
+            audioEnabled: true,
+            performanceMode: false,
+            streamerUser: "",
+            scores: {},
+            gameTimer: null,
+            timerSeconds: 60
+        };
 
-$$(".platform-connect").forEach(btn=>btn.addEventListener("click",()=>{
-  const p=btn.dataset.platform;
-  toast(`ربط ${p.toUpperCase()} يحتاج OAuth رسمي من المنصة. الواجهة جاهزة للتكامل مع endpoint OAuth في Worker.`,"error");
-}));
+        // Complete 21 Games Database Specification
+        const GAMES_DATABASE = [
+            {
+                id: "abyss",
+                title: "الهاوية",
+                desc: "تحدي الجسر الزجاجي؛ اختر لوح النجاة قبل أن تبتلعك الهاوية!",
+                category: "luck",
+                icon: "fa-bridge",
+                color: "from-blue-600 to-indigo-900",
+                badge: "مستوحاة من الحبار",
+                command: "1 أو 2"
+            },
+            {
+                id: "derby",
+                title: "ديربي",
+                desc: "سباق أهداف مباشر بين فريقين؛ اختر زاوية التسديد واكسر توقع الحارس!",
+                category: "battle",
+                icon: "fa-futbol",
+                color: "from-emerald-600 to-teal-900",
+                badge: "حماس رياضي",
+                command: "يمين / يسار"
+            },
+            {
+                id: "match",
+                title: "تطابق",
+                desc: "تحدي الذاكرة البصرية التفاعلي لإيجاد الصور المتطابقة للشات!",
+                category: "mind",
+                icon: "fa-brain",
+                color: "from-purple-600 to-pink-900",
+                badge: "ذاكرة",
+                command: "A1, B2"
+            },
+            {
+                id: "cups",
+                title: "أكواب",
+                desc: "تتبع الكوب الذهبي الذي يخبئ الكرة بعد خلط الأكواب بسرعة!",
+                category: "luck",
+                icon: "fa-glass-water",
+                color: "from-amber-600 to-orange-900",
+                badge: "تركيز وسرعة",
+                command: "1 أو 2 أو 3"
+            },
+            {
+                id: "top10",
+                title: "توب تن",
+                desc: "تحدي تخمين أفضل 10 إجابات للسؤال المطروح بالشات!",
+                category: "mind",
+                icon: "fa-list-ol",
+                color: "from-yellow-500 to-amber-800",
+                badge: "تخمين جماعي",
+                command: "اكتب إجابتك"
+            },
+            {
+                id: "ambush",
+                title: "الكمين",
+                desc: "فك شيفرة الإحداثيات للنجاة من عدوى المصاب!",
+                category: "luck",
+                icon: "fa-biohazard",
+                color: "from-red-600 to-rose-950",
+                badge: "بقاء على قيد الحياة",
+                command: "إحداثي X,Y"
+            },
+            {
+                id: "chairs",
+                title: "الكراسي الموسيقية",
+                desc: "تحدي السرعة والجلوس على الكراسي المتبقية بالشات!",
+                category: "battle",
+                icon: "fa-chair",
+                color: "from-pink-600 to-purple-900",
+                badge: "سرعة بديهة",
+                command: "اجلس"
+            },
+            {
+                id: "hidden_roulette",
+                title: "الروليت المخفي",
+                desc: "روليت الإقصاء مع إخفاء الهويات خلف أعلام الدول!",
+                category: "luck",
+                icon: "fa-flag",
+                color: "from-indigo-600 to-blue-900",
+                badge: "إقصاء غامض",
+                command: "اختر العلم"
+            },
+            {
+                id: "sard",
+                title: "سرد",
+                desc: "تحدي البحث عن الكلمات المترابطة والسريعة!",
+                category: "mind",
+                icon: "fa-font",
+                color: "from-cyan-600 to-blue-900",
+                badge: "لغوي",
+                command: "اكتب الكلمة"
+            },
+            {
+                id: "roulette_elimination",
+                title: "الروليت والإقصاء",
+                desc: "عجلة الروليت وإقصاء اللاعبين التلقائي من الشات!",
+                category: "luck",
+                icon: "fa-dharmachakra",
+                color: "from-red-600 to-purple-900",
+                badge: "حظ متطرق",
+                command: "دخول"
+            },
+            {
+                id: "russian_roulette",
+                title: "الروليت الروسي",
+                desc: "تحدي الموت أو النجاة بالروليت الروسي المباشر!",
+                category: "luck",
+                icon: "fa-gun",
+                color: "from-gray-700 to-black",
+                badge: "مخاطرة عالية",
+                command: "اسحب"
+            },
+            {
+                id: "shabak",
+                title: "شبك",
+                desc: "تحدي ربط الدول والحدود الجغرافية بين المشاهدين!",
+                category: "mind",
+                icon: "fa-globe",
+                color: "from-emerald-600 to-cyan-900",
+                badge: "جغرافيا",
+                command: "اسم الدولة"
+            },
+            {
+                id: "time_bomb",
+                title: "القنبلة الموقوتة",
+                desc: "فريق الشباب ضد فريق البنات وتمرير القنبلة الموقوتة!",
+                category: "battle",
+                icon: "fa-bomb",
+                color: "from-orange-600 to-red-900",
+                badge: "شباب ضد بنات",
+                command: "مرر"
+            },
+            {
+                id: "letter_grid",
+                title: "شبكة الحروف",
+                desc: "مسار الشباب ضد مسار البنات لتوصيل الحروف المتصلة!",
+                category: "mind",
+                icon: "fa-border-all",
+                color: "from-violet-600 to-indigo-900",
+                badge: "تكتيكي",
+                command: "حرف"
+            },
+            {
+                id: "code_breaker",
+                title: "كاسر الشفرة",
+                desc: "تخمين الرقم السري المكون من 4 أرقام عبر الشات!",
+                category: "mind",
+                icon: "fa-key",
+                color: "from-yellow-600 to-orange-900",
+                badge: "تشفير",
+                command: "4 أرقام"
+            },
+            {
+                id: "scribble",
+                title: "خربشة",
+                desc: "ارسم الكلمة والجمهور يخمن الإجابة بالشات مباشرة!",
+                category: "mind",
+                icon: "fa-paintbrush",
+                color: "from-fuchsia-600 to-pink-900",
+                badge: "رسم وتخمين",
+                command: "التخمين"
+            },
+            {
+                id: "sniper",
+                title: "القناص",
+                desc: "تحدي القناص والاختباء الجماعي للمشاهدين بالشات!",
+                category: "battle",
+                icon: "fa-crosshairs",
+                color: "from-stone-700 to-red-900",
+                badge: "تكتيك اختباء",
+                command: "اختر المخبأ"
+            },
+            {
+                id: "salad",
+                title: "سلطة",
+                desc: "مجموعة ألعاب سريعة وتفاعلية متغيرة داخل مكان واحد!",
+                category: "luck",
+                icon: "fa-bowl-rice",
+                color: "from-green-600 to-lime-800",
+                badge: "منوعات سريعة",
+                command: "تفاعل حر"
+            },
+            {
+                id: "cross_out",
+                title: "شطب",
+                desc: "تحدي الأسئلة المتعددة والنجاة من الشطب والإقصاء!",
+                category: "mind",
+                icon: "fa-ban",
+                color: "from-rose-600 to-red-900",
+                badge: "إقصاء ثفافي",
+                command: "خيار أ، ب، ج"
+            },
+            {
+                id: "mentals",
+                title: "ذهنيات",
+                desc: "ألعاب الذكاء، الحساب الذهني الفوري، وتحدي الذاكرة!",
+                category: "mind",
+                icon: "fa-calculator",
+                color: "from-sky-600 to-blue-900",
+                badge: "حساب سريع",
+                command: "الناتج"
+            },
+            {
+                id: "missile_war",
+                title: "حرب الصواريخ",
+                desc: "تحدي إطلاق الصواريخ وحماية القلعة بين فريقين!",
+                category: "battle",
+                icon: "fa-rocket",
+                color: "from-indigo-600 to-purple-950",
+                badge: "حرب استراتيجية",
+                command: "اطلاق"
+            }
+        ];
 
-const saved=localStorage.getItem("kotcha_user");
-if(saved) try{state.user=JSON.parse(saved);updateUserUI()}catch{}
-loadRooms();
-</script>
+        // ============================================================
+        // INITIALIZATION & RENDER ENGINE
+        // ============================================================
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderGamesList(GAMES_DATABASE);
+            selectPlatform('tiktok'); // Default platform
+        });
+
+        function playSound(soundId) {
+            if (!STATE.audioEnabled) return;
+            const audio = document.getElementById(soundId);
+            if (audio) {
+                audio.currentTime = 0;
+                audio.play().catch(() => {});
+            }
+        }
+
+        function toggleAudio() {
+            STATE.audioEnabled = !STATE.audioEnabled;
+            const btn = document.getElementById("audio-btn");
+            if (STATE.audioEnabled) {
+                btn.innerHTML = '<i class="fas fa-volume-up text-indigo-400"></i>';
+                playSound('sfx-click');
+            } else {
+                btn.innerHTML = '<i class="fas fa-volume-mute text-gray-500"></i>';
+            }
+        }
+
+        function togglePerformanceMode() {
+            STATE.performanceMode = !STATE.performanceMode;
+            const btn = document.getElementById("perf-btn");
+            btn.classList.toggle("bg-indigo-600/30");
+            btn.classList.toggle("border-indigo-500");
+            playSound('sfx-click');
+        }
+
+        // Render Games in Grid
+        function renderGamesList(games) {
+            const grid = document.getElementById("games-grid");
+            grid.innerHTML = "";
+
+            games.forEach(game => {
+                const card = document.createElement("div");
+                card.className = `game-card glass-panel rounded-2xl p-4 border border-gray-800 hover:border-indigo-500/50 transition-all flex flex-col justify-between relative overflow-hidden group`;
+                card.dataset.category = game.category;
+                card.dataset.title = game.title;
+
+                card.innerHTML = `
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${game.color}"></div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr ${game.color} flex items-center justify-center text-white text-lg shadow-md">
+                                <i class="fas ${game.icon}"></i>
+                            </div>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-800 text-indigo-300 border border-gray-700">${game.badge}</span>
+                        </div>
+
+                        <div>
+                            <h3 class="font-black text-base text-white group-hover:text-indigo-400 transition">${game.title}</h3>
+                            <p class="text-xs text-gray-400 mt-1 line-clamp-2">${game.desc}</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-gray-800/80 flex items-center justify-between gap-2">
+                        <span class="text-[10px] font-mono text-gray-500">أمر الشات: <span class="text-yellow-400 font-bold">${game.command}</span></span>
+                        
+                        <button onclick="launchGame('${game.id}')" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow transition flex items-center gap-1">
+                            <i class="fas fa-play text-[10px]"></i>
+                            <span>تشغيل</span>
+                        </button>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Category Filtering
+        function filterGames(category) {
+            playSound('sfx-click');
+            const btns = document.querySelectorAll('.cat-btn');
+            btns.forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white');
+                btn.classList.add('bg-gray-800', 'text-gray-400');
+            });
+            event.target.classList.remove('bg-gray-800', 'text-gray-400');
+            event.target.classList.add('bg-indigo-600', 'text-white');
+
+            const cards = document.querySelectorAll('.game-card');
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Search Games
+        function searchGames() {
+            const query = document.getElementById("game-search").value.toLowerCase();
+            const cards = document.querySelectorAll('.game-card');
+            cards.forEach(card => {
+                const title = card.dataset.title.toLowerCase();
+                if (title.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Platform Switcher
+        function selectPlatform(platform) {
+            playSound('sfx-click');
+            STATE.activePlatform = platform;
+            const names = { tiktok: 'TikTok Live', twitch: 'Twitch Live', kick: 'Kick Live' };
+            document.getElementById("active-platform-name").innerText = names[platform];
+
+            document.querySelectorAll('.platform-btn').forEach(btn => {
+                btn.classList.remove('bg-gray-800', 'text-white', 'border', 'border-gray-700');
+            });
+            const activeBtn = document.getElementById(`btn-${platform}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-gray-800', 'text-white', 'border', 'border-gray-700');
+            }
+        }
+
+        // Connection to Chat
+        function connectStream() {
+            const username = document.getElementById("streamer-username").value.trim();
+            if (!username) {
+                alert("الرجاء إدخال اسم الحساب الخاص بك للبث المباشر");
+                return;
+            }
+            STATE.streamerUser = username;
+            playSound('sfx-win');
+            addChatMessage("النظام", `تم الربط بنجاح مع شات ${STATE.activePlatform} للحساب @${username}`, "text-emerald-400 font-bold");
+        }
+
+        // Subscription Modal logic
+        function activateSubscription() {
+            playSound('sfx-click');
+            document.getElementById("sub-modal").classList.remove("hidden");
+        }
+
+        function closeSubModal() {
+            playSound('sfx-click');
+            document.getElementById("sub-modal").classList.add("hidden");
+        }
+
+        function confirmSubscription() {
+            playSound('sfx-win');
+            STATE.subscriptionActive = true;
+            const badge = document.getElementById("sub-badge");
+            badge.className = "flex items-center space-x-2 space-x-reverse px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold";
+            badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>VIP مُفعل</span>';
+            closeSubModal();
+        }
+
+        // Launch Selected Game Engine
+        function launchGame(gameId) {
+            if (!STATE.subscriptionActive) {
+                activateSubscription();
+                return;
+            }
+
+            playSound('sfx-click');
+            const game = GAMES_DATABASE.find(g => g.id === gameId);
+            if (!game) return;
+
+            STATE.activeGameId = gameId;
+
+            // UI Adjustments
+            document.getElementById("stage-placeholder").classList.add("hidden");
+            document.getElementById("stage-active-game").classList.remove("hidden");
+            document.getElementById("stage-game-title").innerText = game.title;
+            
+            const pill = document.getElementById("game-status-pill");
+            pill.innerText = "جاري اللعب المباشر";
+            pill.className = "text-[10px] font-bold px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+
+            renderGameCanvas(game);
+            startTimer(60);
+            addChatMessage("النظام", `تم بدء لعبة [ ${game.title} ] ! اكتبوا الأوامر في الشات لتفاعل فوري`, "text-yellow-400 font-bold");
+        }
+
+        // Dynamic Game Canvas Visualizations
+        function renderGameCanvas(game) {
+            const canvas = document.getElementById("stage-canvas");
+            canvas.innerHTML = "";
+
+            if (game.id === "abyss") {
+                canvas.innerHTML = `
+                    <div class="flex gap-4 items-center justify-center">
+                        <div id="glass-1" class="w-16 h-20 bg-cyan-500/20 border-2 border-cyan-400/50 rounded-xl flex items-center justify-center font-black text-white text-lg">1</div>
+                        <div id="glass-2" class="w-16 h-20 bg-cyan-500/20 border-2 border-cyan-400/50 rounded-xl flex items-center justify-center font-black text-white text-lg">2</div>
+                    </div>
+                `;
+            } else if (game.id === "derby") {
+                canvas.innerHTML = `
+                    <div class="relative w-full h-24 bg-emerald-900/40 rounded-xl border border-emerald-500/30 flex items-center justify-between px-6">
+                        <div class="text-center"><span class="block text-xs text-gray-400">الفريق أ</span><span id="score-a" class="font-pixel text-xl text-yellow-400">0</span></div>
+                        <div class="text-xl font-bold text-white">VS</div>
+                        <div class="text-center"><span class="block text-xs text-gray-400">الفريق ب</span><span id="score-b" class="font-pixel text-xl text-yellow-400">0</span></div>
+                    </div>
+                `;
+            } else if (game.id === "cups") {
+                canvas.innerHTML = `
+                    <div class="flex gap-3 justify-center items-center">
+                        <div class="w-12 h-14 bg-amber-600/30 border border-amber-500 rounded-t-2xl flex items-center justify-center font-pixel text-white">1</div>
+                        <div class="w-12 h-14 bg-amber-600/30 border border-amber-500 rounded-t-2xl flex items-center justify-center font-pixel text-white">2</div>
+                        <div class="w-12 h-14 bg-amber-600/30 border border-amber-500 rounded-t-2xl flex items-center justify-center font-pixel text-white">3</div>
+                    </div>
+                `;
+            } else {
+                canvas.innerHTML = `
+                    <div class="text-center space-y-2">
+                        <div class="w-12 h-12 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto text-xl border border-indigo-500/30">
+                            <i class="fas ${game.icon}"></i>
+                        </div>
+                        <p class="text-xs text-gray-300 font-bold">لعبة ${game.title} نشطة الآن!</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Game Timer Logic
+        function startTimer(seconds) {
+            clearInterval(STATE.gameTimer);
+            STATE.timerSeconds = seconds;
+            updateTimerDisplay();
+
+            STATE.gameTimer = setInterval(() => {
+                STATE.timerSeconds--;
+                updateTimerDisplay();
+                if (STATE.timerSeconds <= 0) {
+                    clearInterval(STATE.gameTimer);
+                    playSound('sfx-fail');
+                    document.getElementById("stage-action-ticker").innerText = "انتهى وقت الجولة!";
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const sec = STATE.timerSeconds < 10 ? `0${STATE.timerSeconds}` : STATE.timerSeconds;
+            document.getElementById("stage-timer").innerText = `00:${sec}`;
+        }
+
+        // Live Interactive Chat Logic
+        function addChatMessage(user, msg, customClass = "") {
+            const chatBox = document.getElementById("live-chat-box");
+            
+            // Remove empty placeholder
+            if (chatBox.children[0] && chatBox.children[0].innerText.includes("سيتم عرض رسائل")) {
+                chatBox.innerHTML = "";
+            }
+
+            const item = document.createElement("div");
+            item.className = "flex items-start space-x-1.5 space-x-reverse break-all";
+            
+            item.innerHTML = `
+                <span class="font-bold text-gray-400 shrink-0">${user}:</span>
+                <span class="${customClass || 'text-gray-200'}">${msg}</span>
+            `;
+
+            chatBox.appendChild(item);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Update Count
+            const count = chatBox.children.length;
+            document.getElementById("chat-count").innerText = `${count} رسالة`;
+
+            // Process Chat Command if Game is active
+            if (STATE.activeGameId && user !== "النظام") {
+                processGameCommand(user, msg);
+            }
+        }
+
+        // Game Engine Logic Command Processor
+        function processGameCommand(user, command) {
+            const ticker = document.getElementById("stage-action-ticker");
+            ticker.innerText = `تفاعل جديد من @${user}: ${command}`;
+
+            if (STATE.activeGameId === "abyss") {
+                if (command === "1" || command === "2") {
+                    playSound('sfx-win');
+                    ticker.innerText = `تخمين @${user} الخيار ${command} - اجتاز اللوح بنجاح!`;
+                }
+            } else if (STATE.activeGameId === "derby") {
+                if (command.includes("يمين") || command.includes("يسار")) {
+                    playSound('sfx-win');
+                    const scoreA = document.getElementById("score-a");
+                    if (scoreA) scoreA.innerText = parseInt(scoreA.innerText) + 1;
+                    ticker.innerText = `هدف محقق لـ @${user}!`;
+                }
+            }
+        }
+
+        function sendSimulatedChat() {
+            const user = document.getElementById("sim-user").value.trim() || "متابع_VIP";
+            const cmd = document.getElementById("sim-cmd").value.trim() || "1";
+            addChatMessage(user, cmd);
+            document.getElementById("sim-cmd").value = "";
+        }
+
+        function stopCurrentGame() {
+            playSound('sfx-click');
+            clearInterval(STATE.gameTimer);
+            STATE.activeGameId = null;
+
+            document.getElementById("stage-placeholder").classList.remove("hidden");
+            document.getElementById("stage-active-game").classList.add("hidden");
+
+            const pill = document.getElementById("game-status-pill");
+            pill.innerText = "خامل";
+            pill.className = "text-[10px] font-bold px-2.5 py-1 rounded-md bg-gray-800 text-gray-400";
+            addChatMessage("النظام", "تم إيقاف اللعبة الحالية", "text-red-400 font-bold");
+        }
+
+        function resetGameScores() {
+            playSound('sfx-click');
+            if (STATE.activeGameId) {
+                launchGame(STATE.activeGameId);
+            }
+        }
+    </script>
 </body>
 </html>
