@@ -1,0 +1,280 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+body {
+  background: radial-gradient(circle at top, #0f172a 0, #020617 40%, #000 100%);
+  color: #e5e7eb;
+}
+
+.header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #1f2937;
+  background: linear-gradient(135deg, #111827, #1d4ed8);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: radial-gradient(circle, #f97316, #b91c1c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: #fff;
+}
+
+.brand h1 {
+  font-size: 1.3rem;
+}
+
+.brand p {
+  font-size: 0.9rem;
+  color: #cbd5f5;
+}
+
+.worker-config {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.worker-config label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8rem;
+}
+
+.worker-config input {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #374151;
+  background: #020617;
+  color: #e5e7eb;
+}
+
+.worker-config button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  background: #22c55e;
+  color: #022c22;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.worker-config button:hover {
+  background: #16a34a;
+}
+
+.status {
+  font-size: 0.8rem;
+  min-width: 160px;
+}
+
+.layout {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  border: 1px solid #1f2937;
+}
+
+.card.wide {
+  grid-column: 1 / -1;
+}
+
+.card h2 {
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.platforms {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.platform-btn {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: none;
+  background: #1d4ed8;
+  color: #e5e7eb;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.platform-btn.active {
+  background: #f97316;
+  color: #111827;
+}
+
+.subscription {
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+
+.subscription button {
+  margin-top: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  background: #facc15;
+  color: #422006;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.perf-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.hint {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.game-card {
+  background: #020617;
+  border-radius: 10px;
+  padding: 10px;
+  border: 1px solid #1f2937;
+  position: relative;
+  overflow: hidden;
+}
+
+.game-card::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.3), transparent 60%);
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.game-card h3 {
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.game-card p {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-bottom: 6px;
+}
+
+.play-btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  background: #22c55e;
+  color: #022c22;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.play-btn:hover {
+  background: #16a34a;
+}
+
+.word-input {
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid #374151;
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 0.8rem;
+}
+
+.chat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.chat-col h3 {
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+.chat-col label {
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+
+.chat-col input {
+  width: 100%;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid #374151;
+  background: #020617;
+  color: #e5e7eb;
+  margin-top: 2px;
+}
+
+.chat-col button {
+  margin-top: 6px;
+  margin-right: 4px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  background: #3b82f6;
+  color: #e5e7eb;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.btn-row {
+  margin-bottom: 6px;
+}
+
+pre {
+  margin-top: 6px;
+  background: #0b1120;
+  border-radius: 8px;
+  padding: 6px;
+  font-size: 0.75rem;
+  max-height: 180px;
+  overflow: auto;
+  border: 1px solid #1f2937;
+}
+
+#wsLog {
+  max-height: 220px;
+}
