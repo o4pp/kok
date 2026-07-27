@@ -1,1142 +1,533 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KOTCHA Live Interactive Gaming v8.0.0</title>
-  
-  <!-- FontAwesome & Google Fonts -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
-  
-  <style>
-    /* ============================================================
-       RESET & BASE DESIGN SYSTEM
-       ============================================================ */
-    :root {
-      --bg-dark: #0a0b10;
-      --bg-card: rgba(18, 22, 36, 0.75);
-      --bg-card-hover: rgba(28, 34, 56, 0.85);
-      --border-color: rgba(255, 255, 255, 0.08);
-      
-      --accent-primary: #ff0055;
-      --accent-secondary: #00f0ff;
-      --accent-purple: #7000ff;
-      --accent-gold: #ffb700;
-      
-      --text-main: #f0f3f9;
-      --text-muted: #8a94a6;
-      
-      --glow-primary: rgba(255, 0, 85, 0.4);
-      --glow-secondary: rgba(0, 240, 255, 0.4);
-      
-      --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Tajawal', sans-serif;
-      user-select: none;
-    }
-
-    body {
-      background-color: var(--bg-dark);
-      background-image: 
-        radial-gradient(circle at 10% 10%, rgba(112, 0, 255, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 90% 90%, rgba(0, 240, 255, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 50% 50%, rgba(255, 0, 85, 0.08) 0%, transparent 60%);
-      background-attachment: fixed;
-      color: var(--text-main);
-      min-height: 100vh;
-      overflow-x: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.2);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--accent-secondary);
-    }
-
-    /* ============================================================
-       TOP HEADER / NAVBAR
-       ============================================================ */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 30px;
-      background: rgba(10, 11, 16, 0.85);
-      backdrop-filter: blur(15px);
-      border-bottom: 1px solid var(--border-color);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .brand-logo {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.8rem;
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: 2px;
-      text-shadow: 0 0 20px var(--glow-primary);
-    }
-
-    .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(0, 240, 255, 0.1);
-      border: 1px solid rgba(0, 240, 255, 0.3);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      color: var(--accent-secondary);
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      background-color: #00ff66;
-      border-radius: 50%;
-      box-shadow: 0 0 10px #00ff66;
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0% { opacity: 0.4; }
-      50% { opacity: 1; }
-      100% { opacity: 0.4; }
-    }
-
-    .header-controls {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .sub-btn {
-      background: linear-gradient(135deg, var(--accent-gold), #ff6a00);
-      color: #000;
-      font-weight: 700;
-      padding: 8px 18px;
-      border-radius: 20px;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 0 15px rgba(255, 183, 0, 0.4);
-      transition: all 0.3s ease;
-    }
-
-    .sub-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 25px rgba(255, 183, 0, 0.7);
-    }
-
-    /* ============================================================
-       MAIN LAYOUT
-       ============================================================ */
-    .container {
-      display: grid;
-      grid-template-columns: 280px 1fr 340px;
-      gap: 20px;
-      padding: 20px;
-      flex: 1;
-      max-width: 1800px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    @media (max-width: 1200px) {
-      .container {
-        grid-template-columns: 1fr 340px;
-      }
-      .sidebar-left {
-        display: none;
-      }
-    }
-
-    @media (max-width: 850px) {
-      .container {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Glass Panels */
-    .panel {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      backdrop-filter: blur(20px);
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    }
-
-    .panel-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 10px;
-    }
-
-    .panel-title i {
-      color: var(--accent-secondary);
-    }
-
-    /* ============================================================
-       PLATFORMS INTEGRATION SIDEBAR
-       ============================================================ */
-    .platform-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 12px 15px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: all 0.3s ease;
-    }
-
-    .platform-card:hover {
-      background: var(--bg-card-hover);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .platform-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .platform-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-    }
-
-    .tiktok-bg { background: #000; color: #ff0050; border: 1px solid #00f2fe; }
-    .twitch-bg { background: #6441a5; color: #fff; }
-    .kick-bg { background: #53fc18; color: #000; }
-    .kotcha-bg { background: var(--accent-purple); color: #fff; }
-
-    .platform-status {
-      font-size: 0.75rem;
-      padding: 3px 8px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-muted);
-    }
-
-    .platform-status.connected {
-      background: rgba(0, 255, 102, 0.15);
-      color: #00ff66;
-    }
-
-    /* ============================================================
-       GAME STAGE (CENTER CONTENT)
-       ============================================================ */
-    .game-stage {
-      position: relative;
-      background: radial-gradient(circle at center, rgba(30, 35, 60, 0.6) 0%, rgba(10, 11, 16, 0.9) 100%);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      min-height: 480px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      overflow: hidden;
-    }
-
-    .stage-header {
-      padding: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(0, 0, 0, 0.3);
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .game-title-active {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.4rem;
-      color: var(--accent-secondary);
-      text-shadow: 0 0 10px var(--glow-secondary);
-    }
-
-    .stage-viewport {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 30px;
-      text-align: center;
-    }
-
-    /* Game Selection Cards */
-    .games-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
-      width: 100%;
-    }
-
-    .game-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 15px 10px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .game-card:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--accent-primary);
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px var(--glow-primary);
-    }
-
-    .game-card.active {
-      border-color: var(--accent-secondary);
-      background: rgba(0, 240, 255, 0.1);
-      box-shadow: 0 0 20px var(--glow-secondary);
-    }
-
-    .game-card i {
-      font-size: 1.8rem;
-      color: var(--accent-secondary);
-    }
-
-    .game-card span {
-      font-size: 0.85rem;
-      font-weight: 700;
-    }
-
-    /* Voting Mechanics UI */
-    .vote-bars {
-      width: 100%;
-      max-width: 500px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .vote-option {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .vote-info {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.9rem;
-    }
-
-    .vote-progress-bg {
-      height: 12px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 6px;
-      overflow: hidden;
-      border: 1px solid var(--border-color);
-    }
-
-    .vote-progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-      width: 0%;
-      transition: width 0.4s ease;
-    }
-
-    /* Number Guess UI */
-    .guess-box {
-      background: rgba(0, 0, 0, 0.4);
-      padding: 25px;
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 15px;
-      max-width: 400px;
-      width: 100%;
-    }
-
-    .guess-input-group {
-      display: flex;
-      gap: 10px;
-      width: 100%;
-    }
-
-    .guess-input {
-      flex: 1;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 10px 15px;
-      color: #fff;
-      font-size: 1.2rem;
-      text-align: center;
-      font-family: 'Orbitron', sans-serif;
-      outline: none;
-    }
-
-    .guess-input:focus {
-      border-color: var(--accent-secondary);
-    }
-
-    .btn {
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-purple));
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: var(--radius-sm);
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .btn:hover {
-      opacity: 0.9;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px var(--glow-primary);
-    }
-
-    /* ============================================================
-       RIGHT SIDEBAR: LIVE CHAT & LEADERBOARD
-       ============================================================ */
-    .chat-container {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      min-height: 500px;
-    }
-
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      padding-right: 5px;
-      max-height: 400px;
-    }
-
-    .chat-msg {
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: var(--radius-sm);
-      padding: 8px 12px;
-      border-right: 3px solid var(--border-color);
-      font-size: 0.88rem;
-      line-height: 1.4;
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .chat-msg.tiktok { border-color: #ff0050; }
-    .chat-msg.twitch { border-color: #6441a5; }
-    .chat-msg.kick { border-color: #53fc18; }
-    .chat-msg.vip { border-color: var(--accent-gold); background: rgba(255, 183, 0, 0.05); }
-
-    .chat-user {
-      font-weight: 700;
-      color: var(--accent-secondary);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 2px;
-    }
-
-    .chat-badge {
-      font-size: 0.65rem;
-      padding: 1px 5px;
-      border-radius: 4px;
-      background: var(--accent-gold);
-      color: #000;
-      font-weight: 900;
-    }
-
-    .chat-input-area {
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid var(--border-color);
-    }
-
-    .chat-input {
-      flex: 1;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 8px 12px;
-      color: #fff;
-      outline: none;
-      font-size: 0.85rem;
-    }
-
-    /* Leaderboard Tab */
-    .leaderboard-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-
-    .leaderboard-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 12px;
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: var(--radius-sm);
-      font-size: 0.85rem;
-    }
-
-    .rank {
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 700;
-      color: var(--accent-gold);
-      width: 20px;
-    }
-
-    /* ============================================================
-       SUBSCRIPTION MODAL
-       ============================================================ */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(10px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.3s ease;
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .subscription-card {
-      background: var(--bg-card);
-      border: 1px solid var(--accent-gold);
-      border-radius: var(--radius-lg);
-      padding: 30px;
-      max-width: 450px;
-      width: 90%;
-      text-align: center;
-      box-shadow: 0 0 40px rgba(255, 183, 0, 0.2);
-      position: relative;
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
-
-    .sub-tiers {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin: 20px 0;
-    }
-
-    .sub-tier-option {
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .sub-tier-option:hover, .sub-tier-option.selected {
-      border-color: var(--accent-gold);
-      background: rgba(255, 183, 0, 0.08);
-    }
-
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOTCHA | منصة البث التفاعلي وصناع المحتوى</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0b10;
+            --bg-secondary: #121520;
+            --bg-card: #1a1e2e;
+            --accent-purple: #7928ca;
+            --accent-cyan: #00dfd8;
+            --accent-pink: #ff0080;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* --- Header Navigation --- */
+        header {
+            background: rgba(18, 21, 32, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--accent-cyan);
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.6rem 1.4rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            color: white;
+            box-shadow: 0 4px 15px rgba(121, 40, 202, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(121, 40, 202, 0.6);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            text-align: center;
+            padding: 5rem 1rem;
+            background: radial-gradient(circle at center, rgba(121, 40, 202, 0.15) 0%, transparent 70%);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        /* --- Main Content Grid --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .live-badge {
+            background: var(--accent-pink);
+            color: white;
+            font-size: 0.8rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .room-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 1.2rem;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-cyan);
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .room-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        /* --- Modal Component --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .platform-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .platform-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 0.6rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .platform-btn.active {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 223, 216, 0.1);
+        }
+
+        /* --- Live Arena Area --- */
+        .arena {
+            display: none;
+            grid-template-columns: 1fr 320px;
+            gap: 1.5rem;
+            height: calc(100vh - 120px);
+        }
+
+        .game-viewport {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .chat-viewport {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .chat-input-area {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.5rem;
+        }
+    </style>
 </head>
 <body>
 
-  <!-- ============================================================
-       HEADER
-       ============================================================ -->
-  <header>
-    <div class="brand">
-      <div class="brand-logo"><i class="fa-solid fa-gamepad"></i> KOTCHA</div>
-      <div class="status-badge">
-        <div class="status-dot"></div>
-        <span>متصل بالبث المباشر</span>
-      </div>
+    <!-- Navigation Header -->
+    <header>
+        <div class="logo">KOTCHA</div>
+        <nav>
+            <ul>
+                <li><a href="#" class="active">الرئيسية</a></li>
+                <li><a href="#">استكشف</a></li>
+                <li><a href="#">الألعاب</a></li>
+                <li><a href="#">الاشتراكات</a></li>
+            </ul>
+        </nav>
+        <div class="user-actions">
+            <button class="btn btn-primary" onclick="openModal('createModal')">+ إنشاء بث</button>
+            <button class="btn btn-secondary" id="loginBtn" onclick="loginOAuth('tiktok')">تسجيل الدخول</button>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Screen -->
+    <div id="mainDashboard">
+        <section class="hero">
+            <h1>العب مع جمهورك مباشرة 🚀</h1>
+            <p>منصة التفاعل المباشر الأولى لصناع المحتوى على TikTok, Twitch, و Kick.</p>
+            <button class="btn btn-primary" onclick="openModal('createModal')">ابدأ البث الآن</button>
+        </section>
+
+        <div class="container">
+            <h2 class="section-title"><span class="live-badge">LIVE</span> البثوث النشطة الآن</h2>
+            <div class="rooms-grid" id="roomsContainer">
+                <!-- Data dynamically populated from backend -->
+            </div>
+        </div>
     </div>
 
-    <div class="header-controls">
-      <button class="sub-btn" onclick="toggleSubModal()">
-        <i class="fa-solid fa-crown"></i> اشتراك VIP
-      </button>
+    <!-- Active Live Arena Screen -->
+    <div class="container">
+        <div class="arena" id="liveArena">
+            <div class="game-viewport">
+                <h2 id="currentRoomTitle">عنوان البث</h2>
+                <div id="gameUI" style="margin-top: 2rem; text-align: center;">
+                    <p style="color: var(--text-muted);">في انتظار بدء الجولة الأولى...</p>
+                    <button class="btn btn-primary" style="margin-top: 1rem;" onclick="triggerGameAction()">تفاعل مع اللعبة 🔥</button>
+                </div>
+            </div>
+            <div class="chat-viewport">
+                <div style="padding: 1rem; border-bottom: 1px solid var(--border-color); font-weight: 700;">الدردشة المباشرة</div>
+                <div class="chat-messages" id="chatBox"></div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" class="form-control" placeholder="اكتب رسالتك...">
+                    <button class="btn btn-primary" onclick="sendChatMessage()">إرسال</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </header>
 
-  <!-- ============================================================
-       MAIN CONTAINER
-       ============================================================ -->
-  <div class="container">
-    
-    <!-- LEFT SIDEBAR: PLATFORMS & SYSTEM -->
-    <aside class="panel sidebar-left">
-      <div class="panel-title">
-        <i class="fa-solid fa-satellite-dish"></i> منصات البث المربوطة
-      </div>
-      
-      <div class="platform-card">
-        <div class="platform-info">
-          <div class="platform-icon tiktok-bg"><i class="fa-brands fa-tiktok"></i></div>
-          <div>
-            <div style="font-weight: 700; font-size: 0.9rem;">TikTok Live</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">تفاعل الدردشة والهدايا</div>
-          </div>
-        </div>
-        <span class="platform-status connected">متصل</span>
-      </div>
-
-      <div class="platform-card">
-        <div class="platform-info">
-          <div class="platform-icon twitch-bg"><i class="fa-brands fa-twitch"></i></div>
-          <div>
-            <div style="font-weight: 700; font-size: 0.9rem;">Twitch</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">أوامر الـ Chat</div>
-          </div>
-        </div>
-        <span class="platform-status connected">متصل</span>
-      </div>
-
-      <div class="platform-card">
-        <div class="platform-info">
-          <div class="platform-icon kick-bg"><i class="fa-solid fa-bolt"></i></div>
-          <div>
-            <div style="font-weight: 700; font-size: 0.9rem;">Kick Stream</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">تفاعل مباشر</div>
-          </div>
-        </div>
-        <span class="platform-status connected">متصل</span>
-      </div>
-
-      <div class="panel-title" style="margin-top: 15px;">
-        <i class="fa-solid fa-gamepad"></i> قائمة الألعاب المتاحة
-      </div>
-
-      <div class="games-grid">
-        <div class="game-card active" onclick="switchGame('VOTE')">
-          <i class="fa-solid fa-check-to-slot"></i>
-          <span>التصويت المباشر</span>
-        </div>
-        <div class="game-card" onclick="switchGame('NUMBER_GUESS')">
-          <i class="fa-solid fa-arrow-up-9-1"></i>
-          <span>تخمين الرقم</span>
-        </div>
-        <div class="game-card" onclick="switchGame('WORD_BATTLE')">
-          <i class="fa-solid fa-font"></i>
-          <span>معركة الكلمات</span>
-        </div>
-        <div class="game-card" onclick="switchGame('QUIZ')">
-          <i class="fa-solid fa-brain"></i>
-          <span>أسئلة وإجابات</span>
-        </div>
-      </div>
-    </aside>
-
-    <!-- CENTER: GAME STAGE -->
-    <main class="game-stage">
-      <div class="stage-header">
-        <div class="game-title-active" id="activeGameTitle">
-          <i class="fa-solid fa-fire"></i> لعبة التصويت التفاعلي
-        </div>
-        <div style="font-size: 0.85rem; color: var(--text-muted);" id="viewerCount">
-          <i class="fa-solid fa-users"></i> 1,245 مشاهد يشارك الآن
-        </div>
-      </div>
-
-      <div class="stage-viewport" id="gameViewport">
-        <!-- Dynamic Game Content Rendered via JS -->
-        <div class="vote-bars">
-          <h3 style="margin-bottom: 15px;">ما هو خيارك المفضل للبث القادم؟</h3>
-          
-          <div class="vote-option" onclick="castVote(1)">
-            <div class="vote-info">
-              <span>1. لعبة رعب ممتعة</span>
-              <span id="vote-count-1">45% (120 صوت)</span>
+    <!-- Create Stream Modal -->
+    <div class="modal-overlay" id="createModal">
+        <div class="modal">
+            <h3 class="modal-title">إنشاء بث جديد</h3>
+            <div class="form-group">
+                <label>عنوان البث</label>
+                <input type="text" id="streamTitle" class="form-control" placeholder="تحدي الجمهور اليوم 🔥">
             </div>
-            <div class="vote-progress-bg">
-              <div class="vote-progress-fill" id="vote-bar-1" style="width: 45%;"></div>
+            <div class="form-group">
+                <label>اختر اللعبة</label>
+                <select id="gameType" class="form-control">
+                    <option value="QUIZ">اختبار معلومات (Quiz)</option>
+                    <option value="REACTION">سرعة البديهة (Reaction)</option>
+                    <option value="VOTE">تصويت الجمهور (Vote)</option>
+                </select>
             </div>
-          </div>
-
-          <div class="vote-option" onclick="castVote(2)">
-            <div class="vote-info">
-              <span>2. تحدي الأسئلة والسريع</span>
-              <span id="vote-count-2">30% (80 صوت)</span>
+            <div class="form-group">
+                <label>اختر المنصة</label>
+                <div class="platform-selector">
+                    <div class="platform-btn active" onclick="selectPlatform(this, 'TikTok')">TikTok</div>
+                    <div class="platform-btn" onclick="selectPlatform(this, 'Twitch')">Twitch</div>
+                    <div class="platform-btn" onclick="selectPlatform(this, 'Kick')">Kick</div>
+                    <div class="platform-btn" onclick="selectPlatform(this, 'KOTCHA')">عام</div>
+                </div>
             </div>
-            <div class="vote-progress-bg">
-              <div class="vote-progress-fill" id="vote-bar-2" style="width: 30%;"></div>
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="btn btn-primary" style="flex: 1;" onclick="submitCreateRoom()">بدء البث</button>
+                <button class="btn btn-secondary" onclick="closeModal('createModal')">إلغاء</button>
             </div>
-          </div>
-
-          <div class="vote-option" onclick="castVote(3)">
-            <div class="vote-info">
-              <span>3. لعب جماعي مع المشاهدين</span>
-              <span id="vote-count-3">25% (65 صوت)</span>
-            </div>
-            <div class="vote-progress-bg">
-              <div class="vote-progress-fill" id="vote-bar-3" style="width: 25%;"></div>
-            </div>
-          </div>
         </div>
-      </div>
-    </main>
-
-    <!-- RIGHT SIDEBAR: LIVE CHAT & LEADERBOARD -->
-    <aside class="panel">
-      <div class="panel-title">
-        <i class="fa-solid fa-comments"></i> الدردشة المباشرة
-      </div>
-
-      <div class="chat-container">
-        <div class="chat-messages" id="chatBox">
-          <div class="chat-msg tiktok">
-            <div class="chat-user"><i class="fa-brands fa-tiktok"></i> أحمد_الغامدي</div>
-            خيار رقم 1 أكيد! متحمس للعبة الرعب 🔥
-          </div>
-          <div class="chat-msg vip">
-            <div class="chat-user"><span class="chat-badge">VIP</span> سارة_الخالد</div>
-            صوتي للأسئلة والأجوبة 🧠✨
-          </div>
-          <div class="chat-msg twitch">
-            <div class="chat-user"><i class="fa-brands fa-twitch"></i> GamerX_99</div>
-            اخترت 3 نبي نلعب معك!
-          </div>
-        </div>
-
-        <div class="chat-input-area">
-          <input type="text" class="chat-input" id="chatInput" placeholder="أرسل رسالة أو شارك باللعبة..." onkeypress="handleChatKey(event)">
-          <button class="btn" onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
-        </div>
-      </div>
-
-      <div class="panel-title" style="margin-top: 15px;">
-        <i class="fa-solid fa-trophy"></i> لائحة المتصدرين
-      </div>
-
-      <div class="leaderboard-list" id="leaderboard">
-        <div class="leaderboard-item">
-          <div style="display:flex; align-items:center; gap: 8px;">
-            <span class="rank">#1</span>
-            <span>سارة_الخالد</span>
-          </div>
-          <span style="color: var(--accent-gold); font-weight:700;">1,450 نقطة</span>
-        </div>
-        <div class="leaderboard-item">
-          <div style="display:flex; align-items:center; gap: 8px;">
-            <span class="rank" style="color: #c0c0c0;">#2</span>
-            <span>GamerX_99</span>
-          </div>
-          <span style="color: var(--accent-gold); font-weight:700;">1,200 نقطة</span>
-        </div>
-        <div class="leaderboard-item">
-          <div style="display:flex; align-items:center; gap: 8px;">
-            <span class="rank" style="color: #cd7f32;">#3</span>
-            <span>أحمد_الغامدي</span>
-          </div>
-          <span style="color: var(--accent-gold); font-weight:700;">980 نقطة</span>
-        </div>
-      </div>
-    </aside>
-
-  </div>
-
-  <!-- ============================================================
-       SUBSCRIPTION MODAL
-       ============================================================ -->
-  <div class="modal-overlay" id="subModal">
-    <div class="subscription-card">
-      <button class="modal-close" onclick="toggleSubModal()"><i class="fa-solid fa-xmark"></i></button>
-      <i class="fa-solid fa-crown" style="font-size: 3rem; color: var(--accent-gold); margin-bottom: 10px;"></i>
-      <h2>اشتراك الداعمين VIP</h2>
-      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">احصل على شارات مميزة، نقاط مضاعفة في الألعاب، وإمكانية التحكم بالألعاب المباشرة!</p>
-
-      <div class="sub-tiers">
-        <div class="sub-tier-option selected">
-          <div>
-            <div style="font-weight: 700;">الاشتراك الشهري الذهبي</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">شارات VIP + نقاط 2x</div>
-          </div>
-          <div style="font-weight: 900; color: var(--accent-gold);">$4.99 / شهر</div>
-        </div>
-
-        <div class="sub-tier-option">
-          <div>
-            <div style="font-weight: 700;">الاشتراك الداعم الماسي</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">شارات خاصة + التحكم بالألعاب</div>
-          </div>
-          <div style="font-weight: 900; color: var(--accent-gold);">$9.99 / شهر</div>
-        </div>
-      </div>
-
-      <button class="btn" style="width: 100%; background: linear-gradient(135deg, var(--accent-gold), #ff6a00); color: #000;" onclick="confirmSub()">
-        تأكيد الاشتراك الآن
-      </button>
     </div>
-  </div>
 
-  <!-- ============================================================
-       JAVASCRIPT LOGIC & INTEGRATION
-       ============================================================ -->
-  <script>
-    // ============================================================
-    // CONFIGURATION & INTEGRATED BACKEND DATA
-    // ============================================================
-    const CONFIG = {
-      workerUrl: "https://kotcha.ig999x.workers.dev",
-      webPagesUrl: "https://kotcha.pages.dev",
-      roomId: "default-live-room",
-      version: "8.0.0"
-    };
+    <script>
+        const API_BASE = "https://kotcha.ig999x.workers.dev"; // رابط Backend الخادم
+        let selectedPlatform = "TikTok";
+        let activeWS = null;
+        let currentUser = "زائر_" + Math.floor(Math.random() * 1000);
 
-    let currentGame = "VOTE";
-    let ws = null;
-    let votes = [120, 80, 65];
+        // --- Initialize Page ---
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchPublicRooms();
+            checkUserAuth();
+        });
 
-    // ============================================================
-    // INITIALIZATION & WEBSOCKET AUTO-CONNECT
-    // ============================================================
-    window.addEventListener("DOMContentLoaded", () => {
-      initWebSocket();
-    });
+        async function fetchPublicRooms() {
+            try {
+                const res = await fetch(`${API_BASE}/api/rooms/public`);
+                const data = await res.json();
+                const container = document.getElementById("roomsContainer");
+                container.innerHTML = "";
 
-    function initWebSocket() {
-      const wsUrl = CONFIG.workerUrl.replace("https://", "wss://") + "/room/" + CONFIG.roomId;
-      
-      try {
-        ws = new WebSocket(wsUrl);
-
-        ws.onopen = () => {
-          console.log("KOTCHA WS Connected Successfully.");
-          // Send Auth Message
-          ws.send(JSON.stringify({
-            type: "AUTH",
-            platform: "kotcha",
-            user: { username: "Viewer_" + Math.floor(Math.random() * 1000) }
-          }));
-        };
-
-        ws.onmessage = (event) => {
-          try {
-            const data = JSON.parse(event.data);
-            handleIncomingWSMessage(data);
-          } catch(e) {
-            console.error("Error parsing WS message:", e);
-          }
-        };
-
-        ws.onclose = () => {
-          setTimeout(initWebSocket, 3000); // Reconnect loop
-        };
-      } catch (e) {
-        console.warn("WS Connection simulated (Running on standalone mode)");
-      }
-    }
-
-    function handleIncomingWSMessage(data) {
-      if (data.type === "CHAT") {
-        renderChatMessage(data.data);
-      } else if (data.type === "VOTE") {
-        updateVoteUI(data.votes);
-      }
-    }
-
-    // ============================================================
-    // GAME SWITCHING LOGIC
-    // ============================================================
-    function switchGame(gameType) {
-      currentGame = gameType;
-      
-      // Update UI Game Cards
-      document.querySelectorAll('.game-card').forEach(card => card.classList.remove('active'));
-      event.currentTarget.classList.add('active');
-
-      const viewport = document.getElementById("gameViewport");
-      const title = document.getElementById("activeGameTitle");
-
-      if (gameType === 'VOTE') {
-        title.innerHTML = `<i class="fa-solid fa-check-to-slot"></i> لعبة التصويت التفاعلي`;
-        renderVoteGame(viewport);
-      } else if (gameType === 'NUMBER_GUESS') {
-        title.innerHTML = `<i class="fa-solid fa-arrow-up-9-1"></i> لعبة تخمين الرقم السرّي`;
-        renderNumberGuessGame(viewport);
-      } else if (gameType === 'WORD_BATTLE') {
-        title.innerHTML = `<i class="fa-solid fa-font"></i> معركة الكلمات السريعة`;
-        renderWordBattleGame(viewport);
-      } else if (gameType === 'QUIZ') {
-        title.innerHTML = `<i class="fa-solid fa-brain"></i> أسئلة وإجابات البث المباشر`;
-        renderQuizGame(viewport);
-      }
-    }
-
-    // Render Vote Game
-    function renderVoteGame(container) {
-      container.innerHTML = `
-        <div class="vote-bars">
-          <h3 style="margin-bottom: 15px;">ما هو خيارك المفضل للبث القادم؟</h3>
-          <div class="vote-option" onclick="castVote(0)">
-            <div class="vote-info">
-              <span>1. لعبة رعب ممتعة</span>
-              <span id="vote-count-0">45% (${votes[0]} صوت)</span>
-            </div>
-            <div class="vote-progress-bg">
-              <div class="vote-progress-fill" id="vote-bar-0" style="width: 45%;"></div>
-            </div>
-          </div>
-          <div class="vote-option" onclick="castVote(1)">
-            <div class="vote-info">
-              <span>2. تحدي الأسئلة والسريع</span>
-              <span id="vote-count-1">30% (${votes[1]} صوت)</span>
-            </div>
-            <div class="vote-progress-bg">
-              <div class="vote-progress-fill" id="vote-bar-1" style="width: 30%;"></div>
-            </div>
-          </div>
-          <div class="vote-option" onclick="castVote(2)">
-            <div class="vote-info">
-              <span>3. لعب جماعي مع المشاهدين</span>
-              <span id="vote-count-2">25% (${votes[2]} صوت)</span>
-            </div>
-            <div class="vote-progress-bg">
-              <div class="vote-progress-fill" id="vote-bar-2" style="width: 25%;"></div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    // Render Number Guess Game
-    function renderNumberGuessGame(container) {
-      container.innerHTML = `
-        <div class="guess-box">
-          <i class="fa-solid fa-question-circle" style="font-size: 3rem; color: var(--accent-secondary);"></i>
-          <h3>خمن الرقم بين 1 و 100</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">أول مشاهد يخمن الرقم الصحيح يحصل على 500 نقطة!</p>
-          <div class="guess-input-group">
-            <input type="number" class="guess-input" id="guessInput" placeholder="50" min="1" max="100">
-            <button class="btn" onclick="submitGuess()">إرسال</button>
-          </div>
-          <div id="guessFeedback" style="font-weight: 700; margin-top: 10px;"></div>
-        </div>
-      `;
-    }
-
-    // Render Word Battle Game
-    function renderWordBattleGame(container) {
-      container.innerHTML = `
-        <div class="guess-box">
-          <i class="fa-solid fa-font" style="font-size: 3rem; color: var(--accent-primary);"></i>
-          <h3>تجميع الكلمة السريعة</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">ركّب الكلمة التالية من الحروف المبعثرة: <strong style="color: var(--accent-gold); font-size: 1.2rem;">(ت - ك - و - ك - ي)</strong></p>
-          <div class="guess-input-group">
-            <input type="text" class="guess-input" id="wordInput" placeholder="اكتب الكلمة هنا...">
-            <button class="btn" onclick="submitWord()">تأكيد</button>
-          </div>
-        </div>
-      `;
-    }
-
-    // Render Quiz Game
-    function renderQuizGame(container) {
-      container.innerHTML = `
-        <div class="guess-box" style="max-width: 500px;">
-          <i class="fa-solid fa-lightbulb" style="font-size: 3rem; color: var(--accent-gold);"></i>
-          <h3>سؤال البث السريع</h3>
-          <p style="font-size: 1rem; margin-bottom: 10px;">ما هي عاصمة ألعاب الفيديو والتكنولوجيا؟</p>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;">
-            <button class="btn" style="background: rgba(255,255,255,0.05);" onclick="alert('إجابة خاطئة!')">طوكيو</button>
-            <button class="btn" style="background: rgba(255,255,255,0.05);" onclick="alert('إجابة خاطئة!')">سيول</button>
-            <button class="btn" style="background: rgba(255,255,255,0.05);" onclick="alert('إجابة صحيحة! +100 نقطة')">الرياض</button>
-            <button class="btn" style="background: rgba(255,255,255,0.05);" onclick="alert('إجابة خاطئة!')">سان فرانسيسكو</button>
-          </div>
-        </div>
-      `;
-    }
-
-    // ============================================================
-    // GAME ACTIONS
-    // ============================================================
-    function castVote(index) {
-      votes[index]++;
-      const total = votes.reduce((a, b) => a + b, 0);
-
-      for (let i = 0; i < votes.length; i++) {
-        const pct = Math.round((votes[i] / total) * 100);
-        const bar = document.getElementById(`vote-bar-${i}`);
-        const count = document.getElementById(`vote-count-${i}`);
-        if (bar && count) {
-          bar.style.width = pct + "%";
-          count.innerText = `${pct}% (${votes[i]} صوت)`;
+                data.rooms.forEach(room => {
+                    container.innerHTML += `
+                        <div class="room-card" onclick="joinRoom('${room.code}', '${room.title}')">
+                            <div class="room-header">
+                                <span>${room.platform}</span>
+                                <span>👁️ ${room.viewers}</span>
+                            </div>
+                            <div class="room-title">${room.title}</div>
+                            <button class="btn btn-secondary" style="width: 100%;">دخول الغرفة</button>
+                        </div>
+                    `;
+                });
+            } catch (e) {
+                console.error("فشل جلب الغرفة العامة", e);
+            }
         }
-      }
 
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: "VOTE", value: index + 1 }));
-      }
-    }
+        async function checkUserAuth() {
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/me`);
+                const data = await res.json();
+                if (data.authenticated) {
+                    document.getElementById("loginBtn").innerText = data.user.displayName;
+                    currentUser = data.user.displayName;
+                }
+            } catch (e) {}
+        }
 
-    function submitGuess() {
-      const val = document.getElementById('guessInput').value;
-      const feedback = document.getElementById('guessFeedback');
-      
-      if (!val) return;
+        function loginOAuth(platform) {
+            window.location.href = `${API_BASE}/api/oauth/${platform}/start`;
+        }
 
-      if (parseInt(val) === 42) {
-        feedback.innerHTML = `<span style="color: #00ff66;">مبروك! التخمين صحيح 🎉</span>`;
-      } else if (parseInt(val) < 42) {
-        feedback.innerHTML = `<span style="color: var(--accent-gold);">الرقم المطلوب أكبر ⬆️</span>`;
-      } else {
-        feedback.innerHTML = `<span style="color: var(--accent-primary);">الرقم المطلوب أصغر ⬇️</span>`;
-      }
-    }
+        // --- Room Creation & Joining ---
+        function selectPlatform(element, platform) {
+            document.querySelectorAll(".platform-btn").forEach(btn => btn.classList.remove("active"));
+            element.classList.add("active");
+            selectedPlatform = platform;
+        }
 
-    function submitWord() {
-      const val = document.getElementById('wordInput').value.trim();
-      if (val === "كوكيت" || val === "تيكتوك") {
-        alert("إجابة صحيحة وممتازة! تمت إضافة النقاط لحسابك.");
-      } else {
-        alert("حاول مرة أخرى!");
-      }
-    }
+        async function submitCreateRoom() {
+            const title = document.getElementById("streamTitle").value || "بث KOTCHA التفاعلي";
+            const gameType = document.getElementById("gameType").value;
 
-    // ============================================================
-    // CHAT SYSTEM LOGIC
-    // ============================================================
-    function sendChatMessage() {
-      const input = document.getElementById("chatInput");
-      const msg = input.value.trim();
-      if (!msg) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/rooms/create`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ title, gameType, platform: selectedPlatform })
+                });
 
-      const chatObj = {
-        user: "أنت (المشاهد)",
-        message: msg,
-        platform: "kotcha",
-        isVip: true
-      };
+                const data = await res.json();
+                if (data.success) {
+                    closeModal("createModal");
+                    joinRoom(data.room.code, data.room.title);
+                }
+            } catch (e) {
+                alert("حدث خطأ أثناء إنشاء الغرفة");
+            }
+        }
 
-      renderChatMessage(chatObj);
-      input.value = "";
+        function joinRoom(roomCode, title) {
+            document.getElementById("mainDashboard").style.display = "none";
+            document.getElementById("liveArena").style.display = "grid";
+            document.getElementById("currentRoomTitle").innerText = title;
 
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: "CHAT_MESSAGE", message: msg }));
-      }
-    }
+            // Connect WebSocket Cleanly via WebServer Bridge
+            const wsUrl = `wss://kotcha.ig999x.workers.dev/api/ws?code=${roomCode}`;
+            activeWS = new WebSocket(wsUrl);
 
-    function handleChatKey(e) {
-      if (e.key === "Enter") {
-        sendChatMessage();
-      }
-    }
+            activeWS.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === "NEW_CHAT") {
+                    appendChat(data.user, data.text);
+                }
+                if (data.type === "GAME_UPDATE") {
+                    appendChat("النظام 🤖", "تم تحديث نقاط اللعبة!");
+                }
+            };
+        }
 
-    function renderChatMessage(data) {
-      const chatBox = document.getElementById("chatBox");
-      const msgDiv = document.createElement("div");
-      msgDiv.className = `chat-msg ${data.isVip ? 'vip' : (data.platform || 'kotcha')}`;
+        // --- Real-time Actions ---
+        function sendChatMessage() {
+            const input = document.getElementById("chatInput");
+            if (input.value.trim() && activeWS) {
+                activeWS.send(JSON.stringify({
+                    type: "CHAT_MESSAGE",
+                    user: currentUser,
+                    text: input.value
+                }));
+                input.value = "";
+            }
+        }
 
-      msgDiv.innerHTML = `
-        <div class="chat-user">
-          ${data.isVip ? '<span class="chat-badge">VIP</span>' : ''}
-          ${data.user}
-        </div>
-        ${data.message}
-      `;
+        function triggerGameAction() {
+            if (activeWS) {
+                activeWS.send(JSON.stringify({
+                    type: "PLAYER_ACTION",
+                    user: currentUser,
+                    points: 100
+                }));
+            }
+        }
 
-      chatBox.appendChild(msgDiv);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
+        function appendChat(user, text) {
+            const box = document.getElementById("chatBox");
+            box.innerHTML += `<div><strong>${user}:</strong> ${text}</div>`;
+            box.scrollTop = box.scrollHeight;
+        }
 
-    // ============================================================
-    // MODAL CONTROLS
-    // ============================================================
-    function toggleSubModal() {
-      const modal = document.getElementById("subModal");
-      modal.classList.toggle("active");
-    }
-
-    function confirmSub() {
-      alert("شكرًا لدعمك البث! تم تفعيل اشتراك VIP بنجاح 🎉");
-      toggleSubModal();
-    }
-  </script>
+        function openModal(id) { document.getElementById(id).style.display = "flex"; }
+        function closeModal(id) { document.getElementById(id).style.display = "none"; }
+    </script>
 </body>
 </html>
